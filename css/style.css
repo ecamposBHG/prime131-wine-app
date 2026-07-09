@@ -1,0 +1,178 @@
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --sumi-900: #0F0E0D;
+  --sumi-700: #1B1918;
+  --sumi-500: #3E2A1E;
+  --washi-100: #F5F1E8;
+  --washi-200: #E3DDD0;
+  --washi-300: #D3CBB8;
+  --shoyu-700: #2A1C13;
+  --shoyu-500: #3E2A1E;
+  --shoyu-300: #8A7A6C;
+  --bronze-600: #8F5D2C;
+  --bronze-500: #B1743A;
+  --bronze-200: #E8D2B8;
+  --wasabi-500: #5C6E4F;
+
+  --font-display: 'Shippori Mincho', serif;
+  --font-body: 'Inter', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0;
+  background: var(--washi-100);
+  color: var(--shoyu-700);
+  font-family: var(--font-body);
+  -webkit-tap-highlight-color: transparent;
+}
+
+#app {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding: 16px 16px 32px;
+  display: flex;
+  flex-direction: column;
+}
+
+button, input {
+  font-family: var(--font-body);
+}
+
+/* Header / nav */
+.app-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+}
+.back-btn {
+  background: none; border: none; color: var(--shoyu-700);
+  font-size: 20px; padding: 4px; cursor: pointer; line-height: 1;
+}
+.header-title {
+  font-family: var(--font-body); font-size: 14px; font-weight: 600;
+  color: var(--shoyu-700); margin: 0;
+}
+.section-label {
+  font-family: var(--font-mono); font-size: 9px; font-weight: 500;
+  color: var(--shoyu-300); text-transform: uppercase; letter-spacing: 0.5px;
+  margin: 16px 0 6px;
+}
+.section-label:first-child { margin-top: 0; }
+
+/* Home screen */
+.home-hero { text-align: center; margin: 24px 0 28px; }
+.home-stamp { margin: 0 auto 10px; display: block; }
+.home-title {
+  font-family: var(--font-mono); font-size: 10px; color: var(--shoyu-300);
+  letter-spacing: 1.5px; text-transform: uppercase; margin: 0;
+}
+.home-options { display: flex; flex-direction: column; gap: 10px; }
+.home-option {
+  background: var(--washi-100); border: 1px solid var(--washi-300);
+  border-radius: 12px; padding: 18px; text-align: center; cursor: pointer;
+}
+.home-option i { font-size: 24px; color: var(--shoyu-700); }
+.home-option p {
+  font-family: var(--font-body); font-size: 14px; font-weight: 500;
+  color: var(--shoyu-700); margin: 8px 0 0;
+}
+
+/* Search input */
+.search-input {
+  width: 100%; background: var(--washi-100); border: 1px solid var(--washi-300);
+  border-radius: 8px; padding: 9px 12px; font-size: 13px; color: var(--shoyu-700);
+  margin-bottom: 10px;
+}
+.search-input::placeholder { color: var(--shoyu-300); }
+
+/* List rows */
+.list-row {
+  background: var(--washi-100); border: 1px solid var(--washi-300);
+  border-radius: 6px; padding: 10px 12px; margin-bottom: 6px;
+  font-size: 13px; color: var(--shoyu-700); cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.list-row.active {
+  background: var(--bronze-200); border-color: var(--bronze-500);
+}
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--bronze-500); flex-shrink: 0; }
+.dot.wasabi { background: var(--wasabi-500); }
+
+/* Nav carousel chips */
+.nav-chips {
+  display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px;
+  margin-bottom: 12px; border-bottom: 1px solid var(--washi-300);
+}
+.nav-chip {
+  font-family: var(--font-mono); font-size: 9px; padding: 4px 10px;
+  border-radius: 12px; background: var(--washi-200); color: var(--shoyu-300);
+  white-space: nowrap; cursor: pointer; border: none; flex-shrink: 0;
+}
+.nav-chip.active { background: var(--bronze-500); color: var(--shoyu-700); }
+
+/* Wine / dish hero header */
+.hero-name {
+  font-family: var(--font-display); font-size: 22px; font-weight: 500;
+  color: var(--shoyu-700); margin: 0 0 4px; line-height: 1.25;
+}
+.hero-meta { font-size: 12px; color: var(--shoyu-300); margin: 0 0 2px; }
+
+/* Pairing pills */
+.pairs-label {
+  font-family: var(--font-mono); font-size: 9px; color: var(--shoyu-300);
+  text-transform: uppercase; letter-spacing: 0.5px; margin: 14px 0 8px;
+}
+.pill-row { display: flex; flex-wrap: wrap; gap: 7px; }
+.pill {
+  font-family: var(--font-body); font-size: 12px; font-weight: 500;
+  padding: 7px 13px; border-radius: 16px; background: var(--washi-100);
+  border: 1px solid var(--shoyu-300); color: var(--shoyu-700); cursor: pointer;
+}
+.pill.active { background: var(--bronze-600); border-color: var(--bronze-600); color: var(--washi-100); }
+
+/* Flip card */
+.flipcard { perspective: 1200px; height: 250px; margin-top: 16px; cursor: pointer; }
+.flipcard-inner {
+  position: relative; width: 100%; height: 100%;
+  transition: transform 0.5s; transform-style: preserve-3d;
+}
+.flipcard.flipped .flipcard-inner { transform: rotateY(180deg); }
+.flipface {
+  position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+  border-radius: 12px; padding: 16px; overflow: hidden;
+}
+.flipface.front { background: var(--sumi-700); color: var(--washi-100); }
+.flipface.back { background: var(--shoyu-500); color: var(--washi-100); transform: rotateY(180deg); }
+.flip-label {
+  font-family: var(--font-mono); font-size: 9px; color: var(--bronze-500);
+  text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 10px;
+}
+.flip-notes { font-size: 12px; color: var(--washi-100); margin: 0 0 12px; line-height: 1.5; }
+.bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.bar-label { font-family: var(--font-mono); font-size: 9px; color: var(--washi-200); width: 64px; flex-shrink: 0; }
+.bar-dots { font-size: 12px; color: var(--bronze-500); letter-spacing: 2px; }
+.back-line { font-size: 11px; color: var(--washi-100); margin: 0 0 8px; line-height: 1.5; }
+.back-line b { color: #D9B98A; }
+.arsenal-block {
+  background: var(--bronze-500); border-radius: 8px; padding: 9px 11px; margin-top: auto;
+}
+.arsenal-label { font-family: var(--font-mono); font-size: 8px; color: var(--shoyu-700); opacity: 0.75; margin: 0 0 3px; }
+.arsenal-text { font-size: 11px; color: var(--shoyu-700); margin: 0; }
+
+.flip-hint { text-align: center; font-family: var(--font-mono); font-size: 9px; color: var(--shoyu-300); margin-top: 8px; }
+
+.structure-inline { display: flex; align-items: center; gap: 5px; margin-top: 10px; }
+.structure-inline span.label { font-family: var(--font-mono); font-size: 9px; color: var(--shoyu-300); text-transform: uppercase; }
+
+.progress-footer {
+  text-align: center; font-family: var(--font-mono); font-size: 9px;
+  color: var(--shoyu-300); margin-top: 16px;
+}
+
+.empty-note {
+  font-size: 12px; color: var(--shoyu-300); text-align: center; padding: 24px 0;
+}

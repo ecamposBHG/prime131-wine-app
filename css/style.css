@@ -158,6 +158,11 @@ button, input {
 .back-line { font-size: 13px; color: var(--washi-100); margin: 0 0 14px; line-height: 1.55; }
 .back-line b { color: #D9B98A; display: block; font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
 .story-text { font-size: 14px; color: var(--washi-100); line-height: 1.65; margin: 0; }
+.face-pill {
+  display: inline-block; font-family: var(--font-body); font-size: 11px;
+  padding: 5px 11px; border-radius: 14px; margin: 0 6px 6px 0;
+  background: var(--sumi-900); border: 1px solid var(--shoyu-500); color: var(--washi-100);
+}
 .arsenal-block {
   background: var(--bronze-500); border-radius: 10px; padding: 12px 14px; margin-top: 16px;
 }

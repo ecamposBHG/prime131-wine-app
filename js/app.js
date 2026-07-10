@@ -77,10 +77,9 @@ function guestFit(wine) {
 function buildFaceHTML(wine, similar, idx) {
   if (idx === 0) {
     return `
-      <p class="flip-label">Flavor profile &middot; 1/3 &middot; tap to flip</p>
-      <p class="flavor-tags">${wine.flavorTags.join(" &ndash; ")}</p>
-      <p class="flip-label" style="margin-top:14px;">Structure</p>
-      ${structureBars(wine.structure)}
+      <p class="flip-label">Sell it &middot; 1/3 &middot; tap to flip</p>
+      <p class="back-line"><b>Guest description:</b> ${wine.guestDescription}</p>
+      <p class="back-line"><b>Three selling points:</b> ${wine.sellingPoints.join(" &middot; ")}</p>
       <div class="arsenal-block">
         <p class="arsenal-label">Table-side line</p>
         <p class="arsenal-text">${wine.arsenal}</p>
@@ -88,19 +87,21 @@ function buildFaceHTML(wine, similar, idx) {
     `;
   } else if (idx === 1) {
     return `
-      <p class="flip-label">Producer &amp; details &middot; 2/3 &middot; tap to flip</p>
-      <p class="back-line"><b>Producer:</b> ${wine.producer}</p>
-      <p class="back-line"><b>Winemaker:</b> ${wine.winemaker}</p>
-      <p class="back-line"><b>Fun fact 1:</b> ${wine.funFact}</p>
-      <p class="back-line"><b>Fun fact 2:</b> ${wine.funFact2}</p>
-      ${similar ? `<p class="back-line"><b>Similar pour:</b> ${similar.name}</p>` : ""}
+      <p class="flip-label">Understand it &middot; 2/3 &middot; tap to flip</p>
+      <p class="back-line"><b>Winemaking note:</b> ${wine.winemakingNote}</p>
+      <p class="flip-label" style="margin-top:4px; margin-bottom:6px;">Flavor profile</p>
+      <div class="pill-row" style="margin-bottom:10px;">${wine.flavorTags.map(t => `<span class="face-pill">${t}</span>`).join("")}</div>
+      ${structureBars(wine.structure)}
+      ${similar ? `<p class="back-line" style="margin-top:12px;"><b>Similar pour:</b> ${similar.name}</p>` : ""}
     `;
   } else {
     return `
-      <p class="flip-label">Short story &middot; 3/3 &middot; tap to flip</p>
-      <p class="story-text">${wine.shortStory}</p>
-      <p class="flip-label" style="margin-top:18px;">Great for</p>
-      <p class="story-text">${guestFit(wine)}</p>
+      <p class="flip-label">Sommelier knowledge &middot; 3/3 &middot; tap to flip</p>
+      <p class="back-line"><b>Fun fact 1:</b> ${wine.funFact}</p>
+      <p class="back-line"><b>Fun fact 2:</b> ${wine.funFact2}</p>
+      <p class="back-line"><b>Short story:</b> ${wine.shortStory}</p>
+      <p class="back-line"><b>The moment:</b> ${wine.moment}</p>
+      <p class="back-line"><b>The memory:</b> ${wine.memory}</p>
     `;
   }
 }
@@ -304,23 +305,40 @@ function renderNavChips(activeWineId, onSelect) {
   return wrap;
 }
 
-function renderWineCardBody(wine) {
-  const container = document.createElement("div");
+function renderHeroHeader(wine) {
+  const frag = document.createElement("div");
 
   const heroName = document.createElement("p");
   heroName.className = "hero-name";
   heroName.textContent = wine.name;
-  container.appendChild(heroName);
+  frag.appendChild(heroName);
 
   const meta1 = document.createElement("p");
   meta1.className = "hero-meta";
   meta1.textContent = wine.grape;
-  container.appendChild(meta1);
+  frag.appendChild(meta1);
 
   const meta2 = document.createElement("p");
   meta2.className = "hero-meta";
   meta2.textContent = wine.region;
-  container.appendChild(meta2);
+  frag.appendChild(meta2);
+
+  const meta3 = document.createElement("p");
+  meta3.className = "hero-meta";
+  meta3.textContent = "Producer: " + wine.producer;
+  frag.appendChild(meta3);
+
+  const meta4 = document.createElement("p");
+  meta4.className = "hero-meta";
+  meta4.textContent = "Winemaker: " + wine.winemaker;
+  frag.appendChild(meta4);
+
+  return frag;
+}
+
+function renderWineCardBody(wine) {
+  const container = document.createElement("div");
+  container.appendChild(renderHeroHeader(wine));
 
   const pairsLabel = document.createElement("p");
   pairsLabel.className = "pairs-label";
@@ -389,15 +407,59 @@ function renderStudyCard(wineId) {
   }, { once: true });
 }
 
+function simpleHash(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) { h = (h * 31 + str.charCodeAt(i)) >>> 0; }
+  return h;
+}
+
 function pairingReason(wine, dish) {
-  const reasons = [];
-  if (wine.structure.acidity >= 4) reasons.push("bright acidity that cuts through richness");
-  if (wine.structure.tannin >= 4) reasons.push("firm tannin that stands up to char and fat");
-  if (wine.structure.body >= 4) reasons.push("a full body that won't get lost next to a bold dish");
-  if (wine.structure.body <= 2) reasons.push("a lighter body that won't overpower delicate flavors");
-  if (wine.style === "sparkling" || wine.style === "sake") reasons.push("clean, refreshing character built for raw and briny flavors");
-  const reasonText = reasons.length ? reasons.join(" and ") : "a flavor profile that complements the dish without competing with it";
-  return `${wine.name} pairs with ${dish.name} because of its ${reasonText}.`;
+  const s = wine.structure;
+  const pick = (arr) => arr[simpleHash(wine.id + dish.id) % arr.length];
+
+  if (s.tannin >= 4) {
+    return pick([
+      `The tannin here is built for this &ndash; it grabs onto the richness of the ${dish.name.toLowerCase()} while the char pulls out the wine's own smoky oak notes. Neither one has to compete.`,
+      `This is a wine that wants fat and char. Order it with the ${dish.name} and the tannin softens right up against the crust, instead of feeling sharp on its own.`,
+      `Big tannin needs something to grip onto &ndash; the ${dish.name} gives it exactly that, and the wine returns the favor by cutting straight through the richness.`
+    ]);
+  }
+  if (s.acidity >= 4 && (dish.section === "Raw Bar" || dish.section === "Sushi" || dish.section === "Sushi Rolls")) {
+    return pick([
+      `Bright acidity is the whole point here &ndash; it mirrors the citrus and salinity already on the plate instead of fighting it.`,
+      `This wine doesn't try to outshine the ${dish.name}, it just sharpens it. The acid lifts the dish rather than sitting heavy next to it.`,
+      `Raw fish wants a wine that gets out of the way and adds lift &ndash; that's exactly what this acidity does here.`
+    ]);
+  }
+  if (s.acidity >= 4 && s.body <= 2) {
+    return pick([
+      `Light and taut, this wine refreshes the palate between bites rather than trying to compete with the dish.`,
+      `Nothing about this pour is trying to dominate the plate &ndash; it's here to cleanse and reset, bite after bite.`
+    ]);
+  }
+  if (s.body >= 4) {
+    return pick([
+      `This has the weight to match the ${dish.name} pound for pound &ndash; neither the dish nor the wine gets lost next to the other.`,
+      `A lighter wine would disappear next to this dish. This one has the density to hold its ground.`,
+      `Richness meets richness here &ndash; the wine's full body matches the dish instead of getting overwhelmed by it.`
+    ]);
+  }
+  if (s.body <= 2) {
+    return pick([
+      `This stays out of the way. It's light enough that the dish leads and the wine just supports it.`,
+      `A heavier wine would bury this dish &ndash; this one lets the food do the talking.`
+    ]);
+  }
+  if (wine.style === "sparkling" || wine.style === "sake") {
+    return pick([
+      `The bubbles do the work here, resetting the palate between bites instead of layering more richness onto the plate.`,
+      `Clean and refreshing by design &ndash; built to sit alongside delicate flavors, not cover them up.`
+    ]);
+  }
+  return pick([
+    `Nothing about this pairing fights for attention &ndash; the wine's flavor profile sits comfortably alongside the dish rather than competing with it.`,
+    `This is a quiet, easy match &ndash; complementary flavors, no sharp edges on either side.`
+  ]);
 }
 
 function renderWineDetailWithPairing(wineId) {
@@ -406,20 +468,7 @@ function renderWineDetailWithPairing(wineId) {
   header("Pair wine &#8594; food");
 
   const container = document.createElement("div");
-  const heroName = document.createElement("p");
-  heroName.className = "hero-name";
-  heroName.textContent = wine.name;
-  container.appendChild(heroName);
-
-  const meta1 = document.createElement("p");
-  meta1.className = "hero-meta";
-  meta1.textContent = wine.grape;
-  container.appendChild(meta1);
-
-  const meta2 = document.createElement("p");
-  meta2.className = "hero-meta";
-  meta2.textContent = wine.region;
-  container.appendChild(meta2);
+  container.appendChild(renderHeroHeader(wine));
 
   const pairsLabel = document.createElement("p");
   pairsLabel.className = "pairs-label";

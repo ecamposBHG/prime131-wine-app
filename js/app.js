@@ -77,9 +77,12 @@ function guestFit(wine) {
 function buildFaceHTML(wine, similar, idx) {
   if (idx === 0) {
     return `
-      <p class="flip-label">Sell it &middot; 1/3 &middot; tap to flip</p>
-      <p class="back-line"><b>Guest description:</b> ${wine.guestDescription}</p>
-      <p class="back-line"><b>Three selling points:</b> ${wine.sellingPoints.join(" &middot; ")}</p>
+      <p class="flip-label">1/3</p>
+      <p class="face-title">Sell it</p>
+      <p class="face-h3"><span class="ic">&#128172;</span> Guest description</p>
+      <p class="face-desc">${wine.guestDescription}</p>
+      <p class="face-h3"><span class="ic">&#10003;</span> Three selling points</p>
+      ${wine.sellingPoints.map(p => `<div class="point-row"><span class="ic">&#10003;</span><span>${p}</span></div>`).join("")}
       <div class="arsenal-block">
         <p class="arsenal-label">Table-side line</p>
         <p class="arsenal-text">${wine.arsenal}</p>
@@ -87,21 +90,29 @@ function buildFaceHTML(wine, similar, idx) {
     `;
   } else if (idx === 1) {
     return `
-      <p class="flip-label">Understand it &middot; 2/3 &middot; tap to flip</p>
-      <p class="back-line"><b>Winemaking note:</b> ${wine.winemakingNote}</p>
-      <p class="flip-label" style="margin-top:4px; margin-bottom:6px;">Flavor profile</p>
-      <div class="pill-row" style="margin-bottom:10px;">${wine.flavorTags.map(t => `<span class="face-pill">${t}</span>`).join("")}</div>
+      <p class="flip-label">2/3</p>
+      <p class="face-title">Understand it</p>
+      <p class="face-h3"><span class="ic">&#127866;</span> Winemaking note</p>
+      <p class="face-desc" style="margin-bottom:14px;">${wine.winemakingNote}</p>
+      <p class="face-h3"><span class="ic">&#127815;</span> Flavor profile</p>
+      <div class="flavor-grid">${wine.flavorTags.map(t => `<div class="flavor-item"><div class="icon">${getFlavorIcon(t)}</div><p>${t}</p></div>`).join("")}</div>
+      <p class="face-h3"><span class="ic">&#128202;</span> Structure</p>
       ${structureBars(wine.structure)}
-      ${similar ? `<p class="back-line" style="margin-top:12px;"><b>Similar pour:</b> ${similar.name}</p>` : ""}
+      ${similar ? `<p class="back-line" style="margin-top:8px;"><b>Similar pour</b>${similar.name}</p>` : ""}
     `;
   } else {
     return `
-      <p class="flip-label">Sommelier knowledge &middot; 3/3 &middot; tap to flip</p>
-      <p class="back-line"><b>Fun fact 1:</b> ${wine.funFact}</p>
-      <p class="back-line"><b>Fun fact 2:</b> ${wine.funFact2}</p>
-      <p class="back-line"><b>Short story:</b> ${wine.shortStory}</p>
-      <p class="back-line"><b>The moment:</b> ${wine.moment}</p>
-      <p class="back-line"><b>The memory:</b> ${wine.memory}</p>
+      <p class="flip-label">3/3</p>
+      <p class="face-title">Sommelier knowledge</p>
+      <p class="face-h3"><span class="ic">&#10024;</span> Fun facts</p>
+      <div class="fact-block"><p>${wine.funFact}</p></div>
+      <div class="fact-block"><p>${wine.funFact2}</p></div>
+      <p class="face-h3"><span class="ic">&#128214;</span> Short story</p>
+      <p class="face-desc" style="margin-bottom:14px;">${wine.shortStory}</p>
+      <p class="face-h3"><span class="ic">&#128278;</span> The moment</p>
+      <p class="face-desc">${wine.moment}</p>
+      <p class="face-h3"><span class="ic">&#128142;</span> The memory</p>
+      <p class="face-desc">${wine.memory}</p>
     `;
   }
 }
@@ -135,20 +146,52 @@ function similarPour(wine) {
   return sameStyle[0];
 }
 
+const WSET_BANDS = {
+  sweetness: ["Dry", "Off-Dry", "Medium-Dry", "Medium-Sweet", "Sweet"],
+  acidity: ["Low", "Medium(-)", "Medium", "Medium(+)", "High"],
+  tannin: ["Low", "Medium(-)", "Medium", "Medium(+)", "High"],
+  alcohol: ["Low", "Medium(-)", "Medium", "Medium(+)", "High"],
+  body: ["Light", "Medium(-)", "Medium", "Medium(+)", "Full"]
+};
+
 function structureBars(structure) {
-  const rows = [
-    ["SWEETNESS", structure.sweetness],
-    ["ACIDITY", structure.acidity],
-    ["TANNIN", structure.tannin],
-    ["ALCOHOL", structure.alcohol],
-    ["BODY", structure.body]
-  ];
-  return rows.map(([label, val]) => {
-    if (label === "TANNIN" && val === 0) return "";
-    const dots = "●".repeat(val) + "○".repeat(5 - val);
-    return `<div class="bar-row"><span class="bar-label">${label}</span><span class="bar-dots">${dots}</span></div>`;
+  const order = ["sweetness", "acidity", "tannin", "alcohol", "body"];
+  return order.map((key) => {
+    const val = structure[key];
+    if (key === "tannin" && val === 0) return "";
+    const band = WSET_BANDS[key][val - 1] || WSET_BANDS[key][0];
+    const width = val * 20;
+    return `<div class="bar-block"><div class="bar-track"><div class="bar-fill" style="width:${width}%;"></div></div><p>${band} ${key === "sweetness" ? "" : key === "body" ? "Body" : key.charAt(0).toUpperCase() + key.slice(1)}</p></div>`;
   }).join("");
 }
+
+const FLAVOR_ICON_MAP = [
+  [["berry", "currant", "plum", "cassis"], "\u{1F347}"],
+  [["cherry", "strawberry", "raspberry", "cranberry"], "\u{1F352}"],
+  [["citrus", "lemon", "lime", "zest"], "\u{1F34B}"],
+  [["peach", "apple"], "\u{1F34F}"],
+  [["tropical", "pineapple"], "\u{1F34D}"],
+  [["melon", "honeydew", "lychee", "pear"], "\u{1F348}"],
+  [["flower", "honeysuckle", "violet", "floral"], "\u{1F338}"],
+  [["mocha", "cocoa", "chocolate", "coffee"], "\u2615"],
+  [["oak", "cedar", "vanilla", "spice", "pepper"], "\u{1FAB5}"],
+  [["earth", "forest", "herb", "garrigue", "mineral", "stone", "flint", "tar", "savory"], "\u{1F33F}"],
+  [["brioche", "toast", "bread", "chalk"], "\u{1F950}"]
+];
+function getFlavorIcon(tag) {
+  const lower = tag.toLowerCase();
+  for (const [keywords, icon] of FLAVOR_ICON_MAP) {
+    if (keywords.some(k => lower.includes(k))) return icon;
+  }
+  return "\u{1F377}";
+}
+
+const SECTION_ICON_MAP = {
+  "Raw Bar": "\u{1F9AA}", "Starters": "\u{1F961}", "Soups & Salads": "\u{1F957}",
+  "Entr\u00E9es": "\u{1F37D}\uFE0F", "Sushi": "\u{1F363}", "Sushi Rolls": "\u{1F363}",
+  "Sides": "\u{1F35F}", "Steaks": "\u{1F969}"
+};
+function getSectionIcon(section) { return SECTION_ICON_MAP[section] || "\u{1F37D}\uFE0F"; }
 
 function render() {
   app.innerHTML = "";
@@ -190,9 +233,18 @@ function renderHome() {
   const options = document.createElement("div");
   options.className = "home-options";
   options.innerHTML = `
-    <div class="home-option" data-go="study"><i class="ti">&#128214;</i><p>Study wines</p></div>
-    <div class="home-option" data-go="pairwf"><i class="ti">&#127863;</i><p>Pair wine &#8594; food</p></div>
-    <div class="home-option" data-go="pairfw"><i class="ti">&#127860;</i><p>Pair food &#8594; wine</p></div>
+    <div class="home-option" data-go="study">
+      <div class="home-icon-circle">&#128214;</div>
+      <div class="home-option-text"><p>Study wines</p><span>Learn the full list, one at a time</span></div>
+    </div>
+    <div class="home-option" data-go="pairwf">
+      <div class="home-icon-circle">&#127863;</div>
+      <div class="home-option-text"><p>Pair wine &#8594; food</p><span>Start from the bottle</span></div>
+    </div>
+    <div class="home-option" data-go="pairfw">
+      <div class="home-icon-circle">&#127860;</div>
+      <div class="home-option-text"><p>Pair food &#8594; wine</p><span>Start from the dish</span></div>
+    </div>
   `;
   options.querySelector('[data-go="study"]').onclick = () => go("study-list");
   options.querySelector('[data-go="pairwf"]').onclick = () => go("pairwf-list");
@@ -224,7 +276,7 @@ function renderSearchableWineList(onSelect, placeholder) {
       wines.forEach(w => {
         const row = document.createElement("div");
         row.className = "list-row";
-        row.innerHTML = `<span>${w.name}</span>`;
+        row.innerHTML = `<span class="list-row-main"><span class="style-dot ${w.style}"></span>${w.name}</span>`;
         row.onclick = () => onSelect(w.id);
         listWrap.appendChild(row);
       });
@@ -278,7 +330,7 @@ function renderPairFoodWineList() {
       dishes.forEach(d => {
         const row = document.createElement("div");
         row.className = "list-row";
-        row.innerHTML = `<span>${d.name}</span>`;
+        row.innerHTML = `<span class="list-row-main"><span class="dish-icon">${getSectionIcon(d.section)}</span>${d.name}</span>`;
         row.onclick = () => go("dish-detail", { dishId: d.id });
         listWrap.appendChild(row);
       });
@@ -324,12 +376,12 @@ function renderHeroHeader(wine) {
   frag.appendChild(meta2);
 
   const meta3 = document.createElement("p");
-  meta3.className = "hero-meta";
+  meta3.className = "hero-meta strong";
   meta3.textContent = "Producer: " + wine.producer;
   frag.appendChild(meta3);
 
   const meta4 = document.createElement("p");
-  meta4.className = "hero-meta";
+  meta4.className = "hero-meta strong";
   meta4.textContent = "Winemaker: " + wine.winemaker;
   frag.appendChild(meta4);
 
@@ -342,7 +394,7 @@ function renderWineCardBody(wine) {
 
   const pairsLabel = document.createElement("p");
   pairsLabel.className = "pairs-label";
-  pairsLabel.textContent = "Pairs with";
+  pairsLabel.innerHTML = `<span class="ic">&#127860;</span>Pairs with`;
   container.appendChild(pairsLabel);
 
   const pillRow = document.createElement("div");
@@ -418,48 +470,48 @@ function pairingReason(wine, dish) {
   const pick = (arr) => arr[simpleHash(wine.id + dish.id) % arr.length];
 
   if (s.tannin >= 4) {
-    return pick([
+    return { trait: "tannin", value: s.tannin, text: pick([
       `The tannin here is built for this &ndash; it grabs onto the richness of the ${dish.name.toLowerCase()} while the char pulls out the wine's own smoky oak notes. Neither one has to compete.`,
       `This is a wine that wants fat and char. Order it with the ${dish.name} and the tannin softens right up against the crust, instead of feeling sharp on its own.`,
       `Big tannin needs something to grip onto &ndash; the ${dish.name} gives it exactly that, and the wine returns the favor by cutting straight through the richness.`
-    ]);
+    ])};
   }
   if (s.acidity >= 4 && (dish.section === "Raw Bar" || dish.section === "Sushi" || dish.section === "Sushi Rolls")) {
-    return pick([
+    return { trait: "acidity", value: s.acidity, text: pick([
       `Bright acidity is the whole point here &ndash; it mirrors the citrus and salinity already on the plate instead of fighting it.`,
       `This wine doesn't try to outshine the ${dish.name}, it just sharpens it. The acid lifts the dish rather than sitting heavy next to it.`,
       `Raw fish wants a wine that gets out of the way and adds lift &ndash; that's exactly what this acidity does here.`
-    ]);
+    ])};
   }
   if (s.acidity >= 4 && s.body <= 2) {
-    return pick([
+    return { trait: "acidity", value: s.acidity, text: pick([
       `Light and taut, this wine refreshes the palate between bites rather than trying to compete with the dish.`,
       `Nothing about this pour is trying to dominate the plate &ndash; it's here to cleanse and reset, bite after bite.`
-    ]);
+    ])};
   }
   if (s.body >= 4) {
-    return pick([
+    return { trait: "body", value: s.body, text: pick([
       `This has the weight to match the ${dish.name} pound for pound &ndash; neither the dish nor the wine gets lost next to the other.`,
       `A lighter wine would disappear next to this dish. This one has the density to hold its ground.`,
       `Richness meets richness here &ndash; the wine's full body matches the dish instead of getting overwhelmed by it.`
-    ]);
+    ])};
   }
   if (s.body <= 2) {
-    return pick([
+    return { trait: "body", value: s.body, text: pick([
       `This stays out of the way. It's light enough that the dish leads and the wine just supports it.`,
       `A heavier wine would bury this dish &ndash; this one lets the food do the talking.`
-    ]);
+    ])};
   }
   if (wine.style === "sparkling" || wine.style === "sake") {
-    return pick([
+    return { trait: "acidity", value: s.acidity, text: pick([
       `The bubbles do the work here, resetting the palate between bites instead of layering more richness onto the plate.`,
       `Clean and refreshing by design &ndash; built to sit alongside delicate flavors, not cover them up.`
-    ]);
+    ])};
   }
-  return pick([
+  return { trait: "body", value: s.body, text: pick([
     `Nothing about this pairing fights for attention &ndash; the wine's flavor profile sits comfortably alongside the dish rather than competing with it.`,
     `This is a quiet, easy match &ndash; complementary flavors, no sharp edges on either side.`
-  ]);
+  ])};
 }
 
 function renderWineDetailWithPairing(wineId) {
@@ -472,7 +524,7 @@ function renderWineDetailWithPairing(wineId) {
 
   const pairsLabel = document.createElement("p");
   pairsLabel.className = "pairs-label";
-  pairsLabel.textContent = "Pairs with";
+  pairsLabel.innerHTML = `<span class="ic">&#127860;</span>Pairs with`;
   container.appendChild(pairsLabel);
 
   const pillRow = document.createElement("div");
@@ -510,7 +562,7 @@ function renderDishDetail(dishId) {
 
   const pairsLabel = document.createElement("p");
   pairsLabel.className = "pairs-label";
-  pairsLabel.textContent = "Pairs with";
+  pairsLabel.innerHTML = `<span class="ic">&#127863;</span>Pairs with`;
   container.appendChild(pairsLabel);
 
   const pillRow = document.createElement("div");
@@ -546,11 +598,17 @@ function renderPairingExplain(wineId, dishId) {
   header("Why this pairs");
 
   const container = document.createElement("div");
+  const reason = pairingReason(wine, dish);
+  const traitBand = WSET_BANDS[reason.trait][reason.value - 1];
   container.innerHTML = `
-    <p class="hero-name" style="font-size:19px; margin-bottom:2px;">${wine.name}</p>
+    <p class="hero-name" style="font-size:19px; margin-bottom:2px; text-align:center;">${wine.name}</p>
     <p class="pairs-connector">+</p>
-    <p class="hero-name" style="font-size:19px; margin-top:2px;">${dish.name}</p>
-    <p class="pairing-reason">${pairingReason(wine, dish)}</p>
+    <p class="hero-name" style="font-size:19px; margin-top:2px; text-align:center;">${dish.name}</p>
+    <div class="mini-bar-wrap">
+      <p class="mini-bar-lbl">Driving trait &middot; ${reason.trait} (${traitBand})</p>
+      <div class="mini-track"><div class="mini-fill" style="width:${reason.value * 20}%;"></div></div>
+    </div>
+    <p class="pairing-reason">${reason.text}</p>
     <p class="pairing-reason"><b>Table-side line:</b> ${wine.arsenal}</p>
   `;
   app.appendChild(container);

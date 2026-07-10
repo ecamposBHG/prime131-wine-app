@@ -77,7 +77,7 @@ function similarPour(wine) {
 
 function structureBars(structure) {
   const rows = [
-    ["SWEET", structure.sweetness],
+    ["SWEETNESS", structure.sweetness],
     ["ACIDITY", structure.acidity],
     ["TANNIN", structure.tannin],
     ["ALCOHOL", structure.alcohol],
@@ -287,20 +287,23 @@ function renderWineCardBody(wine) {
   flipcard.innerHTML = `
     <div class="flipcard-inner">
       <div class="flipface front">
-        <p class="flip-label">Flavor &amp; structure &middot; tap to flip</p>
-        <p class="flip-notes">${wine.tastingNotes}</p>
+        <p class="flip-label">Flavor profile &middot; tap to flip</p>
+        <p class="flavor-tags">${wine.flavorTags.join(" &ndash; ")}</p>
+        <p class="flip-label" style="margin-top:14px;">Structure</p>
         ${structureBars(wine.structure)}
-        <p class="serving-note">${servingNote(wine.style)}</p>
-      </div>
-      <div class="flipface back">
-        <p class="flip-label">Producer &amp; story &middot; tap to flip</p>
-        <p class="back-line"><b>Producer:</b> ${wine.producer}</p>
-        <p class="back-line"><b>Fun fact:</b> ${wine.funFact}</p>
-        ${similar ? `<p class="back-line"><b>Similar pour:</b> if this one's out, ${similar.name} sits in the same lane.</p>` : ""}
         <div class="arsenal-block">
           <p class="arsenal-label">Table-side line</p>
           <p class="arsenal-text">${wine.arsenal}</p>
         </div>
+      </div>
+      <div class="flipface back">
+        <p class="flip-label">Producer &amp; story &middot; tap to flip</p>
+        <p class="back-line"><b>Producer:</b> ${wine.producer}</p>
+        <p class="back-line"><b>Winemaker:</b> ${wine.winemaker}</p>
+        <p class="back-line"><b>Fun fact 1:</b> ${wine.funFact}</p>
+        <p class="back-line"><b>Fun fact 2:</b> ${wine.funFact2}</p>
+        ${similar ? `<p class="back-line"><b>Similar pour:</b> ${similar.name}</p>` : ""}
+        <p class="back-line"><b>Short story:</b> ${wine.shortStory}</p>
       </div>
     </div>
   `;

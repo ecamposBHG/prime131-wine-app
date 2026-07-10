@@ -1,24 +1,32 @@
 // Prime 131 Wine App — logic
 
 const app = document.getElementById("app");
-let historyStack = [];
 let current = { view: "home", params: {} };
 
 function go(view, params = {}, pushHistory = true) {
-  if (pushHistory) historyStack.push(current);
   current = { view, params };
+  if (pushHistory) {
+    history.pushState({ view, params }, "", "");
+  } else {
+    history.replaceState({ view, params }, "", "");
+  }
   render();
 }
 
 function goBack() {
-  const prev = historyStack.pop();
-  if (prev) {
-    current = prev;
-    render();
-  } else {
-    go("home", {}, false);
-  }
+  history.back();
 }
+
+window.addEventListener("popstate", (e) => {
+  if (e.state) {
+    current = e.state;
+  } else {
+    current = { view: "home", params: {} };
+  }
+  render();
+});
+
+history.replaceState({ view: "home", params: {} }, "", "");
 
 function findWine(id) { return WINES.find(w => w.id === id); }
 function findDish(id) { return DISHES.find(d => d.id === id); }
@@ -48,6 +56,23 @@ function stampSVG(currentNum, total) {
       transform="rotate(-90 30 30)"/>
     <text x="30" y="36" text-anchor="middle" font-family="JetBrains Mono" font-size="14" fill="var(--shoyu-700)">${currentNum}</text>
   </svg>`;
+}
+
+function servingNote(style) {
+  switch (style) {
+    case "sparkling": return "Serve well-chilled, 40-45\u00B0F";
+    case "white": return "Serve chilled, 45-50\u00B0F";
+    case "red": return "Serve at cellar temp, 60-65\u00B0F";
+    case "sake": return "Serve chilled, 45-50\u00B0F";
+    case "dessert": return "Serve well-chilled, 40-45\u00B0F";
+    default: return "";
+  }
+}
+
+function similarPour(wine) {
+  const sameStyle = WINES.filter(w => w.style === wine.style && w.id !== wine.id);
+  if (!sameStyle.length) return null;
+  return sameStyle[0];
 }
 
 function structureBars(structure) {
@@ -219,7 +244,7 @@ function renderNavChips(activeWineId, onSelect) {
   return wrap;
 }
 
-function renderWineCardBody(wine, pillMode) {
+function renderWineCardBody(wine) {
   const container = document.createElement("div");
 
   const heroName = document.createElement("p");
@@ -255,6 +280,8 @@ function renderWineCardBody(wine, pillMode) {
   });
   container.appendChild(pillRow);
 
+  const similar = similarPour(wine);
+
   const flipcard = document.createElement("div");
   flipcard.className = "flipcard";
   flipcard.innerHTML = `
@@ -263,11 +290,13 @@ function renderWineCardBody(wine, pillMode) {
         <p class="flip-label">Flavor &amp; structure &middot; tap to flip</p>
         <p class="flip-notes">${wine.tastingNotes}</p>
         ${structureBars(wine.structure)}
+        <p class="serving-note">${servingNote(wine.style)}</p>
       </div>
       <div class="flipface back">
         <p class="flip-label">Producer &amp; story &middot; tap to flip</p>
         <p class="back-line"><b>Producer:</b> ${wine.producer}</p>
         <p class="back-line"><b>Fun fact:</b> ${wine.funFact}</p>
+        ${similar ? `<p class="back-line"><b>Similar pour:</b> if this one's out, ${similar.name} sits in the same lane.</p>` : ""}
         <div class="arsenal-block">
           <p class="arsenal-label">Table-side line</p>
           <p class="arsenal-text">${wine.arsenal}</p>
@@ -277,11 +306,6 @@ function renderWineCardBody(wine, pillMode) {
   `;
   flipcard.onclick = () => flipcard.classList.toggle("flipped");
   container.appendChild(flipcard);
-
-  const hint = document.createElement("p");
-  hint.className = "flip-hint";
-  hint.textContent = "tap card to flip";
-  container.appendChild(hint);
 
   return container;
 }
@@ -294,11 +318,30 @@ function renderStudyCard(wineId) {
   app.appendChild(renderNavChips(wine.id, (id) => go("study-card", { wineId: id }, false)));
   app.appendChild(renderWineCardBody(wine));
 
-  const footer = document.createElement("p");
-  footer.className = "progress-footer";
-  footer.textContent = `${idx + 1} / ${WINES.length} &middot; swipe or tap top nav`;
-  footer.innerHTML = `${idx + 1} / ${WINES.length} &middot; tap top nav for next wine`;
-  app.appendChild(footer);
+  const footerNav = document.createElement("div");
+  footerNav.className = "card-footer-nav";
+
+  const backBtn = document.createElement("button");
+  backBtn.className = "footer-btn";
+  backBtn.textContent = "\u2190 Back";
+  backBtn.disabled = idx === 0;
+  backBtn.onclick = () => go("study-card", { wineId: WINES[idx - 1].id }, false);
+
+  const homeBtn = document.createElement("button");
+  homeBtn.className = "footer-btn footer-btn-home";
+  homeBtn.textContent = "Home";
+  homeBtn.onclick = () => go("home", {});
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "footer-btn";
+  nextBtn.textContent = "Next \u2192";
+  nextBtn.disabled = idx === WINES.length - 1;
+  nextBtn.onclick = () => go("study-card", { wineId: WINES[idx + 1].id }, false);
+
+  footerNav.appendChild(backBtn);
+  footerNav.appendChild(homeBtn);
+  footerNav.appendChild(nextBtn);
+  app.appendChild(footerNav);
 
   let touchStartX = null;
   app.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; }, { once: true });

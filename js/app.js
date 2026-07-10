@@ -58,15 +58,74 @@ function stampSVG(currentNum, total) {
   </svg>`;
 }
 
-function servingNote(style) {
-  switch (style) {
-    case "sparkling": return "Serve well-chilled, 40-45\u00B0F";
-    case "white": return "Serve chilled, 45-50\u00B0F";
-    case "red": return "Serve at cellar temp, 60-65\u00B0F";
-    case "sake": return "Serve chilled, 45-50\u00B0F";
-    case "dessert": return "Serve well-chilled, 40-45\u00B0F";
-    default: return "";
+function guestFit(wine) {
+  const { body, tannin } = wine.structure;
+  if (wine.style === "sparkling") return "Celebratory moments, or any guest who wants something festive without a full glass of still wine.";
+  if (wine.style === "sake") return "Guests doing the sushi or omakase who want a pour built specifically for raw fish.";
+  if (wine.style === "white") {
+    if (body >= 4) return "Guests who usually drink red but want something rich enough to feel substantial.";
+    return "Lighter appetites, raw bar lovers, or anyone who wants a refreshing glass before the main course.";
   }
+  if (wine.style === "red") {
+    if (tannin >= 4) return "Serious steak guests who want a wine that can stand up to char, fat, and bold seasoning.";
+    if (body <= 2) return "Guests who want red wine but are ordering fish — this one won't overpower the plate.";
+    return "A dependable crowd-pleaser for guests who want red wine without a strong opinion on style.";
+  }
+  return "A flexible, food-friendly pour for most of the menu.";
+}
+
+function buildFaceHTML(wine, similar, idx) {
+  if (idx === 0) {
+    return `
+      <p class="flip-label">Flavor profile &middot; 1/3 &middot; tap to flip</p>
+      <p class="flavor-tags">${wine.flavorTags.join(" &ndash; ")}</p>
+      <p class="flip-label" style="margin-top:14px;">Structure</p>
+      ${structureBars(wine.structure)}
+      <div class="arsenal-block">
+        <p class="arsenal-label">Table-side line</p>
+        <p class="arsenal-text">${wine.arsenal}</p>
+      </div>
+    `;
+  } else if (idx === 1) {
+    return `
+      <p class="flip-label">Producer &amp; details &middot; 2/3 &middot; tap to flip</p>
+      <p class="back-line"><b>Producer:</b> ${wine.producer}</p>
+      <p class="back-line"><b>Winemaker:</b> ${wine.winemaker}</p>
+      <p class="back-line"><b>Fun fact 1:</b> ${wine.funFact}</p>
+      <p class="back-line"><b>Fun fact 2:</b> ${wine.funFact2}</p>
+      ${similar ? `<p class="back-line"><b>Similar pour:</b> ${similar.name}</p>` : ""}
+    `;
+  } else {
+    return `
+      <p class="flip-label">Short story &middot; 3/3 &middot; tap to flip</p>
+      <p class="story-text">${wine.shortStory}</p>
+      <p class="flip-label" style="margin-top:18px;">Great for</p>
+      <p class="story-text">${guestFit(wine)}</p>
+    `;
+  }
+}
+
+function renderFlipCard(wine) {
+  const similar = similarPour(wine);
+  const flipcard = document.createElement("div");
+  flipcard.className = "flipcard";
+  const inner = document.createElement("div");
+  inner.className = "flip-inner face-0";
+  inner.innerHTML = buildFaceHTML(wine, similar, 0);
+  flipcard.appendChild(inner);
+
+  let faceIndex = 0;
+  flipcard.onclick = () => {
+    flipcard.classList.add("flipping");
+    setTimeout(() => {
+      faceIndex = (faceIndex + 1) % 3;
+      inner.className = "flip-inner face-" + faceIndex;
+      inner.innerHTML = buildFaceHTML(wine, similar, faceIndex);
+      flipcard.classList.remove("flipping");
+    }, 200);
+  };
+
+  return flipcard;
 }
 
 function similarPour(wine) {
@@ -99,6 +158,7 @@ function render() {
   else if (current.view === "pairwf-detail") renderWineDetailWithPairing(current.params.wineId);
   else if (current.view === "pairfw-list") renderPairFoodWineList();
   else if (current.view === "dish-detail") renderDishDetail(current.params.dishId);
+  else if (current.view === "pairing-explain") renderPairingExplain(current.params.wineId, current.params.dishId);
   window.scrollTo(0, 0);
 }
 
@@ -279,36 +339,7 @@ function renderWineCardBody(wine) {
     pillRow.appendChild(pill);
   });
   container.appendChild(pillRow);
-
-  const similar = similarPour(wine);
-
-  const flipcard = document.createElement("div");
-  flipcard.className = "flipcard";
-  flipcard.innerHTML = `
-    <div class="flipcard-inner">
-      <div class="flipface front">
-        <p class="flip-label">Flavor profile &middot; tap to flip</p>
-        <p class="flavor-tags">${wine.flavorTags.join(" &ndash; ")}</p>
-        <p class="flip-label" style="margin-top:14px;">Structure</p>
-        ${structureBars(wine.structure)}
-        <div class="arsenal-block">
-          <p class="arsenal-label">Table-side line</p>
-          <p class="arsenal-text">${wine.arsenal}</p>
-        </div>
-      </div>
-      <div class="flipface back">
-        <p class="flip-label">Producer &amp; story &middot; tap to flip</p>
-        <p class="back-line"><b>Producer:</b> ${wine.producer}</p>
-        <p class="back-line"><b>Winemaker:</b> ${wine.winemaker}</p>
-        <p class="back-line"><b>Fun fact 1:</b> ${wine.funFact}</p>
-        <p class="back-line"><b>Fun fact 2:</b> ${wine.funFact2}</p>
-        ${similar ? `<p class="back-line"><b>Similar pour:</b> ${similar.name}</p>` : ""}
-        <p class="back-line"><b>Short story:</b> ${wine.shortStory}</p>
-      </div>
-    </div>
-  `;
-  flipcard.onclick = () => flipcard.classList.toggle("flipped");
-  container.appendChild(flipcard);
+  container.appendChild(renderFlipCard(wine));
 
   return container;
 }
@@ -358,11 +389,57 @@ function renderStudyCard(wineId) {
   }, { once: true });
 }
 
+function pairingReason(wine, dish) {
+  const reasons = [];
+  if (wine.structure.acidity >= 4) reasons.push("bright acidity that cuts through richness");
+  if (wine.structure.tannin >= 4) reasons.push("firm tannin that stands up to char and fat");
+  if (wine.structure.body >= 4) reasons.push("a full body that won't get lost next to a bold dish");
+  if (wine.structure.body <= 2) reasons.push("a lighter body that won't overpower delicate flavors");
+  if (wine.style === "sparkling" || wine.style === "sake") reasons.push("clean, refreshing character built for raw and briny flavors");
+  const reasonText = reasons.length ? reasons.join(" and ") : "a flavor profile that complements the dish without competing with it";
+  return `${wine.name} pairs with ${dish.name} because of its ${reasonText}.`;
+}
+
 function renderWineDetailWithPairing(wineId) {
   const wine = findWine(wineId);
   if (!wine) { go("pairwf-list", {}, false); return; }
   header("Pair wine &#8594; food");
-  app.appendChild(renderWineCardBody(wine));
+
+  const container = document.createElement("div");
+  const heroName = document.createElement("p");
+  heroName.className = "hero-name";
+  heroName.textContent = wine.name;
+  container.appendChild(heroName);
+
+  const meta1 = document.createElement("p");
+  meta1.className = "hero-meta";
+  meta1.textContent = wine.grape;
+  container.appendChild(meta1);
+
+  const meta2 = document.createElement("p");
+  meta2.className = "hero-meta";
+  meta2.textContent = wine.region;
+  container.appendChild(meta2);
+
+  const pairsLabel = document.createElement("p");
+  pairsLabel.className = "pairs-label";
+  pairsLabel.textContent = "Pairs with";
+  container.appendChild(pairsLabel);
+
+  const pillRow = document.createElement("div");
+  pillRow.className = "pill-row";
+  wine.pairingDishIds.forEach(dishId => {
+    const dish = findDish(dishId);
+    if (!dish) return;
+    const pill = document.createElement("button");
+    pill.className = "pill";
+    pill.textContent = dish.name;
+    pill.onclick = () => go("pairing-explain", { wineId: wine.id, dishId: dish.id });
+    pillRow.appendChild(pill);
+  });
+  container.appendChild(pillRow);
+
+  app.appendChild(container);
 }
 
 function renderDishDetail(dishId) {
@@ -396,7 +473,7 @@ function renderDishDetail(dishId) {
       const pill = document.createElement("button");
       pill.className = "pill";
       pill.textContent = wine.name;
-      pill.onclick = () => go("study-card", { wineId: wine.id });
+      pill.onclick = () => go("pairing-explain", { wineId: wine.id, dishId: dish.id });
       pillRow.appendChild(pill);
     });
   }
@@ -410,6 +487,38 @@ function renderDishDetail(dishId) {
   }
 
   app.appendChild(container);
+}
+
+function renderPairingExplain(wineId, dishId) {
+  const wine = findWine(wineId);
+  const dish = findDish(dishId);
+  if (!wine || !dish) { go("home", {}, false); return; }
+
+  header("Why this pairs");
+
+  const container = document.createElement("div");
+  container.innerHTML = `
+    <p class="hero-name" style="font-size:19px; margin-bottom:2px;">${wine.name}</p>
+    <p class="pairs-connector">+</p>
+    <p class="hero-name" style="font-size:19px; margin-top:2px;">${dish.name}</p>
+    <p class="pairing-reason">${pairingReason(wine, dish)}</p>
+    <p class="pairing-reason"><b>Table-side line:</b> ${wine.arsenal}</p>
+  `;
+  app.appendChild(container);
+
+  const linksRow = document.createElement("div");
+  linksRow.className = "card-footer-nav";
+  const wineBtn = document.createElement("button");
+  wineBtn.className = "footer-btn";
+  wineBtn.textContent = "View wine";
+  wineBtn.onclick = () => go("study-card", { wineId: wine.id });
+  const dishBtn = document.createElement("button");
+  dishBtn.className = "footer-btn";
+  dishBtn.textContent = "View dish";
+  dishBtn.onclick = () => go("dish-detail", { dishId: dish.id });
+  linksRow.appendChild(wineBtn);
+  linksRow.appendChild(dishBtn);
+  app.appendChild(linksRow);
 }
 
 render();

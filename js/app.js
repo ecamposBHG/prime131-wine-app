@@ -201,6 +201,7 @@ function render() {
   else if (current.view === "pairwf-list") renderPairWineFoodList();
   else if (current.view === "pairwf-detail") renderWineDetailWithPairing(current.params.wineId);
   else if (current.view === "pairfw-list") renderPairFoodWineList();
+  else if (current.view === "menu-list") renderMenuList();
   else if (current.view === "dish-detail") renderDishDetail(current.params.dishId);
   else if (current.view === "pairing-explain") renderPairingExplain(current.params.wineId, current.params.dishId);
   window.scrollTo(0, 0);
@@ -245,10 +246,15 @@ function renderHome() {
       <div class="home-icon-circle">&#127860;</div>
       <div class="home-option-text"><p>Pair food &#8594; wine</p><span>Start from the dish</span></div>
     </div>
+    <div class="home-option" data-go="menu">
+      <div class="home-icon-circle">&#128220;</div>
+      <div class="home-option-text"><p>Menu</p><span>Browse the full food menu</span></div>
+    </div>
   `;
   options.querySelector('[data-go="study"]').onclick = () => go("study-list");
   options.querySelector('[data-go="pairwf"]').onclick = () => go("pairwf-list");
   options.querySelector('[data-go="pairfw"]').onclick = () => go("pairfw-list");
+  options.querySelector('[data-go="menu"]').onclick = () => go("menu-list");
   app.appendChild(options);
 }
 
@@ -306,12 +312,12 @@ function renderPairWineFoodList() {
   ));
 }
 
-function renderPairFoodWineList() {
-  header("Pair food &#8594; wine");
+function renderDishList(headerTitle, searchPlaceholder) {
+  header(headerTitle);
   const wrap = document.createElement("div");
   const input = document.createElement("input");
   input.className = "search-input";
-  input.placeholder = "Search a dish";
+  input.placeholder = searchPlaceholder;
   wrap.appendChild(input);
   const listWrap = document.createElement("div");
   wrap.appendChild(listWrap);
@@ -342,6 +348,14 @@ function renderPairFoodWineList() {
   draw("");
   input.oninput = () => draw(input.value);
   app.appendChild(wrap);
+}
+
+function renderPairFoodWineList() {
+  renderDishList("Pair food &#8594; wine", "Search a dish");
+}
+
+function renderMenuList() {
+  renderDishList("Menu", "Search the menu");
 }
 
 function renderNavChips(activeWineId, onSelect) {

@@ -479,53 +479,109 @@ function simpleHash(str) {
   return h;
 }
 
-function pairingReason(wine, dish) {
-  const s = wine.structure;
-  const pick = (arr) => arr[simpleHash(wine.id + dish.id) % arr.length];
+const PAIRING_REASONS = {
+  "w1|d-oysters": "Prosecco's bubbles and light sweetness mirror the citrus in the shallot ponzu and cut straight through the brine, resetting your palate before the next shuck.",
+  "w1|d-edamame": "Simple sea-salted soybeans want a wine that's just as unfussy &ndash; Prosecco's apple and pear fruit softens the salt while the bubbles clear the palate between handfuls.",
+  "w1|d-shishitos": "The blistered char and furikake here carry a little heat and a lot of salt &ndash; Prosecco's off-dry edge and low alcohol keep that from ever tasting sharp, and the bubbles cut the sesame oil.",
 
-  if (s.tannin >= 4) {
-    return { trait: "tannin", value: s.tannin, text: pick([
-      `The tannin here is built for this &ndash; it grabs onto the richness of the ${dish.name.toLowerCase()} while the char pulls out the wine's own smoky oak notes. Neither one has to compete.`,
-      `This is a wine that wants fat and char. Order it with the ${dish.name} and the tannin softens right up against the crust, instead of feeling sharp on its own.`,
-      `Big tannin needs something to grip onto &ndash; the ${dish.name} gives it exactly that, and the wine returns the favor by cutting straight through the richness.`
-    ])};
-  }
-  if (s.acidity >= 4 && (dish.section === "Raw Bar" || dish.section === "Sushi" || dish.section === "Sushi Rolls")) {
-    return { trait: "acidity", value: s.acidity, text: pick([
-      `Bright acidity is the whole point here &ndash; it mirrors the citrus and salinity already on the plate instead of fighting it.`,
-      `This wine doesn't try to outshine the ${dish.name}, it just sharpens it. The acid lifts the dish rather than sitting heavy next to it.`,
-      `Raw fish wants a wine that gets out of the way and adds lift &ndash; that's exactly what this acidity does here.`
-    ])};
-  }
-  if (s.acidity >= 4 && s.body <= 2) {
-    return { trait: "acidity", value: s.acidity, text: pick([
-      `Light and taut, this wine refreshes the palate between bites rather than trying to compete with the dish.`,
-      `Nothing about this pour is trying to dominate the plate &ndash; it's here to cleanse and reset, bite after bite.`
-    ])};
-  }
-  if (s.body >= 4) {
-    return { trait: "body", value: s.body, text: pick([
-      `This has the weight to match the ${dish.name} pound for pound &ndash; neither the dish nor the wine gets lost next to the other.`,
-      `A lighter wine would disappear next to this dish. This one has the density to hold its ground.`,
-      `Richness meets richness here &ndash; the wine's full body matches the dish instead of getting overwhelmed by it.`
-    ])};
-  }
-  if (s.body <= 2) {
-    return { trait: "body", value: s.body, text: pick([
-      `This stays out of the way. It's light enough that the dish leads and the wine just supports it.`,
-      `A heavier wine would bury this dish &ndash; this one lets the food do the talking.`
-    ])};
-  }
-  if (wine.style === "sparkling" || wine.style === "sake") {
-    return { trait: "acidity", value: s.acidity, text: pick([
-      `The bubbles do the work here, resetting the palate between bites instead of layering more richness onto the plate.`,
-      `Clean and refreshing by design &ndash; built to sit alongside delicate flavors, not cover them up.`
-    ])};
-  }
-  return { trait: "body", value: s.body, text: pick([
-    `Nothing about this pairing fights for attention &ndash; the wine's flavor profile sits comfortably alongside the dish rather than competing with it.`,
-    `This is a quiet, easy match &ndash; complementary flavors, no sharp edges on either side.`
-  ])};
+  "w2|d-caviar": "This isn't a classic pairing by reputation alone &ndash; Telmont's own brioche and toast character (from extended lees aging) genuinely echoes the nutty, buttery pop of the sturgeon roe itself.",
+  "w2|d-shellfish-tower": "Four butter-drenched proteins in one dish need real acid to keep up &ndash; Telmont's chalky, high acidity is built for exactly this much richness without disappearing under it.",
+
+  "w3|d-tuna-tartare": "The avocado purée brings fat, the yuzu-garlic-soy dressing brings sharp acid &ndash; the rosé's red berry fruit softens that sharpness while its own acidity stays right in step with the dressing.",
+  "w3|d-yellowtail-carpaccio": "The wakamomo ponzu here is sweet-tart, built from baby Japanese peach &ndash; that's a genuine flavor echo with the wine's own strawberry and red currant fruit, not just a raw-fish default.",
+  "w3|d-seared-spicy-salmon-roll": "Seared salmon and spicy aioli bring char and richness &ndash; the wine's acid cuts both, while its red fruit stays out of the way of the ponzu's savory edge instead of competing with it.",
+
+  "w4|d-grilled-romaine": "The anchovy black garlic dressing is pungent and salty &ndash; Pinot Grigio's neutral, high-acid profile refuses to get bullied by it, letting the char on the lettuce still come through.",
+  "w4|d-fire-roasted-beets": "Sweet-earthy beets with tangy labneh and warm-spiced pistachio dukkah don't need a wine trying to match them note for note &ndash; the wine's crisp apple character is a clean contrast instead.",
+  "w4|d-branzino": "About as textbook as pairing gets: a delicate, simply grilled fish wants a delicate wine, and both just get out of the way and let the brown butter and lemon do the talking.",
+
+  "w5|d-oysters": "Same shallot ponzu as the Ruffino pairing, but Emmolo's fresh-cut herb character leans directly into the raw brine, while its citrus zest matches the orange and lemon already in the sauce.",
+  "w5|d-yellowtail-carpaccio": "Where the rosé Champagne leans into the sweetness of the wakamomo ponzu, Emmolo comes at the same dish from its herbal, stone-fruit side &ndash; a genuinely different but equally valid angle.",
+  "w5|d-crunchy-spicy-tuna-roll": "Spicy mayo, sweet eel sauce, and fermented kimchi sauce is a real flavor bomb &ndash; Emmolo's high acid and citrus don't get lost in it, they cut straight through the mayo's richness.",
+  "w5|d-131-california-roll": "A gentler roll than the crunchy tuna &ndash; crab, avocado, cucumber. Emmolo's citrus and herb notes complement the natural sweetness of the crab without overwhelming a more delicate roll.",
+
+  "w6|d-mac-cheese": "This is rich meeting rich on purpose &ndash; the sharp cheddar cream sauce and the wine's own buttery, oak-driven character come from the same place, so neither one cuts the other, they just agree.",
+  "w6|d-mashed-potato": "The richest dish on the menu &ndash; braised short rib, truffle jus, raclette melted over cream and butter. Cambria's full body means it won't get bulldozed, though the truffle's umami is working against the oak a little; this is a big-wine-big-dish match more than a precise umami answer.",
+  "w6|d-miso-cod": "The coconut lemongrass espuma actually gives Cambria something specific to grab onto &ndash; its own tropical fruit picks up the coconut directly. Real flavor bridge, though Benton-Lane remains the safer choice if the umami from the miso marinade reads assertive that night.",
+  "w6|d-wagyu-skirt": "The chili vinaigrette brings heat, the blue cheese brings funk &ndash; Cambria's roundness takes the edge off the heat while its tropical fruit plays well against the cheese instead of clashing with it.",
+
+  "w7|d-lobster": "Butter-on-butter, but not redundant &ndash; Stag's Leap's own brioche and toast character (from time in oak) genuinely echoes the richness of the garlic ponzu butter rather than just matching its weight.",
+  "w7|d-branzino": "The same fish as the Santa Margherita pairing, but here it's about the brown butter specifically &ndash; brown butter is nuttier and richer than a simple grilled preparation, and this Chardonnay's fuller body was built for that difference.",
+  "w7|d-chicken-fried-lobster": "The richest lobster preparation on the menu &ndash; fried, breaded, finished with brown butter aioli. This needs Stag's Leap's fullest body and its own toasted, brioche-like character to stand up to the fry oil.",
+
+  "w8|d-chopped-salad": "The plum vinaigrette is sweet-tart and the feta is salty &ndash; Miraval's delicate peach fruit doesn't try to compete with the plum syrup, and its bright acid sits right alongside the vinaigrette's own tang.",
+  "w8|d-naan": "Smoky babaganoush or tangy labneh are both a little heavy on their own &ndash; the rosé's floral lift keeps the whole thing feeling fresh instead of dense.",
+  "w8|d-edamame": "Same simple, salted snack as the Prosecco pairing, but Miraval's more delicate peach fruit (versus Prosecco's apple-pear) makes this the quieter, more contemplative choice rather than the celebratory one.",
+
+  "w9|d-clam-chowder": "A genuinely classic move &ndash; mineral, flinty Sancerre rosé against a cream-based seafood soup. The high acid cuts the richness while the flint in the wine echoes the chowder's own smokiness.",
+  "w9|d-shishitos": "The second shishito pairing on the list, but a different angle &ndash; Sancerre rosé's higher acid and more savory, mineral edge (versus Prosecco's fruit-forward sweetness) is the drier, more serious answer for this dish.",
+  "w9|d-hamachi": "Textbook raw-fish logic &ndash; high acid, light body, and just enough red berry fruit to add brightness without masking the natural fat in the yellowtail.",
+
+  "w10|d-branzino": "The crispy skin and brown butter here don't need to be met with force &ndash; Pinot's soft tannin means there's nothing to clash with the delicate flesh, and its acid takes care of the butter.",
+  "w10|d-miso-cod": "The strongest technical answer on the whole list for this dish &ndash; the miso's umami and the espuma's citrus both behave better against Pinot's soft tannin and bright acid than they do against a bigger wine.",
+  "w10|d-chefs-nigiri": "The fish changes daily on a chef's selection, so the wine needs to be the constant &ndash; light body and soft tannin is the safest bet across whatever's actually on the plate that night.",
+
+  "w11|d-wagyu-skirt": "The chili vinaigrette and blue cheese both bring real intensity &ndash; Flowers' earthy spice notes stand up to the char while its acid handles the vinaigrette's heat more gracefully than a bigger red would.",
+  "w11|d-short-rib": "Braised, glazed, finished with chimichurri &ndash; the wine's dark cherry fruit and moderate tannin suit the richness of a long-braised cut without the tannin overpowering meat that's already this tender.",
+  "w11|d-negi-toro-roll": "An unusual move on paper &ndash; red wine with raw fish &ndash; but fatty bluefin toro behaves more like meat than like lean sushi, and Flowers' acid cuts the fat the same way it would with duck.",
+  "w11|d-marinated-chicken": "The espelette marinade and chili-spiked potatoes bring real heat, and the double-fried potatoes bring real richness &ndash; Flowers' soft tannin won't amplify the burn, and its bright acid is exactly what cuts through the fry oil. This is also the restaurant's own tested pairing for this dish.",
+
+  "w12|d-short-rib": "Malbec's riper, jammier fruit (versus the more savory Flowers Pinot Noir also linked to this dish) makes it the bigger, more crowd-pleasing option for a guest who wants more fruit-forward richness with their short rib.",
+  "w12|d-marinated-chicken": "Still a fair pairing, though Flowers is the sharper technical answer &ndash; Malbec's slightly higher tannin makes this the pick for a guest who wants more red wine presence and isn't worried about the chili heat clashing.",
+  "w12|d-burger": "Char-grilled beef, a special sauce with real chili flakes in it &ndash; Malbec's ripe fruit and moderate tannin is a straightforward, crowd-pleasing burger match, no subtlety required.",
+
+  "w13|d-marinated-chicken": "The softest tannin of any red linked to this dish &ndash; genuinely the gentlest option if a guest is heat-sensitive and doesn't want any tannic bite stacked on top of the espelette and chili.",
+  "w13|d-bone-marrow": "Rich, fatty, finished with a sweet onion jam &ndash; Merlot's plum and cocoa notes are a classic match here, soft enough that they don't fight the almost dessert-like sweetness of the jam.",
+  "w13|d-short-rib": "The gentlest of the three short rib pairings on this list &ndash; good for a guest who wants red wine with their braise but finds big tannin off-putting against something this tender.",
+
+  "w14|d-ribeye": "The fattiest cut on the menu wants the wine with the most grip &ndash; Austin Hope's high tannin is built specifically to cut through this much marbling.",
+  "w14|d-ny-strip-14": "Leaner than the ribeye but still a well-marbled Australian wagyu cut &ndash; same tannin-to-fat logic, just slightly less fat for the wine to work against.",
+  "w14|d-short-rib": "The highest-tannin option paired with short rib on the list &ndash; the right call if the guest wants real structure against the glaze's sweetness rather than a softer red.",
+
+  "w15|d-filet-8": "Filet is the leanest cut on the menu, so it doesn't want the biggest wine &ndash; Oberon's medium tannin is deliberately gentler than Caymus or Austin Hope, matched to a cut with less fat to push against.",
+  "w15|d-bone-in-filet": "Slightly more richness than a standard filet thanks to the bone, but still a lean cut &ndash; same logic as the 8oz filet, it wants the softer of the two Wagner-family Cabernets.",
+  "w15|d-burger": "The cassis and mocha notes echo the char on the patty directly, and the medium tannin doesn't overpower the special sauce the way a bigger wine would.",
+
+  "w16|d-tomahawk": "The biggest, most heavily marbled cut on the menu wants the biggest wine on the list &ndash; Caymus's full body and tannin were built for exactly this scale.",
+  "w16|d-porterhouse": "Two cuts in one, strip and filet &ndash; Caymus's plush tannin handles the fattier strip side without being outclassed by a dish this large.",
+  "w16|d-ny-strip-16": "Well-marbled but a notch below the tomahawk in scale &ndash; still wants a big wine, and Caymus's vanilla-oak character actually echoes the char from the wood-fire grill.",
+
+  "w17|d-naan": "Babaganoush's smokiness and the tahini's nuttiness share a flavor world with the wine's own garrigue herb character &ndash; a real regional echo, not just a soft-tannin safety pick.",
+  "w17|d-marinated-chicken": "The peppery spice already in this wine actually mirrors the espelette in the chicken's marinade &ndash; a genuine flavor-affinity match, on top of the soft tannin doing its usual job of not fighting the heat.",
+  "w17|d-wild-mushrooms": "An earthy, umami-forward dish that would turn bitter against a tannic red &ndash; this Grenache-Syrah blend's soft tannin avoids that clash, and its own earthy undertone leans right into the mushrooms.",
+
+  "w18|d-short-rib": "More restrained tannin than the Napa Cabs also linked to short rib &ndash; the right call for a guest who wants elegance over raw power with their braise.",
+  "w18|d-bone-in-filet": "The bone adds a layer of richness beyond a standard filet, giving this more structured Bordeaux blend something to actually grip onto that a plain filet wouldn't offer alone.",
+  "w18|d-bone-marrow": "Violet and cassis notes are a classic Bordeaux answer to something this rich &ndash; refined enough not to be crushed by the almost dessert-sweet onion jam and the marrow itself.",
+
+  "w19|d-tenderloin-8": "A blend brings more complexity to a very simple, unadorned cut than a single-varietal wine would &ndash; the cedar and dried herb notes give the dish a second layer it wouldn't otherwise have.",
+  "w19|d-wagyu-skirt": "Cedar and dried herb echo the char and the savory edge of the chili vinaigrette without needing to be as big or tannic as a straight Cabernet.",
+  "w19|d-short-rib": "Sits right between Markham's softness and Austin Hope's power &ndash; a genuine middle-ground option for braised richness that doesn't ask the guest to pick an extreme.",
+
+  "w20|d-sushi-sashimi-nigiri": "Same production logic as the food itself &ndash; rice, water, minimal intervention &ndash; so it never competes with clean raw fish, it just sits alongside it.",
+  "w20|d-sushi-rolls": "Rolls often add mayo or sauce richness on top of the fish &ndash; sake's gentle natural sweetness handles that better than its clean profile alone would suggest.",
+  "w20|d-sashimi-platter": "A platter this varied needs one constant, umami-friendly partner &ndash; sake's total lack of tannin means it's never wrong no matter which fish shows up that day.",
+  "w20|d-omakase-platter": "At the very top of the list, the chef is choosing unpredictable, extremely premium ingredients &ndash; uni, otoro &ndash; and sake is the one pour on this list that's never a poor match for any of it.",
+  "w20|d-ikura": "Salmon roe is intensely briny and umami, with a burst of liquid richness &ndash; the sake's own delicate melon and lychee sweetness is a genuine bridge against the salt, not just a safe umami default.",
+  "w20|d-tamagoyaki": "This is a literal ingredient echo &ndash; the tamagoyaki itself is built with dashi, mirin, and sake, so the same character shows up again in the glass as it does on the plate.",
+  "w20|d-unagi": "The eel is glazed in a sweet soy-mirin sauce &ndash; the sake's own off-dry character matches that sweetness instead of the dry-versus-sweet clash a bone-dry white would create."
+};
+
+function getDominantTrait(wine) {
+  const s = wine.structure;
+  if (s.tannin >= 4) return { trait: "tannin", value: s.tannin };
+  if (s.acidity >= 4) return { trait: "acidity", value: s.acidity };
+  if (s.body >= 4) return { trait: "body", value: s.body };
+  if (s.body <= 2) return { trait: "body", value: s.body };
+  if (s.acidity <= 2) return { trait: "acidity", value: s.acidity };
+  return { trait: "tannin", value: s.tannin || s.body };
+}
+
+function pairingReason(wine, dish) {
+  const key = wine.id + "|" + dish.id;
+  const trait = getDominantTrait(wine);
+  const text = PAIRING_REASONS[key] || `Its ${trait.trait} profile is the reason this works &ndash; balanced against the ${dish.name.toLowerCase()} rather than fighting it.`;
+  return { trait: trait.trait, value: trait.value, text };
 }
 
 function renderWineDetailWithPairing(wineId) {

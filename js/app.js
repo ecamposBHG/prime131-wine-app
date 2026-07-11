@@ -557,6 +557,49 @@ function renderWineDetailWithPairing(wineId) {
   app.appendChild(container);
 }
 
+function splitIngredients(text) {
+  if (!text) return [];
+  const parts = text.split(" | ").flatMap(p => p.split(/\.\s+(?=[A-Z])/));
+  return parts.map(p => p.trim().replace(/\.$/, "")).filter(p => p.length > 0);
+}
+
+function renderDishFlipCard(dish) {
+  const ingredientItems = splitIngredients(dish.ingredients);
+  const flipcard = document.createElement("div");
+  flipcard.className = "dish-flipcard";
+  const inner = document.createElement("div");
+  inner.className = "dish-flip-inner";
+
+  function faceHTML(idx) {
+    if (idx === 0) {
+      return `
+        <p class="dish-flip-tag">1/2 &middot; tap to flip</p>
+        <p class="dish-flip-title">&#129367; Ingredients</p>
+        <ul class="ingredient-list">${ingredientItems.map(i => `<li>${i}</li>`).join("")}</ul>
+      `;
+    }
+    return `
+      <p class="dish-flip-tag">2/2 &middot; tap to flip</p>
+      <p class="dish-flip-title">&#128293; Chef prep</p>
+      <p class="chefprep-text">${dish.chefPrep}</p>
+    `;
+  }
+
+  inner.innerHTML = faceHTML(0);
+  flipcard.appendChild(inner);
+  let faceIndex = 0;
+  flipcard.onclick = () => {
+    flipcard.classList.add("flipping");
+    setTimeout(() => {
+      faceIndex = (faceIndex + 1) % 2;
+      inner.className = "dish-flip-inner" + (faceIndex === 1 ? " chefprep" : "");
+      inner.innerHTML = faceHTML(faceIndex);
+      flipcard.classList.remove("flipping");
+    }, 200);
+  };
+  return flipcard;
+}
+
 function renderDishDetail(dishId) {
   const dish = findDish(dishId);
   if (!dish) { go("pairfw-list", {}, false); return; }
@@ -569,10 +612,60 @@ function renderDishDetail(dishId) {
   name.textContent = dish.name;
   container.appendChild(name);
 
-  const desc = document.createElement("p");
-  desc.className = "hero-meta";
-  desc.textContent = dish.description;
-  container.appendChild(desc);
+  if (dish.dropLine) {
+    const dropLine = document.createElement("p");
+    dropLine.className = "drop-line";
+    dropLine.textContent = "\u201C" + dish.dropLine + "\u201D";
+    container.appendChild(dropLine);
+  } else {
+    const desc = document.createElement("p");
+    desc.className = "hero-meta";
+    desc.textContent = dish.description;
+    container.appendChild(desc);
+  }
+
+  if (dish.ingredients && dish.chefPrep) {
+    container.appendChild(renderDishFlipCard(dish));
+  }
+
+  if (dish.allergensInRecipe && dish.allergensInRecipe.length) {
+    const allergenTitle = document.createElement("p");
+    allergenTitle.className = "detail-h3";
+    allergenTitle.innerHTML = `<span>&#9888;&#65039;</span> Allergens`;
+    container.appendChild(allergenTitle);
+
+    const inRecipeLabel = document.createElement("p");
+    inRecipeLabel.className = "allergen-group-label";
+    inRecipeLabel.textContent = "In recipe";
+    container.appendChild(inRecipeLabel);
+
+    const inRecipeRow = document.createElement("div");
+    inRecipeRow.className = "allergen-row";
+    dish.allergensInRecipe.forEach(a => {
+      const chip = document.createElement("span");
+      chip.className = "chip in-recipe";
+      chip.textContent = a.charAt(0).toUpperCase() + a.slice(1);
+      inRecipeRow.appendChild(chip);
+    });
+    container.appendChild(inRecipeRow);
+
+    if (dish.allergensRemovable && dish.allergensRemovable.length) {
+      const removableLabel = document.createElement("p");
+      removableLabel.className = "allergen-group-label";
+      removableLabel.textContent = "Can be removed";
+      container.appendChild(removableLabel);
+
+      const removableRow = document.createElement("div");
+      removableRow.className = "allergen-row";
+      dish.allergensRemovable.forEach(a => {
+        const chip = document.createElement("span");
+        chip.className = "chip removable";
+        chip.textContent = a.charAt(0).toUpperCase() + a.slice(1);
+        removableRow.appendChild(chip);
+      });
+      container.appendChild(removableRow);
+    }
+  }
 
   const pairsLabel = document.createElement("p");
   pairsLabel.className = "pairs-label";

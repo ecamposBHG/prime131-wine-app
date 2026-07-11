@@ -231,3 +231,40 @@ button, input {
 .empty-note {
   font-size: 14px; color: var(--shoyu-300); text-align: center; padding: 24px 0;
 }
+
+/* Dish detail: drop line, flip card, allergen chips */
+.drop-line { font-size: 15px; color: var(--shoyu-500); line-height: 1.5; margin: 4px 0 16px; font-style: italic; }
+.detail-h3 {
+  font-size: 17px; font-weight: 600; color: var(--shoyu-700); margin: 16px 0 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.detail-h3:first-of-type { margin-top: 0; }
+.allergen-group-label {
+  font-family: var(--font-mono); font-size: 10px; color: var(--shoyu-300);
+  text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 5px;
+}
+.allergen-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.chip { font-size: 12px; padding: 6px 11px; border-radius: 13px; font-weight: 500; }
+.chip.in-recipe { background: var(--bronze-200); color: var(--shoyu-700); border: 1px solid var(--bronze-500); }
+.chip.removable { background: var(--washi-100); color: var(--shoyu-500); border: 1px solid var(--washi-300); }
+
+.dish-flipcard { height: 300px; margin: 4px 0 8px; cursor: pointer; }
+.dish-flip-inner {
+  width: 100%; height: 100%; border-radius: 14px; padding: 18px;
+  overflow-y: auto; display: flex; flex-direction: column;
+  background: var(--sumi-700); color: var(--washi-100); transition: transform 0.2s ease;
+}
+.dish-flip-inner.chefprep { background: var(--shoyu-500); }
+.dish-flipcard.flipping .dish-flip-inner { transform: rotateY(90deg); }
+.dish-flip-tag {
+  font-family: var(--font-mono); font-size: 10px; color: var(--bronze-500);
+  text-transform: uppercase; letter-spacing: 1px; margin: 0 0 4px;
+}
+.dish-flip-title { font-size: 18px; font-weight: 600; color: var(--washi-100); margin: 0 0 14px; display: flex; align-items: center; gap: 7px; }
+.ingredient-list { margin: 0; padding: 0; list-style: none; }
+.ingredient-list li {
+  font-size: 15px; color: var(--washi-100); line-height: 1.5;
+  margin-bottom: 10px; padding-left: 16px; position: relative;
+}
+.ingredient-list li::before { content: "\2013"; position: absolute; left: 0; color: var(--bronze-500); }
+.chefprep-text { font-size: 14px; color: var(--washi-100); line-height: 1.65; margin: 0 0 10px; }

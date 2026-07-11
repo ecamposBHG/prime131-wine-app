@@ -234,6 +234,10 @@ function renderHome() {
   const options = document.createElement("div");
   options.className = "home-options";
   options.innerHTML = `
+    <div class="home-option" data-go="menu">
+      <div class="home-icon-circle">&#128220;</div>
+      <div class="home-option-text"><p>Food menu</p><span>Browse the full food menu</span></div>
+    </div>
     <div class="home-option" data-go="study">
       <div class="home-icon-circle">&#128214;</div>
       <div class="home-option-text"><p>Study wines</p><span>Learn the full list, one at a time</span></div>
@@ -245,10 +249,6 @@ function renderHome() {
     <div class="home-option" data-go="pairfw">
       <div class="home-icon-circle">&#127860;</div>
       <div class="home-option-text"><p>Pair food &#8594; wine</p><span>Start from the dish</span></div>
-    </div>
-    <div class="home-option" data-go="menu">
-      <div class="home-icon-circle">&#128220;</div>
-      <div class="home-option-text"><p>Menu</p><span>Browse the full food menu</span></div>
     </div>
   `;
   options.querySelector('[data-go="study"]').onclick = () => go("study-list");
@@ -355,7 +355,7 @@ function renderPairFoodWineList() {
 }
 
 function renderMenuList() {
-  renderDishList("Menu", "Search the menu");
+  renderDishList("Food menu", "Search the menu");
 }
 
 function renderNavChips(activeWineId, onSelect) {

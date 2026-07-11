@@ -189,7 +189,7 @@ function getFlavorIcon(tag) {
 const SECTION_ICON_MAP = {
   "Raw Bar": "\u{1F9AA}", "Starters": "\u{1F961}", "Soups & Salads": "\u{1F957}",
   "Entr\u00E9es": "\u{1F37D}\uFE0F", "Sushi": "\u{1F363}", "Sushi Rolls": "\u{1F363}",
-  "Sides": "\u{1F35F}", "Steaks": "\u{1F969}"
+  "Sides": "\u{1F35F}", "Steaks": "\u{1F969}", "Sauces": "\u{1F958}"
 };
 function getSectionIcon(section) { return SECTION_ICON_MAP[section] || "\u{1F37D}\uFE0F"; }
 

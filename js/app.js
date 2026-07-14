@@ -204,6 +204,7 @@ function render() {
   else if (current.view === "menu-list") renderMenuList();
   else if (current.view === "dish-detail") renderDishDetail(current.params.dishId);
   else if (current.view === "pairing-explain") renderPairingExplain(current.params.wineId, current.params.dishId);
+  else if (current.view === "test-me") renderTestMe();
   window.scrollTo(0, 0);
 }
 
@@ -218,10 +219,47 @@ function header(title, showBack = true) {
   app.appendChild(div);
 }
 
+/* Device-local storage helpers (per-device, no accounts) */
+const THEME_KEY = "p131-theme";
+const PROGRESS_KEY = "p131-progress";
+
+function getTheme() {
+  try { return localStorage.getItem(THEME_KEY) || "light"; } catch (e) { return "light"; }
+}
+function setTheme(theme) {
+  try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
+  document.body.classList.toggle("dark", theme === "dark");
+}
+function initTheme() { setTheme(getTheme()); }
+
+function getProgress() {
+  try { return JSON.parse(localStorage.getItem(PROGRESS_KEY)) || {}; } catch (e) { return {}; }
+}
+function setWineProgress(wineId, status) {
+  const p = getProgress();
+  p[wineId] = status;
+  try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(p)); } catch (e) {}
+}
+function resetProgress() {
+  try { localStorage.removeItem(PROGRESS_KEY); } catch (e) {}
+}
+
+function wineOfTheDay() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const dayOfYear = Math.floor((now - start) / 86400000);
+  return WINES[dayOfYear % WINES.length];
+}
+
+function randomWine() {
+  return WINES[Math.floor(Math.random() * WINES.length)];
+}
+
 function renderHome() {
   const hero = document.createElement("div");
   hero.className = "home-hero";
   hero.innerHTML = `
+    <button class="theme-toggle" aria-label="Toggle dark mode">${getTheme() === "dark" ? "\u2600\uFE0F" : "\u{1F319}"}</button>
     <svg width="48" height="48" viewBox="0 0 56 56" class="home-stamp">
       <circle cx="28" cy="28" r="24" fill="none" stroke="var(--washi-300)" stroke-width="2"/>
       <circle cx="28" cy="28" r="24" fill="none" stroke="var(--bronze-500)" stroke-width="2.5"/>
@@ -229,7 +267,28 @@ function renderHome() {
     </svg>
     <p class="home-title">Prime 131 Wines</p>
   `;
+  hero.querySelector(".theme-toggle").onclick = () => {
+    setTheme(getTheme() === "dark" ? "light" : "dark");
+    render();
+  };
   app.appendChild(hero);
+
+  const wotd = wineOfTheDay();
+  const wotdStrip = document.createElement("div");
+  wotdStrip.className = "wotd-strip";
+  wotdStrip.innerHTML = `
+    <div class="wotd-main">
+      <p class="wotd-label">&#127863; Wine of the day</p>
+      <p class="wotd-name">${wotd.name}</p>
+    </div>
+    <button class="wotd-shuffle" aria-label="Surprise me with a random wine">&#127922;</button>
+  `;
+  wotdStrip.querySelector(".wotd-main").onclick = () => go("study-card", { wineId: wotd.id });
+  wotdStrip.querySelector(".wotd-shuffle").onclick = (e) => {
+    e.stopPropagation();
+    go("study-card", { wineId: randomWine().id });
+  };
+  app.appendChild(wotdStrip);
 
   const options = document.createElement("div");
   options.className = "home-options";
@@ -250,11 +309,16 @@ function renderHome() {
       <div class="home-icon-circle">&#127860;</div>
       <div class="home-option-text"><p>Pair food &#8594; wine</p><span>Start from the dish</span></div>
     </div>
+    <div class="home-option" data-go="testme">
+      <div class="home-icon-circle">&#127919;</div>
+      <div class="home-option-text"><p>Test me</p><span>Guess the wine, track what you know</span></div>
+    </div>
   `;
   options.querySelector('[data-go="study"]').onclick = () => go("study-list");
   options.querySelector('[data-go="pairwf"]').onclick = () => go("pairwf-list");
   options.querySelector('[data-go="pairfw"]').onclick = () => go("pairfw-list");
   options.querySelector('[data-go="menu"]').onclick = () => go("menu-list");
+  options.querySelector('[data-go="testme"]').onclick = () => go("test-me");
   app.appendChild(options);
 }
 
@@ -791,4 +855,123 @@ function renderPairingExplain(wineId, dishId) {
   app.appendChild(linksRow);
 }
 
+/* Test Me — flashcard drill with device-local progress */
+let testQueue = [];
+
+function buildTestQueue() {
+  const progress = getProgress();
+  const learning = [], unseen = [], known = [];
+  WINES.forEach(w => {
+    const status = progress[w.id];
+    if (status === "learning") learning.push(w.id);
+    else if (status === "known") known.push(w.id);
+    else unseen.push(w.id);
+  });
+  const shuffle = (arr) => {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  };
+  return [...shuffle(learning), ...shuffle(unseen), ...shuffle(known)];
+}
+
+function renderTestMe() {
+  header("Test me");
+
+  if (!testQueue.length) testQueue = buildTestQueue();
+  const wineId = testQueue[0];
+  const wine = findWine(wineId);
+  const progress = getProgress();
+  const knownCount = WINES.filter(w => progress[w.id] === "known").length;
+
+  const counter = document.createElement("p");
+  counter.className = "testme-counter";
+  counter.textContent = `${knownCount} of ${WINES.length} marked as known`;
+  app.appendChild(counter);
+
+  const card = document.createElement("div");
+  card.className = "testme-card";
+  let revealed = false;
+
+  function clueHTML() {
+    return `
+      <p class="dish-flip-tag">Guess the wine &middot; tap to reveal</p>
+      <p class="face-h3" style="margin-top:8px;"><span class="ic">&#128269;</span> Clues</p>
+      <p class="face-desc" style="margin-bottom:10px;">${STYLE_LABELS[wine.style]} &middot; ${wine.region}</p>
+      <div class="flavor-grid">${wine.flavorTags.map(t => `<div class="flavor-item"><div class="icon">${getFlavorIcon(t)}</div><p>${t}</p></div>`).join("")}</div>
+      ${structureBars(wine.structure)}
+    `;
+  }
+  function answerHTML() {
+    return `
+      <p class="dish-flip-tag">Answer</p>
+      <p class="testme-answer-name">${wine.name}</p>
+      <p class="face-desc">${wine.grape}</p>
+      <p class="face-desc">Producer: ${wine.producer}</p>
+      <p class="face-desc" style="margin-top:12px; color:var(--bronze-500);">Swipe right if you knew it, left if you're still learning &mdash; or use the buttons below.</p>
+    `;
+  }
+
+  const inner = document.createElement("div");
+  inner.className = "dish-flip-inner";
+  inner.innerHTML = clueHTML();
+  card.appendChild(inner);
+
+  card.onclick = () => {
+    if (revealed) return;
+    revealed = true;
+    inner.innerHTML = answerHTML();
+    btnRow.style.display = "flex";
+  };
+
+  function advance(status) {
+    setWineProgress(wine.id, status);
+    testQueue.shift();
+    if (status === "learning") testQueue.push(wine.id);
+    if (!testQueue.length) testQueue = buildTestQueue();
+    renderApp();
+  }
+  function renderApp() { render(); }
+
+  let touchStartX = null;
+  card.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; });
+  card.addEventListener("touchend", (e) => {
+    if (!revealed || touchStartX === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (dx > 60) advance("known");
+    else if (dx < -60) advance("learning");
+    touchStartX = null;
+  });
+
+  app.appendChild(card);
+
+  const btnRow = document.createElement("div");
+  btnRow.className = "card-footer-nav";
+  btnRow.style.display = "none";
+  const learningBtn = document.createElement("button");
+  learningBtn.className = "footer-btn";
+  learningBtn.textContent = "\u2190 Still learning";
+  learningBtn.onclick = () => advance("learning");
+  const knownBtn = document.createElement("button");
+  knownBtn.className = "footer-btn footer-btn-home";
+  knownBtn.textContent = "Got it \u2192";
+  knownBtn.onclick = () => advance("known");
+  btnRow.appendChild(learningBtn);
+  btnRow.appendChild(knownBtn);
+  app.appendChild(btnRow);
+
+  const resetLink = document.createElement("p");
+  resetLink.className = "testme-reset";
+  resetLink.textContent = "Reset my progress";
+  resetLink.onclick = () => {
+    resetProgress();
+    testQueue = [];
+    render();
+  };
+  app.appendChild(resetLink);
+}
+
+initTheme();
 render();

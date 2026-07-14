@@ -270,3 +270,66 @@ button, input {
 }
 .ingredient-list li::before { content: "\2013"; position: absolute; left: 0; color: var(--bronze-500); }
 .chefprep-text { font-size: 14px; color: var(--washi-100); line-height: 1.65; margin: 0 0 10px; }
+
+/* Dark theme — token overrides, remembered per device */
+body.dark {
+  --washi-100: #1B1918;
+  --washi-200: #242120;
+  --washi-300: #3E3A36;
+  --shoyu-700: #F5F1E8;
+  --shoyu-500: #E3DDD0;
+  --shoyu-300: #9C948A;
+  --bronze-200: #4A3826;
+}
+body.dark .flip-inner.face-0, body.dark .dish-flip-inner { background: #0F0E0D; }
+body.dark .flip-inner.face-1 { background: #242120; }
+body.dark .flip-inner.face-2 { background: #2A2522; }
+body.dark .dish-flip-inner.chefprep { background: #242120; }
+body.dark .fact-block, body.dark .flavor-item, body.dark .bar-track { background: #16110E; }
+body.dark .face-title, body.dark .face-h3, body.dark .face-desc, body.dark .point-row,
+body.dark .back-line, body.dark .fact-block p, body.dark .flavor-item p, body.dark .bar-block p,
+body.dark .story-text, body.dark .ingredient-list li, body.dark .chefprep-text,
+body.dark .dish-flip-title, body.dark .testme-answer-name { color: #F5F1E8; }
+body.dark .arsenal-block p, body.dark .arsenal-label, body.dark .arsenal-text { color: #2A1C13; }
+
+/* Theme toggle */
+.home-hero { position: relative; }
+.theme-toggle {
+  position: absolute; top: 0; right: 0; background: none; border: 1px solid var(--washi-300);
+  border-radius: 50%; width: 40px; height: 40px; font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Wine of the day strip */
+.wotd-strip {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bronze-200); border: 1px solid var(--bronze-500);
+  border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; cursor: pointer;
+}
+.wotd-main { flex: 1; }
+.wotd-label {
+  font-family: var(--font-mono); font-size: 10px; color: var(--bronze-600);
+  text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 3px;
+}
+body.dark .wotd-label { color: var(--bronze-500); }
+.wotd-name { font-family: var(--font-display); font-size: 17px; color: var(--shoyu-700); margin: 0; }
+.wotd-shuffle {
+  background: var(--washi-100); border: 1px solid var(--washi-300); border-radius: 10px;
+  width: 44px; height: 44px; font-size: 20px; cursor: pointer; flex-shrink: 0;
+}
+
+/* Test Me */
+.testme-counter {
+  font-family: var(--font-mono); font-size: 12px; color: var(--shoyu-300);
+  text-align: center; margin: 0 0 12px;
+}
+.testme-card { height: var(--flipcard-height); cursor: pointer; }
+.testme-answer-name {
+  font-family: var(--font-display); font-size: 24px; color: var(--washi-100);
+  margin: 8px 0 10px; line-height: 1.25;
+}
+body.dark .testme-answer-name { color: #F5F1E8; }
+.testme-reset {
+  font-size: 13px; color: var(--shoyu-300); text-align: center;
+  text-decoration: underline; cursor: pointer; margin-top: 18px;
+}

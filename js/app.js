@@ -168,15 +168,23 @@ function structureBars(structure) {
 const FLAVOR_ICON_MAP = [
   [["berry", "currant", "plum", "cassis"], "\u{1F347}"],
   [["cherry", "strawberry", "raspberry", "cranberry"], "\u{1F352}"],
-  [["citrus", "lemon", "lime", "zest"], "\u{1F34B}"],
+  [["citrus", "lemon", "lime", "zest", "yuzu", "bergamot"], "\u{1F34B}"],
   [["peach", "apple"], "\u{1F34F}"],
-  [["tropical", "pineapple"], "\u{1F34D}"],
+  [["tropical", "pineapple", "papaya", "dragon fruit"], "\u{1F34D}"],
   [["melon", "honeydew", "lychee", "pear"], "\u{1F348}"],
-  [["flower", "honeysuckle", "violet", "floral"], "\u{1F338}"],
-  [["mocha", "cocoa", "chocolate", "coffee"], "\u2615"],
-  [["oak", "cedar", "vanilla", "spice", "pepper"], "\u{1FAB5}"],
-  [["earth", "forest", "herb", "garrigue", "mineral", "stone", "flint", "tar", "savory"], "\u{1F33F}"],
-  [["brioche", "toast", "bread", "chalk"], "\u{1F950}"]
+  [["flower", "honeysuckle", "violet", "floral", "lavender"], "\u{1F338}"],
+  [["mocha", "cocoa", "chocolate", "coffee", "espresso", "roasted"], "\u2615"],
+  [["oak", "cedar", "vanilla", "spice", "pepper", "whiskey", "bourbon", "malt", "bitters"], "\u{1FAB5}"],
+  [["earth", "forest", "herb", "garrigue", "mineral", "stone", "flint", "tar", "savory", "basil", "mint", "matcha"], "\u{1F33F}"],
+  [["brioche", "toast", "bread", "chalk"], "\u{1F950}"],
+  [["honey"], "\u{1F36F}"],
+  [["olive", "brin"], "\u{1FAD2}"],
+  [["smoke"], "\u{1F525}"],
+  [["agave"], "\u{1F335}"],
+  [["ginger"], "\u{1FADA}"],
+  [["sparkling", "bubbl"], "\u{1F942}"],
+  [["sweet", "sugar"], "\u{1F36C}"],
+  [["dry", "crisp", "silky", "bright"], "\u2744\uFE0F"]
 ];
 function getFlavorIcon(tag) {
   const lower = tag.toLowerCase();
@@ -205,6 +213,9 @@ function render() {
   else if (current.view === "dish-detail") renderDishDetail(current.params.dishId);
   else if (current.view === "pairing-explain") renderPairingExplain(current.params.wineId, current.params.dishId);
   else if (current.view === "test-me") renderTestMe();
+  else if (current.view === "test-me-run") renderTestMeRun(current.params.mode);
+  else if (current.view === "cocktail-list") renderCocktailList();
+  else if (current.view === "cocktail-detail") renderCocktailDetail(current.params.cocktailId);
   window.scrollTo(0, 0);
 }
 
@@ -295,26 +306,31 @@ function renderHome() {
   options.innerHTML = `
     <div class="home-option" data-go="menu">
       <div class="home-icon-circle">&#128220;</div>
-      <div class="home-option-text"><p>Food menu</p><span>Browse the full food menu</span></div>
+      <div class="home-option-text"><p>Food Menu</p><span>Browse the full food menu</span></div>
     </div>
     <div class="home-option" data-go="study">
-      <div class="home-icon-circle">&#128214;</div>
-      <div class="home-option-text"><p>Study wines</p><span>Learn the full list, one at a time</span></div>
+      <div class="home-icon-circle">&#127863;</div>
+      <div class="home-option-text"><p>Wine BTG</p><span>Learn the by-the-glass list</span></div>
+    </div>
+    <div class="home-option" data-go="cocktails">
+      <div class="home-icon-circle">&#127864;</div>
+      <div class="home-option-text"><p>Cocktails</p><span>Recipes, builds, and flavor profiles</span></div>
     </div>
     <div class="home-option" data-go="pairwf">
-      <div class="home-icon-circle">&#127863;</div>
-      <div class="home-option-text"><p>Pair wine &#8594; food</p><span>Start from the bottle</span></div>
+      <div class="home-icon-circle">&#127815;</div>
+      <div class="home-option-text"><p>Pair Wine with Food</p><span>Start from the bottle</span></div>
     </div>
     <div class="home-option" data-go="pairfw">
       <div class="home-icon-circle">&#127860;</div>
-      <div class="home-option-text"><p>Pair food &#8594; wine</p><span>Start from the dish</span></div>
+      <div class="home-option-text"><p>Pair Food with Wine</p><span>Start from the dish</span></div>
     </div>
     <div class="home-option" data-go="testme">
       <div class="home-icon-circle">&#127919;</div>
-      <div class="home-option-text"><p>Test me</p><span>Guess the wine, track what you know</span></div>
+      <div class="home-option-text"><p>Quiz Tool</p><span>Test yourself on wines and food</span></div>
     </div>
   `;
   options.querySelector('[data-go="study"]').onclick = () => go("study-list");
+  options.querySelector('[data-go="cocktails"]').onclick = () => go("cocktail-list");
   options.querySelector('[data-go="pairwf"]').onclick = () => go("pairwf-list");
   options.querySelector('[data-go="pairfw"]').onclick = () => go("pairfw-list");
   options.querySelector('[data-go="menu"]').onclick = () => go("menu-list");
@@ -361,7 +377,7 @@ function renderSearchableWineList(onSelect, placeholder) {
 }
 
 function renderStudyList() {
-  header("Study wines");
+  header("Wine BTG");
   app.appendChild(renderSearchableWineList(
     (wineId) => go("study-card", { wineId }),
     "Search wines"
@@ -420,6 +436,110 @@ function renderPairFoodWineList() {
 
 function renderMenuList() {
   renderDishList("Food menu", "Search the menu");
+}
+
+function renderCocktailList() {
+  header("Cocktails");
+  const wrap = document.createElement("div");
+  const input = document.createElement("input");
+  input.className = "search-input";
+  input.placeholder = "Search cocktails";
+  wrap.appendChild(input);
+  const listWrap = document.createElement("div");
+  wrap.appendChild(listWrap);
+
+  function draw(filter) {
+    listWrap.innerHTML = "";
+    const filtered = COCKTAILS.filter(c => c.name.toLowerCase().includes(filter.toLowerCase()));
+    filtered.forEach(c => {
+      const row = document.createElement("div");
+      row.className = "list-row";
+      row.innerHTML = `<span class="list-row-main"><span class="dish-icon">&#127864;</span>${c.name}</span>`;
+      row.onclick = () => go("cocktail-detail", { cocktailId: c.id });
+      listWrap.appendChild(row);
+    });
+    if (!filtered.length) {
+      listWrap.innerHTML = `<p class="empty-note">No cocktails match that search.</p>`;
+    }
+  }
+  draw("");
+  input.oninput = () => draw(input.value);
+  app.appendChild(wrap);
+}
+
+function findCocktail(id) { return COCKTAILS.find(c => c.id === id); }
+
+function renderCocktailDetail(cocktailId) {
+  const cocktail = findCocktail(cocktailId);
+  if (!cocktail) { go("cocktail-list", {}, false); return; }
+
+  header("Cocktails");
+
+  const container = document.createElement("div");
+  const name = document.createElement("p");
+  name.className = "hero-name";
+  name.textContent = cocktail.name;
+  container.appendChild(name);
+
+  const meta1 = document.createElement("p");
+  meta1.className = "hero-meta";
+  meta1.textContent = cocktail.glassware;
+  container.appendChild(meta1);
+
+  const meta2 = document.createElement("p");
+  meta2.className = "hero-meta strong";
+  meta2.textContent = cocktail.method;
+  container.appendChild(meta2);
+
+  const flavorTitle = document.createElement("p");
+  flavorTitle.className = "detail-h3";
+  flavorTitle.innerHTML = `<span>&#127864;</span> Flavor profile`;
+  container.appendChild(flavorTitle);
+
+  const flavorGrid = document.createElement("div");
+  flavorGrid.className = "flavor-grid cocktail-flavor-grid";
+  flavorGrid.innerHTML = cocktail.flavorTags.map(t =>
+    `<div class="flavor-item"><div class="icon">${getFlavorIcon(t)}</div><p>${t}</p></div>`
+  ).join("");
+  container.appendChild(flavorGrid);
+
+  const flipcard = document.createElement("div");
+  flipcard.className = "dish-flipcard";
+  const inner = document.createElement("div");
+  inner.className = "dish-flip-inner";
+
+  function faceHTML(idx) {
+    if (idx === 0) {
+      return `
+        <p class="dish-flip-tag">1/2 &middot; tap to flip</p>
+        <p class="dish-flip-title">&#129380; Ingredients</p>
+        <ul class="ingredient-list">${cocktail.ingredients.map(i => `<li>${i}</li>`).join("")}</ul>
+        <p class="chefprep-text" style="margin-top:auto;"><b style="color:#D9B98A;">Garnish:</b> ${cocktail.garnish}</p>
+      `;
+    }
+    return `
+      <p class="dish-flip-tag">2/2 &middot; tap to flip</p>
+      <p class="dish-flip-title">&#127864; Build</p>
+      <p class="chefprep-text">${cocktail.directions}</p>
+      ${cocktail.prep ? `<p class="chefprep-text" style="margin-top:8px;"><b style="color:#D9B98A;">House prep:</b> ${cocktail.prep}</p>` : ""}
+    `;
+  }
+
+  inner.innerHTML = faceHTML(0);
+  flipcard.appendChild(inner);
+  let faceIndex = 0;
+  flipcard.onclick = () => {
+    flipcard.classList.add("flipping");
+    setTimeout(() => {
+      faceIndex = (faceIndex + 1) % 2;
+      inner.className = "dish-flip-inner" + (faceIndex === 1 ? " chefprep" : "");
+      inner.innerHTML = faceHTML(faceIndex);
+      flipcard.classList.remove("flipping");
+    }, 200);
+  };
+  container.appendChild(flipcard);
+
+  app.appendChild(container);
 }
 
 function renderNavChips(activeWineId, onSelect) {
@@ -496,7 +616,7 @@ function renderStudyCard(wineId) {
   const wine = findWine(wineId) || WINES[0];
   const idx = WINES.findIndex(w => w.id === wine.id);
 
-  header("Study wines");
+  header("Wine BTG");
   app.appendChild(renderNavChips(wine.id, (id) => go("study-card", { wineId: id }, false)));
   app.appendChild(renderWineCardBody(wine));
 
@@ -856,16 +976,23 @@ function renderPairingExplain(wineId, dishId) {
 }
 
 /* Test Me — flashcard drill with device-local progress */
-let testQueue = [];
+let testQueues = { wine: [], food: [] };
 
-function buildTestQueue() {
+function quizPool(mode) {
+  if (mode === "food") {
+    return DISHES.filter(d => !d.id.includes("general") && (d.dropLine || d.description));
+  }
+  return WINES;
+}
+
+function buildTestQueue(mode) {
   const progress = getProgress();
   const learning = [], unseen = [], known = [];
-  WINES.forEach(w => {
-    const status = progress[w.id];
-    if (status === "learning") learning.push(w.id);
-    else if (status === "known") known.push(w.id);
-    else unseen.push(w.id);
+  quizPool(mode).forEach(item => {
+    const status = progress[item.id];
+    if (status === "learning") learning.push(item.id);
+    else if (status === "known") known.push(item.id);
+    else unseen.push(item.id);
   });
   const shuffle = (arr) => {
     for (let i = arr.length - 1; i > 0; i--) {
@@ -878,17 +1005,46 @@ function buildTestQueue() {
 }
 
 function renderTestMe() {
-  header("Test me");
+  header("Quiz tool");
 
-  if (!testQueue.length) testQueue = buildTestQueue();
-  const wineId = testQueue[0];
-  const wine = findWine(wineId);
+  const intro = document.createElement("p");
+  intro.className = "testme-counter";
+  intro.textContent = "What do you want to be tested on?";
+  app.appendChild(intro);
+
+  const options = document.createElement("div");
+  options.className = "home-options";
+  options.innerHTML = `
+    <div class="home-option" data-go="wine">
+      <div class="home-icon-circle">&#127863;</div>
+      <div class="home-option-text"><p>Wine</p><span>Guess the wine from its profile</span></div>
+    </div>
+    <div class="home-option" data-go="food">
+      <div class="home-icon-circle">&#127860;</div>
+      <div class="home-option-text"><p>Food</p><span>Guess the dish from its description</span></div>
+    </div>
+  `;
+  options.querySelector('[data-go="wine"]').onclick = () => go("test-me-run", { mode: "wine" });
+  options.querySelector('[data-go="food"]').onclick = () => go("test-me-run", { mode: "food" });
+  app.appendChild(options);
+}
+
+function renderTestMeRun(mode) {
+  mode = mode === "food" ? "food" : "wine";
+  header("Quiz tool");
+
+  if (!testQueues[mode].length) testQueues[mode] = buildTestQueue(mode);
+  const itemId = testQueues[mode][0];
+  const isFood = mode === "food";
+  const item = isFood ? findDish(itemId) : findWine(itemId);
+  if (!item) { testQueues[mode] = []; go("test-me", {}, false); return; }
+  const pool = quizPool(mode);
   const progress = getProgress();
-  const knownCount = WINES.filter(w => progress[w.id] === "known").length;
+  const knownCount = pool.filter(x => progress[x.id] === "known").length;
 
   const counter = document.createElement("p");
   counter.className = "testme-counter";
-  counter.textContent = `${knownCount} of ${WINES.length} marked as known`;
+  counter.textContent = `${knownCount} of ${pool.length} marked as known`;
   app.appendChild(counter);
 
   const card = document.createElement("div");
@@ -896,20 +1052,36 @@ function renderTestMe() {
   let revealed = false;
 
   function clueHTML() {
+    if (isFood) {
+      return `
+        <p class="dish-flip-tag">Guess the dish &middot; tap to reveal</p>
+        <p class="face-h3" style="margin-top:8px;"><span class="ic">&#128269;</span> Clues</p>
+        <p class="face-desc" style="margin-bottom:10px;">${getSectionIcon(item.section)} ${item.section}</p>
+        <p class="chefprep-text">&ldquo;${item.dropLine || item.description}&rdquo;</p>
+      `;
+    }
     return `
       <p class="dish-flip-tag">Guess the wine &middot; tap to reveal</p>
       <p class="face-h3" style="margin-top:8px;"><span class="ic">&#128269;</span> Clues</p>
-      <p class="face-desc" style="margin-bottom:10px;">${STYLE_LABELS[wine.style]} &middot; ${wine.region}</p>
-      <div class="flavor-grid">${wine.flavorTags.map(t => `<div class="flavor-item"><div class="icon">${getFlavorIcon(t)}</div><p>${t}</p></div>`).join("")}</div>
-      ${structureBars(wine.structure)}
+      <p class="face-desc" style="margin-bottom:10px;">${STYLE_LABELS[item.style]} &middot; ${item.region}</p>
+      <div class="flavor-grid">${item.flavorTags.map(t => `<div class="flavor-item"><div class="icon">${getFlavorIcon(t)}</div><p>${t}</p></div>`).join("")}</div>
+      ${structureBars(item.structure)}
     `;
   }
   function answerHTML() {
+    if (isFood) {
+      return `
+        <p class="dish-flip-tag">Answer</p>
+        <p class="testme-answer-name">${item.name}</p>
+        <p class="face-desc">${item.section}</p>
+        <p class="face-desc" style="margin-top:12px; color:var(--bronze-500);">Swipe right if you knew it, left if you're still learning &mdash; or use the buttons below.</p>
+      `;
+    }
     return `
       <p class="dish-flip-tag">Answer</p>
-      <p class="testme-answer-name">${wine.name}</p>
-      <p class="face-desc">${wine.grape}</p>
-      <p class="face-desc">Producer: ${wine.producer}</p>
+      <p class="testme-answer-name">${item.name}</p>
+      <p class="face-desc">${item.grape}</p>
+      <p class="face-desc">Producer: ${item.producer}</p>
       <p class="face-desc" style="margin-top:12px; color:var(--bronze-500);">Swipe right if you knew it, left if you're still learning &mdash; or use the buttons below.</p>
     `;
   }
@@ -927,22 +1099,48 @@ function renderTestMe() {
   };
 
   function advance(status) {
-    setWineProgress(wine.id, status);
-    testQueue.shift();
-    if (status === "learning") testQueue.push(wine.id);
-    if (!testQueue.length) testQueue = buildTestQueue();
-    renderApp();
+    setWineProgress(item.id, status);
+    testQueues[mode].shift();
+    if (status === "learning") testQueues[mode].push(item.id);
+    if (!testQueues[mode].length) testQueues[mode] = buildTestQueue(mode);
+    render();
   }
-  function renderApp() { render(); }
 
+  /* Swipe with live drag feedback: card follows the finger, tilts, and hints
+     the direction; snaps back if released before the threshold. */
   let touchStartX = null;
-  card.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; });
-  card.addEventListener("touchend", (e) => {
+  let dragging = false;
+  card.addEventListener("touchstart", (e) => {
+    touchStartX = e.touches[0].clientX;
+    dragging = false;
+  }, { passive: true });
+  card.addEventListener("touchmove", (e) => {
     if (!revealed || touchStartX === null) return;
+    const dx = e.touches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 8) dragging = true;
+    if (!dragging) return;
+    inner.style.transition = "none";
+    inner.style.transform = `translateX(${dx}px) rotate(${dx / 18}deg)`;
+    inner.classList.toggle("drag-right", dx > 40);
+    inner.classList.toggle("drag-left", dx < -40);
+  }, { passive: true });
+  card.addEventListener("touchend", (e) => {
+    if (!revealed || touchStartX === null) { touchStartX = null; return; }
     const dx = e.changedTouches[0].clientX - touchStartX;
-    if (dx > 60) advance("known");
-    else if (dx < -60) advance("learning");
     touchStartX = null;
+    if (dx > 60) {
+      inner.style.transition = "transform 0.25s ease";
+      inner.style.transform = `translateX(120%) rotate(12deg)`;
+      setTimeout(() => advance("known"), 220);
+    } else if (dx < -60) {
+      inner.style.transition = "transform 0.25s ease";
+      inner.style.transform = `translateX(-120%) rotate(-12deg)`;
+      setTimeout(() => advance("learning"), 220);
+    } else {
+      inner.style.transition = "transform 0.25s ease";
+      inner.style.transform = "translateX(0) rotate(0)";
+      inner.classList.remove("drag-right", "drag-left");
+    }
   });
 
   app.appendChild(card);
@@ -967,7 +1165,7 @@ function renderTestMe() {
   resetLink.textContent = "Reset my progress";
   resetLink.onclick = () => {
     resetProgress();
-    testQueue = [];
+    testQueues = { wine: [], food: [] };
     render();
   };
   app.appendChild(resetLink);

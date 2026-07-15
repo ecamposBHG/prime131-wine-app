@@ -426,3 +426,102 @@ const STYLE_LABELS = {
 
 const STYLE_ORDER = ["sparkling", "white", "red", "dessert", "sake"];
 const SECTION_ORDER = ["Raw Bar", "Starters", "Soups & Salads", "Entrées", "Sushi", "Sushi Rolls", "Sides", "Steaks", "Sauces"];
+
+const COCKTAILS = [
+  {
+    id: "c1", name: "Lycheetini", glassware: "Martini", method: "Shake & Strain",
+    flavorTags: ["Lychee", "Citrus", "Floral", "Sweet"],
+    ingredients: ["2 oz Haku Vodka", "1 oz Re\u00e0l Lychee", "1 oz Finest Call Single Pressed Lemon Juice"],
+    garnish: "Popping Boba Pearls",
+    directions: "Combine all ingredients in a cocktail shaker with ice. Shake and strain into martini glass. Garnish and serve.",
+    prep: ""
+  },
+  {
+    id: "c2", name: "Tequila Twilight", glassware: "Double Rocks", method: "Shake & Strain",
+    flavorTags: ["Dragon Fruit", "Papaya", "Lime", "Agave"],
+    ingredients: ["1.5 oz Casamigos Blanco", "0.5 oz Cointreau Orange Liqueur", "1 oz Finest Call Single Pressed Lime Juice", "1 oz Sweetbird Dragon Fruit & Papaya Syrup"],
+    garnish: "Dehydrated Dragon Fruit, Mint Sprig",
+    directions: "Combine all ingredients in a cocktail shaker with ice. Shake and strain over fresh ice into Rocks Glass. Garnish and serve.",
+    prep: ""
+  },
+  {
+    id: "c3", name: "Yuzu Basil Martini", glassware: "Martini", method: "Shake & Strain",
+    flavorTags: ["Yuzu", "Ginger", "Basil", "Bright Citrus"],
+    ingredients: ["2 oz Ketel One Vodka", "0.5 oz Finest Call Single Pressed Lemon Juice", "0.5 oz Finest Call Single Pressed Lime Juice", "0.75 oz Yuzu & Ginger Puree (house prep)", "4 Basil Leaves (torn in half)"],
+    garnish: "Basil Leaf, Fresh or Dehydrated Lemon Wheel",
+    directions: "Combine all ingredients in a cocktail shaker with ice. Shake and strain into martini glass. Garnish and serve.",
+    prep: "Yuzu Ginger Puree: whisk or blend 1 bottle (16.9 oz) Re\u00e0l Yuzu with 1 bottle (16.9 oz) Re\u00e0l Ginger for 3-5 minutes until fully emulsified. Label, date, refrigerate. Shake well before use. Yields 33.8 oz."
+  },
+  {
+    id: "c4", name: "Negroni Bianco", glassware: "Rocks Glass", method: "Stir & Strain",
+    flavorTags: ["Bergamot", "Floral", "Herbal", "Bittersweet"],
+    ingredients: ["1 oz Bombay Dry Gin", "1 oz Italicus", "1 oz Cinzano Bianco Vermouth"],
+    garnish: "Large Format Ice, Lemon Peel, Rosemary Sprig",
+    directions: "Stir all ingredients in a mixing glass with ice. Strain over large format ice cube. Garnish and serve.",
+    prep: ""
+  },
+  {
+    id: "c5", name: "Mystic Garden", glassware: "Martini, Jewelry Box", method: "Shake & Strain",
+    flavorTags: ["Herbal", "Honey", "Yuzu", "Smoke"],
+    ingredients: ["1.5 oz The Botanist Gin", "0.5 oz Cointreau Orange Liqueur", "0.5 oz Finest Call Single Pressed Lemon Juice", "0.5 oz Sweetbird Honeycomb Syrup", "2 oz Fever Tree Lime Yuzu Soda", "4 Basil Leaves (torn in half)"],
+    garnish: "Basil and/or Mint Sprig, Dehydrated Lavender, Lemon Wheel, Flavored Smoke",
+    directions: "Combine all ingredients (except Fever Tree) in a cocktail shaker with ice. Shake and strain into martini glass. Top with Fever Tree Lime Yuzu Soda. Garnish and fill bottom drawer with flavored smoke. Open tableside to release smoke and inform guest of interactive self garnish.",
+    prep: ""
+  },
+  {
+    id: "c6", name: "Scottish Manhattan", glassware: "Martini", method: "Stir & Strain",
+    flavorTags: ["Malt", "Dried Fruit", "Baking Spice", "Bitters"],
+    ingredients: ["2 oz Glenfiddich 12yr Single Malt", "1 oz Martini & Rossi Sweet Vermouth", "2 Dashes Angostura Bitters"],
+    garnish: "Cherry",
+    directions: "Combine all ingredients into mixing glass with ice. Stir and strain into martini glass. Garnish and serve.",
+    prep: ""
+  },
+  {
+    id: "c7", name: "Jade in the Shade", glassware: "Coupe", method: "Shake & Strain",
+    flavorTags: ["Matcha", "Mint", "Lime", "Silky"],
+    ingredients: ["2 oz Roku Gin", "1.5 oz Mint Matcha Syrup (house prep)", "1 oz Finest Call Single Pressed Lime Juice", "1 oz Egg White"],
+    garnish: "Mint Leaf, Matcha Chocolate Shavings",
+    directions: "Combine all ingredients in a cocktail shaker with ice. Shake and strain into coupe glass. Garnish and serve.",
+    prep: "Mint Matcha Syrup: whisk 1 bottle (33 oz) Sweetbird Mojito Mint Syrup with 2 tbsp high grade matcha powder until fully suspended. Label, date, refrigerate."
+  },
+  {
+    id: "c8", name: "Gilded Goose", glassware: "Martini, Martini Tray Set (optional)", method: "Shake & Strain",
+    flavorTags: ["Briny", "Olive", "Dry", "Crisp"],
+    ingredients: ["2.5 oz Grey Goose Vodka", "0.5 oz Martini & Rossi Dry Vermouth", "0.5 oz Olive Brine"],
+    garnish: "3 Skewered Olives, Fries (optional)",
+    directions: "Combine vodka, vermouth, and olive brine into a shaker tin. Shake with ice and double strain into a chilled martini glass. Garnish and serve.",
+    prep: ""
+  },
+  {
+    id: "c9", name: "Cosmobelle", glassware: "Coupe", method: "Shake & Strain",
+    flavorTags: ["Cranberry", "Citrus", "Dragon Fruit", "Sweet-Tart"],
+    ingredients: ["1.5 oz Absolut Citron", "0.5 oz Cointreau Orange Liqueur", "1.5 oz Cranberry Juice", "0.5 oz Finest Call Single Pressed Lime Juice", "0.5 oz Sweetbird Dragon Fruit & Papaya Syrup"],
+    garnish: "Dehydrated Dragon Fruit, Gold Sugar Half Rim",
+    directions: "Combine all ingredients in a cocktail shaker with ice. Shake and strain into coupe glass. Garnish and serve.",
+    prep: ""
+  },
+  {
+    id: "c10", name: "Gold Fashioned", glassware: "Single Rocks Glass", method: "Stir & Strain",
+    flavorTags: ["Whiskey", "Cabernet", "Oak Spice", "Bitters"],
+    ingredients: ["1.5 oz Jameson Irish Whiskey", "0.5 oz WhistlePig PiggyBack 6yr Rye", "0.25 oz Cabernet Simple Syrup (house prep)", "2 Dashes Angostura Bitters"],
+    garnish: "Manicured Orange Peel, Luxardo Cherry, 24k Large Gold Flakes",
+    directions: "Combine all ingredients into a mixing glass with ice. Stir and strain into single rocks glass over large format ice. Garnish and serve.",
+    prep: "Cabernet Simple Syrup: blend 1 bottle (25 oz) house Cabernet with 40 oz white sugar on medium for 5 minutes until fully dissolved and smooth. Label, date, store chilled. Yields ~66 oz."
+  },
+  {
+    id: "c11", name: "Golden 'B'", glassware: "Martini", method: "Shake & Strain",
+    flavorTags: ["Honey", "Lemon", "Bourbon", "Sparkling"],
+    ingredients: ["1.5 oz Maker's Mark Bourbon", "1 oz Finest Call Single Pressed Lemon Juice", "0.75 oz Gold Glitter Honeycomb Syrup (house prep)", "2 oz Sparkling Wine"],
+    garnish: "Dehydrated Lemon Wheel, Gold Sugar Stripe",
+    directions: "Combine all ingredients (minus sparkling wine) into a shaker tin. Shake with ice and strain into a martini glass. Top with sparkling wine. Garnish and serve.",
+    prep: "Gold Glitter Honeycomb Syrup: whisk 1 bottle (33 oz) Sweetbird Honeycomb Syrup with 2.5 g edible gold luster dust until fully suspended. Label, date. Yields 33 oz."
+  },
+  {
+    id: "c12", name: "Opulent Espresso Martini", glassware: "Coupe", method: "Shake & Strain",
+    flavorTags: ["Espresso", "Vanilla", "Agave", "Roasted"],
+    ingredients: ["1.5 oz Vanilla Bean Infused Patr\u00f3n Reposado (house prep)", "0.5 oz Mr. Black Cold Brew Liqueur", "2.5 oz Berg House Espresso Martini Mix (house prep)"],
+    garnish: "Three Gold Dusted Espresso Beans",
+    directions: "Combine all ingredients into a shaker tin. Shake with ice and strain into a coupe glass. Garnish and serve.",
+    prep: "Vanilla Bean Patr\u00f3n: drop 2 split vanilla pods into a Patr\u00f3n Reposado bottle to infuse on the backbar; keep at least 2 infused bottles on hand. Espresso Martini Mix: dissolve 1 can (94g) Illy Instant Classico into 40 oz warm water, add 24 oz Maven Cold Brew and 1 bottle (33.8 oz) Sweetbird Vanilla Syrup, stir. Label, date, chill. Yields 64 oz."
+  }
+];

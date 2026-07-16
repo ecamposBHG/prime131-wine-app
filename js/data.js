@@ -3,7 +3,7 @@
 
 const WINES = [
   {
-    id: "w1", name: "Ruffino Prosecco", style: "sparkling",
+    id: "w1", name: "Ruffino", style: "sparkling",
     grape: "100% Glera", producer: "Ruffino", region: "Veneto DOC, Italy",
     winemaker: "Ruffino's technical winemaking team",
     flavorTags: ["Green Apple", "Pear", "Citrus", "White Flower"],
@@ -54,7 +54,7 @@ const WINES = [
     shortStory: "Built as a cooperative representing thousands of small grower families rather than one aristocratic estate, Nicolas Feuillatte proves Champagne doesn't need centuries of noble history to be excellent — just excellent fruit and blending."
   },
   {
-    id: "w4", name: "Santa Margherita Pinot Grigio", style: "white",
+    id: "w4", name: "Santa Margherita", style: "white",
     grape: "100% Pinot Grigio", producer: "Santa Margherita", region: "Alto Adige DOC, Italy",
     winemaker: "Santa Margherita winemaking team",
     flavorTags: ["Green Apple", "Citrus", "White Flowers", "Mineral"],
@@ -71,7 +71,7 @@ const WINES = [
     shortStory: "Before Santa Margherita, most American drinkers had never heard of Pinot Grigio. Their clean, crisp house style became the template most people now picture when they think of the grape."
   },
   {
-    id: "w5", name: "Emmolo Sauvignon Blanc", style: "white",
+    id: "w5", name: "Emmolo", style: "white",
     grape: "100% Sauvignon Blanc", producer: "Emmolo", region: "Napa Valley, California",
     winemaker: "Jenny Wagner",
     flavorTags: ["Citrus Zest", "White Peach", "Fresh Herb", "Wet Stone"],
@@ -88,7 +88,7 @@ const WINES = [
     shortStory: "Emmolo is Jenny Wagner's own label within the larger Wagner family of wines — named for her mother's side, Sicilian immigrants who ran a grapevine nursery in Napa for decades."
   },
   {
-    id: "w6", name: "Cambria 'Katherine's Vineyard' Chardonnay", style: "white",
+    id: "w6", name: "Cambria 'Katherine's Vineyard'", style: "white",
     grape: "100% Chardonnay", producer: "Cambria", region: "Santa Maria Valley, California",
     winemaker: "Cambria estate winemaking team",
     flavorTags: ["Toasted Oak", "Tropical Fruit", "Baked Apple", "Vanilla"],
@@ -105,7 +105,7 @@ const WINES = [
     shortStory: "Katherine's Vineyard sits in the Santa Maria Valley, one of the few California AVAs that runs east-west, funneling cool Pacific air straight through the vines — part of why this Chardonnay keeps its richness without losing freshness."
   },
   {
-    id: "w7", name: "Stag's Leap Chardonnay", style: "white",
+    id: "w7", name: "Stag's Leap", style: "white",
     grape: "100% Chardonnay", producer: "Stag's Leap Wine Cellars", region: "Napa Valley, California",
     winemaker: "Marcus Notaro, Head Winemaker",
     flavorTags: ["Baked Pear", "Honeysuckle", "Toasted Brioche", "Vanilla Oak"],
@@ -122,7 +122,7 @@ const WINES = [
     shortStory: "Stag's Leap built its reputation on Cabernet after the 1976 Judgment of Paris, but the estate's Chardonnay carries the same philosophy — richness balanced by restraint, an approach the winery calls 'an iron fist in a velvet glove.'"
   },
   {
-    id: "w8", name: "Miraval Rosé", style: "white",
+    id: "w8", name: "Miraval", style: "white",
     grape: "Grenache, Cinsault, Syrah", producer: "Château Miraval", region: "Côtes de Provence, France",
     winemaker: "Estate winemaking team, Château Miraval",
     flavorTags: ["White Peach", "Citrus", "Floral"],
@@ -139,7 +139,7 @@ const WINES = [
     shortStory: "Long before it was a celebrity property, Miraval was a working wine estate in the hills of Correns, Provence. Today it's one of the region's most recognized rosé labels, made in a classic pale, dry Provençal style."
   },
   {
-    id: "w9", name: "Domaine de la Chezatte Sancerre Rosé", style: "white",
+    id: "w9", name: "Domaine de la Chezatte Sancerre", style: "white",
     grape: "100% Pinot Noir", producer: "Domaine de la Chézatte", region: "Sancerre, Loire Valley, France",
     winemaker: "Estate winemaking team",
     flavorTags: ["Red Berry", "Citrus", "Flint"],
@@ -156,7 +156,7 @@ const WINES = [
     shortStory: "Sancerre is famous for white wine, but a small amount of Pinot Noir grown on the same limestone slopes goes into pale, mineral-driven rosé like this one — a style locals drink far more than tourists ever hear about."
   },
   {
-    id: "w10", name: "Benton-Lane Pinot Noir", style: "red",
+    id: "w10", name: "Benton-Lane", style: "red",
     grape: "100% Pinot Noir", producer: "Benton-Lane", region: "Willamette Valley, Oregon",
     winemaker: "Estate winemaking team",
     flavorTags: ["Red Cherry", "Cranberry", "Forest Floor", "Herbal"],
@@ -173,7 +173,7 @@ const WINES = [
     shortStory: "Founded in the early 1980s in the Willamette Valley, Benton-Lane was one of the earlier wineries to bet on Oregon Pinot Noir before the region became internationally famous for it."
   },
   {
-    id: "w11", name: "Flowers Pinot Noir", style: "red",
+    id: "w11", name: "Flowers", style: "red",
     grape: "100% Pinot Noir", producer: "Flowers Vineyard & Winery", region: "Sonoma Coast, California",
     winemaker: "Chantal Forthun, Director of Winemaking",
     flavorTags: ["Wild Strawberry", "Dark Cherry", "Baking Spice", "Earthy Mineral"],
@@ -190,7 +190,7 @@ const WINES = [
     shortStory: "Founded by Walt and Joan Flowers in 1989 on land most winemakers considered too extreme to farm, Flowers helped prove the far Sonoma Coast could produce some of California's most elegant Pinot Noir."
   },
   {
-    id: "w12", name: "Corazon del Sol Malbec", style: "red",
+    id: "w12", name: "Corazon del Sol", style: "red",
     grape: "100% Malbec", producer: "Corazón del Sol", region: "Uco Valley, Mendoza, Argentina",
     winemaker: "Estate winemaking team, Uco Valley",
     flavorTags: ["Black Plum", "Blackberry", "Violet", "Tar & Spice"],
@@ -207,7 +207,7 @@ const WINES = [
     shortStory: "Malbec followed French immigrants to Argentina in the 1800s and nearly disappeared after a hard frost in the 1950s. High-altitude sites like this one in the Uco Valley are part of why the grape came roaring back as Argentina's signature red."
   },
   {
-    id: "w13", name: "Markham Merlot", style: "red",
+    id: "w13", name: "Markham", style: "red",
     grape: "Merlot-dominant blend", producer: "Markham Vineyards", region: "Napa Valley, California",
     winemaker: "Estate winemaking team",
     flavorTags: ["Black Cherry", "Plum", "Cocoa", "Baking Spice"],
@@ -224,7 +224,7 @@ const WINES = [
     shortStory: "The winery's stone building dates to the 1870s, making Markham one of the physically oldest working wine properties in Napa Valley, even though the Markham name itself came later."
   },
   {
-    id: "w14", name: "Austin Hope Cabernet Sauvignon", style: "red",
+    id: "w14", name: "Austin Hope", style: "red",
     grape: "Cabernet Sauvignon", producer: "Austin Hope", region: "Paso Robles, California",
     winemaker: "Austin Hope",
     flavorTags: ["Blackberry", "Dark Chocolate", "Vanilla Oak", "Warm Spice"],
@@ -241,7 +241,7 @@ const WINES = [
     shortStory: "Built on ripe, generous Paso Robles Cabernet at a time when most collectors only took Napa seriously, Austin Hope's namesake wine helped change that conversation."
   },
   {
-    id: "w15", name: "Oberon Cabernet Sauvignon", style: "red",
+    id: "w15", name: "Oberon", style: "red",
     grape: "Cabernet Sauvignon", producer: "Oberon", region: "Napa Valley, California",
     winemaker: "Chuck Wagner",
     flavorTags: ["Dark Berry", "Cassis", "Oak Spice", "Mocha"],
@@ -258,7 +258,7 @@ const WINES = [
     shortStory: "Named after Shakespeare's fairy king, Oberon was built to be Caymus's more playful, easy-drinking little sibling — same winemaking hand, lighter price tag."
   },
   {
-    id: "w16", name: "Caymus Cabernet Sauvignon", style: "red",
+    id: "w16", name: "Caymus", style: "red",
     grape: "Cabernet Sauvignon", producer: "Caymus Vineyards", region: "California",
     winemaker: "Chuck Wagner",
     flavorTags: ["Black Currant", "Mocha", "Vanilla", "Toasted Oak"],
@@ -309,7 +309,7 @@ const WINES = [
     shortStory: "'Madame' gives guests a taste of real, classified Bordeaux château pedigree — made from younger vines and lots that don't quite make the cut for the flagship wine — without the flagship price tag."
   },
   {
-    id: "w19", name: "Trefethen 'Eshcol' Meritage", style: "red",
+    id: "w19", name: "Trefethen 'Eshcol'", style: "red",
     grape: "Cabernet Sauvignon-led Bordeaux blend", producer: "Trefethen Family Vineyards", region: "Oak Knoll District, Napa Valley, California",
     winemaker: "Estate winemaking team",
     flavorTags: ["Black Cherry", "Dried Herb", "Cedar", "Baking Spice"],
@@ -326,7 +326,7 @@ const WINES = [
     shortStory: "The winery's original wooden building, called Eshcol, was built in 1886 and is one of the oldest wooden wine structures still in use in Napa Valley — the wine takes its name directly from it."
   },
   {
-    id: "w20", name: "Yoshi No Gawa 'Winter Warrior' Junmai Ginjo", style: "sake",
+    id: "w20", name: "Yoshi No Gawa 'Winter Warrior'", style: "sake",
     grape: "Gohyakumangoku rice, 60% polish", producer: "Yoshinogawa", region: "Niigata Prefecture, Japan",
     winemaker: "Toji (master brewer), Yoshinogawa Brewery",
     flavorTags: ["Melon", "Honeydew", "Lychee", "Floral"],

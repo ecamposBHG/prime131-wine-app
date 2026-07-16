@@ -1598,13 +1598,6 @@ function renderSpeedEnd(mode, score) {
 
 function buildImposterRound() {
   const rules = [];
-  STYLE_ORDER.forEach(style => {
-    const group = WINES.filter(w => w.style === style);
-    if (group.length >= 3) rules.push({
-      pick: group, exclude: WINES.filter(w => w.style !== style),
-      why: `The other three are all ${STYLE_LABELS[style].toLowerCase()} pours.`
-    });
-  });
   const napa = WINES.filter(w => w.region.includes("Napa"));
   if (napa.length >= 3) rules.push({
     pick: napa, exclude: WINES.filter(w => !w.region.includes("Napa")),
@@ -1619,6 +1612,16 @@ function buildImposterRound() {
   if (highAcid.length >= 3) rules.push({
     pick: highAcid, exclude: WINES.filter(w => w.structure.acidity <= 2),
     why: "The other three are all high-acid, fresh-style pours &mdash; the imposter is soft and round."
+  });
+  const fullBody = WINES.filter(w => w.structure.body >= 4);
+  if (fullBody.length >= 3) rules.push({
+    pick: fullBody, exclude: WINES.filter(w => w.structure.body <= 2),
+    why: "The other three are all full-bodied &mdash; the imposter is noticeably lighter on the palate."
+  });
+  const lightBody = WINES.filter(w => w.structure.body <= 2);
+  if (lightBody.length >= 3) rules.push({
+    pick: lightBody, exclude: WINES.filter(w => w.structure.body >= 4),
+    why: "The other three are all light-bodied &mdash; the imposter is much fuller and richer."
   });
   DISHES.filter(d => d.pairedWineIds && d.pairedWineIds.length >= 3).forEach(dish => {
     rules.push({
@@ -1661,7 +1664,7 @@ function renderImposter() {
   tiles.forEach(w => {
     const tile = document.createElement("button");
     tile.className = "match-tile imposter-tile";
-    tile.innerHTML = `<b>${w.name}</b><br><span class="imposter-sub">${w.grape}</span>`;
+    tile.innerHTML = `<b>${w.name}</b>`;
     tile.onclick = () => {
       if (done) return;
       done = true;
@@ -1699,6 +1702,7 @@ function buildSommStatement() {
 
   function otherWine(fieldFn) {
     const candidates = WINES.filter(w => w.id !== wine.id && fieldFn(w) !== fieldFn(wine));
+    if (!candidates.length) return wine;
     return candidates[Math.floor(Math.random() * candidates.length)];
   }
 

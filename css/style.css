@@ -422,7 +422,7 @@ body.dark .testme-answer-name { color: #F5F1E8; }
   min-height: 170px; display: flex; align-items: center; justify-content: center;
   transition: box-shadow 0.15s ease;
 }
-.somm-statement { font-size: 18px; color: var(--washi-100); line-height: 1.55; text-align: center; margin: 0; font-weight: 500; }
+.somm-statement { font-size: 18px; color: #F5F1E8; line-height: 1.55; text-align: center; margin: 0; font-weight: 500; }
 .somm-card.somm-flash-right { box-shadow: inset 0 0 0 4px var(--wasabi-500); }
 .somm-card.somm-flash-wrong { box-shadow: inset 0 0 0 4px #A5533B; }
 .somm-btn-row { display: flex; gap: 10px; margin-top: 14px; }

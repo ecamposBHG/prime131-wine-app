@@ -201,7 +201,10 @@ const SECTION_ICON_MAP = {
 };
 function getSectionIcon(section) { return SECTION_ICON_MAP[section] || "\u{1F37D}\uFE0F"; }
 
+let activeTimer = null;
+
 function render() {
+  if (activeTimer) { clearInterval(activeTimer); activeTimer = null; }
   app.innerHTML = "";
   if (current.view === "home") renderHome();
   else if (current.view === "study-list") renderStudyList();
@@ -216,6 +219,9 @@ function render() {
   else if (current.view === "test-me-run") renderTestMeRun(current.params.mode);
   else if (current.view === "game-room") renderGameRoom();
   else if (current.view === "this-or-that") renderThisOrThat();
+  else if (current.view === "imposter") renderImposter();
+  else if (current.view === "somm-says") renderSommSays();
+  else if (current.view === "somm-says-run") renderSommSaysRun(current.params.seconds);
   else if (current.view === "match-it") renderMatchIt(current.params.matchType);
   else if (current.view === "match-it-picker") renderMatchItPicker();
   else if (current.view === "cocktail-list") renderCocktailList();
@@ -1046,6 +1052,19 @@ function buildTestQueue(mode) {
   return [...shuffle(learning), ...shuffle(unseen), ...shuffle(known)];
 }
 
+let speedPref = { testme: false, match: false };
+
+function speedToggleRow(prefKey, label) {
+  const row = document.createElement("div");
+  row.className = "speed-toggle" + (speedPref[prefKey] ? " active" : "");
+  row.innerHTML = `<span class="speed-icon">&#9889;</span><span class="speed-text">${label}</span><span class="speed-state">${speedPref[prefKey] ? "ON" : "OFF"}</span>`;
+  row.onclick = () => {
+    speedPref[prefKey] = !speedPref[prefKey];
+    render();
+  };
+  return row;
+}
+
 function renderTestMe() {
   header("Quiz tool");
 
@@ -1053,6 +1072,8 @@ function renderTestMe() {
   intro.className = "testme-counter";
   intro.textContent = "What do you want to be tested on?";
   app.appendChild(intro);
+
+  app.appendChild(speedToggleRow("testme", "Speed round \u00b7 60 seconds, score as many as you can"));
 
   const options = document.createElement("div");
   options.className = "home-options";
@@ -1075,6 +1096,8 @@ function renderTestMeRun(mode) {
   mode = mode === "food" ? "food" : "wine";
   header("Quiz tool");
 
+  const isSpeed = speedPref.testme;
+
   if (!testQueues[mode].length) testQueues[mode] = buildTestQueue(mode);
   const itemId = testQueues[mode][0];
   const isFood = mode === "food";
@@ -1084,10 +1107,40 @@ function renderTestMeRun(mode) {
   const progress = getProgress();
   const knownCount = pool.filter(x => progress[x.id] === "known").length;
 
-  const counter = document.createElement("p");
-  counter.className = "testme-counter";
-  counter.textContent = `${knownCount} of ${pool.length} marked as known`;
-  app.appendChild(counter);
+  if (isSpeed) {
+    if (typeof current.params.score !== "number") {
+      current.params.score = 0;
+      current.params.endsAt = Date.now() + 60000;
+    }
+    const remaining = Math.max(0, current.params.endsAt - Date.now());
+    if (remaining <= 0) {
+      renderSpeedEnd(mode, current.params.score);
+      return;
+    }
+    const timerWrap = document.createElement("div");
+    timerWrap.className = "timer-wrap";
+    timerWrap.innerHTML = `
+      <div class="timer-row"><span class="timer-score">&#9889; Score: ${current.params.score}</span><span class="timer-count">${Math.ceil(remaining / 1000)}s</span></div>
+      <div class="timer-track"><div class="timer-fill" style="width:${(remaining / 60000) * 100}%;"></div></div>
+    `;
+    app.appendChild(timerWrap);
+    activeTimer = setInterval(() => {
+      const left = Math.max(0, current.params.endsAt - Date.now());
+      const countEl = timerWrap.querySelector(".timer-count");
+      const fillEl = timerWrap.querySelector(".timer-fill");
+      if (countEl) countEl.textContent = Math.ceil(left / 1000) + "s";
+      if (fillEl) fillEl.style.width = (left / 60000) * 100 + "%";
+      if (left <= 0) {
+        clearInterval(activeTimer); activeTimer = null;
+        renderSpeedEnd(mode, current.params.score);
+      }
+    }, 250);
+  } else {
+    const counter = document.createElement("p");
+    counter.className = "testme-counter";
+    counter.textContent = `${knownCount} of ${pool.length} marked as known`;
+    app.appendChild(counter);
+  }
 
   const card = document.createElement("div");
   card.className = "testme-card";
@@ -1145,6 +1198,11 @@ function renderTestMeRun(mode) {
     testQueues[mode].shift();
     if (status === "learning") testQueues[mode].push(item.id);
     if (!testQueues[mode].length) testQueues[mode] = buildTestQueue(mode);
+    if (isSpeed) {
+      if (status === "known") current.params.score++;
+      render();
+      return;
+    }
     const updated = getProgress();
     const allKnown = pool.every(x => updated[x.id] === "known");
     if (allKnown && markMilestone("testme-" + mode + "-complete")) {
@@ -1280,10 +1338,20 @@ function renderGameRoom() {
       <div class="home-icon-circle">&#127183;</div>
       <div class="home-option-text"><p>Match It</p><span>Flip and match wines to regions, flavors, and pairings</span></div>
     </div>
+    <div class="home-option" data-go="imposter">
+      <div class="home-icon-circle">&#128373;&#65039;</div>
+      <div class="home-option-text"><p>Imposter</p><span>Three belong together &mdash; one doesn't. Find it.</span></div>
+    </div>
+    <div class="home-option" data-go="sommsays">
+      <div class="home-icon-circle">&#9889;</div>
+      <div class="home-option-text"><p>Sommelier Says</p><span>Rapid-fire true or false, against the clock</span></div>
+    </div>
   `;
   options.querySelector('[data-go="testme"]').onclick = () => go("test-me");
   options.querySelector('[data-go="thisorthat"]').onclick = () => go("this-or-that");
   options.querySelector('[data-go="matchit"]').onclick = () => go("match-it-picker");
+  options.querySelector('[data-go="imposter"]').onclick = () => go("imposter");
+  options.querySelector('[data-go="sommsays"]').onclick = () => go("somm-says");
   app.appendChild(options);
 }
 
@@ -1485,6 +1553,299 @@ function renderMatchIt(matchType) {
   });
 
   app.appendChild(grid);
+}
+
+/* ---------- Speed round end screen ---------- */
+
+function renderSpeedEnd(mode, score) {
+  app.innerHTML = "";
+  header("Quiz tool");
+  const bestKey = "p131-best-speed-" + mode;
+  let best = 0;
+  try { best = parseInt(localStorage.getItem(bestKey)) || 0; } catch (e) {}
+  const isRecord = score > best;
+  if (isRecord) {
+    try { localStorage.setItem(bestKey, String(score)); } catch (e) {}
+    celebrate();
+  }
+
+  const wrap = document.createElement("div");
+  wrap.className = "speed-end";
+  wrap.innerHTML = `
+    <p class="speed-end-icon">&#9889;</p>
+    <p class="speed-end-score">${score}</p>
+    <p class="speed-end-label">${mode === "food" ? "dishes" : "wines"} nailed in 60 seconds</p>
+    <p class="speed-end-best">${isRecord ? "&#127942; New personal best!" : `Personal best: ${best}`}</p>
+  `;
+  app.appendChild(wrap);
+
+  const btnRow = document.createElement("div");
+  btnRow.className = "card-footer-nav";
+  const againBtn = document.createElement("button");
+  againBtn.className = "footer-btn footer-btn-home";
+  againBtn.textContent = "Run it back \u26A1";
+  againBtn.onclick = () => go("test-me-run", { mode });
+  const backBtn = document.createElement("button");
+  backBtn.className = "footer-btn";
+  backBtn.textContent = "Game Room";
+  backBtn.onclick = () => go("game-room");
+  btnRow.appendChild(backBtn);
+  btnRow.appendChild(againBtn);
+  app.appendChild(btnRow);
+}
+
+/* ---------- Imposter: three share a trait, one doesn't ---------- */
+
+function buildImposterRound() {
+  const rules = [];
+  STYLE_ORDER.forEach(style => {
+    const group = WINES.filter(w => w.style === style);
+    if (group.length >= 3) rules.push({
+      pick: group, exclude: WINES.filter(w => w.style !== style),
+      why: `The other three are all ${STYLE_LABELS[style].toLowerCase()} pours.`
+    });
+  });
+  const napa = WINES.filter(w => w.region.includes("Napa"));
+  if (napa.length >= 3) rules.push({
+    pick: napa, exclude: WINES.filter(w => !w.region.includes("Napa")),
+    why: "The other three are all from Napa Valley."
+  });
+  const bigTannin = WINES.filter(w => w.structure.tannin >= 3);
+  if (bigTannin.length >= 3) rules.push({
+    pick: bigTannin, exclude: WINES.filter(w => w.structure.tannin <= 1),
+    why: "The other three are structured, tannic reds &mdash; the imposter barely has any grip."
+  });
+  const highAcid = WINES.filter(w => w.structure.acidity >= 4);
+  if (highAcid.length >= 3) rules.push({
+    pick: highAcid, exclude: WINES.filter(w => w.structure.acidity <= 2),
+    why: "The other three are all high-acid, fresh-style pours &mdash; the imposter is soft and round."
+  });
+  DISHES.filter(d => d.pairedWineIds && d.pairedWineIds.length >= 3).forEach(dish => {
+    rules.push({
+      pick: dish.pairedWineIds.map(findWine).filter(Boolean),
+      exclude: WINES.filter(w => !dish.pairedWineIds.includes(w.id)),
+      why: `The other three are all listed pairings for the ${dish.name}.`
+    });
+  });
+
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const rule = rules[Math.floor(Math.random() * rules.length)];
+    if (rule.pick.length < 3 || !rule.exclude.length) continue;
+    const trio = [...rule.pick].sort(() => Math.random() - 0.5).slice(0, 3);
+    const imposter = rule.exclude[Math.floor(Math.random() * rule.exclude.length)];
+    return { trio, imposter, why: rule.why };
+  }
+  return null;
+}
+
+function renderImposter() {
+  header("Imposter");
+
+  const round = buildImposterRound();
+  if (!round) { go("game-room", {}, false); return; }
+  const tiles = [...round.trio, round.imposter].sort(() => Math.random() - 0.5);
+
+  const intro = document.createElement("p");
+  intro.className = "testme-counter";
+  intro.textContent = "Three of these belong together. Tap the imposter.";
+  app.appendChild(intro);
+
+  const grid = document.createElement("div");
+  grid.className = "match-grid";
+  let done = false;
+
+  const explain = document.createElement("div");
+  explain.className = "tot-explain";
+  explain.style.display = "none";
+
+  tiles.forEach(w => {
+    const tile = document.createElement("button");
+    tile.className = "match-tile imposter-tile";
+    tile.innerHTML = `<b>${w.name}</b><br><span class="imposter-sub">${w.grape}</span>`;
+    tile.onclick = () => {
+      if (done) return;
+      done = true;
+      const correct = w.id === round.imposter.id;
+      grid.querySelectorAll(".imposter-tile").forEach(t => t.classList.add("revealed"));
+      tile.classList.add(correct ? "matched" : "tot-wrong-tile");
+      if (!correct) {
+        [...grid.children].forEach((t, i) => {
+          if (tiles[i].id === round.imposter.id) t.classList.add("matched");
+        });
+      }
+      explain.innerHTML = `
+        <p class="tot-verdict">${correct ? "&#9989; Found it." : `&#10060; The imposter was <b>${round.imposter.name}</b>.`}</p>
+        <p class="pairing-reason">${round.why}</p>
+        <button class="footer-btn footer-btn-home tot-next">Next round &rarr;</button>
+      `;
+      explain.style.display = "block";
+      explain.querySelector(".tot-next").onclick = () => render();
+    };
+    grid.appendChild(tile);
+  });
+
+  app.appendChild(grid);
+  app.appendChild(explain);
+}
+
+/* ---------- Sommelier Says: rapid-fire true/false against the clock ---------- */
+
+function buildSommStatement() {
+  const wine = WINES[Math.floor(Math.random() * WINES.length)];
+  const isTrue = Math.random() < 0.5;
+  const types = ["region", "grape", "pairing"];
+  if (!wine.winemaker.toLowerCase().includes("team") && !wine.winemaker.toLowerCase().includes("toji")) types.push("winemaker");
+  const type = types[Math.floor(Math.random() * types.length)];
+
+  function otherWine(fieldFn) {
+    const candidates = WINES.filter(w => w.id !== wine.id && fieldFn(w) !== fieldFn(wine));
+    return candidates[Math.floor(Math.random() * candidates.length)];
+  }
+
+  if (type === "region") {
+    const shown = isTrue ? wine.region : otherWine(w => w.region).region;
+    return { text: `${wine.name} comes from ${shown}.`, isTrue };
+  }
+  if (type === "grape") {
+    const shown = isTrue ? wine.grape : otherWine(w => w.grape).grape;
+    return { text: `${wine.name} is made from ${shown}.`, isTrue };
+  }
+  if (type === "winemaker") {
+    const namedOthers = WINES.filter(w => w.id !== wine.id && !w.winemaker.toLowerCase().includes("team") && !w.winemaker.toLowerCase().includes("toji") && w.winemaker !== wine.winemaker);
+    if (isTrue || !namedOthers.length) {
+      return { text: `${wine.name} is made by ${wine.winemaker}.`, isTrue: true };
+    }
+    const other = namedOthers[Math.floor(Math.random() * namedOthers.length)];
+    return { text: `${wine.name} is made by ${other.winemaker}.`, isTrue: false };
+  }
+  // pairing
+  if (isTrue && wine.pairingDishIds.length) {
+    const dish = findDish(wine.pairingDishIds[Math.floor(Math.random() * wine.pairingDishIds.length)]);
+    return { text: `${wine.name} is a listed pairing for the ${dish.name}.`, isTrue: true };
+  }
+  const nonPaired = DISHES.filter(d => d.pairedWineIds && d.pairedWineIds.length && !wine.pairingDishIds.includes(d.id));
+  const dish = nonPaired[Math.floor(Math.random() * nonPaired.length)];
+  return { text: `${wine.name} is a listed pairing for the ${dish.name}.`, isTrue: false };
+}
+
+function renderSommSays() {
+  header("Sommelier Says");
+
+  const intro = document.createElement("p");
+  intro.className = "testme-counter";
+  intro.textContent = "True or false, as fast as you can. How long do you want?";
+  app.appendChild(intro);
+
+  const options = document.createElement("div");
+  options.className = "home-options";
+  [15, 30, 60, 90].forEach(s => {
+    const opt = document.createElement("div");
+    opt.className = "home-option";
+    opt.innerHTML = `
+      <div class="home-icon-circle">&#9200;</div>
+      <div class="home-option-text"><p>${s} seconds</p><span>${s <= 15 ? "Lightning round" : s <= 30 ? "Quick hit" : s <= 60 ? "The standard" : "The marathon"}</span></div>
+    `;
+    opt.onclick = () => go("somm-says-run", { seconds: s });
+    options.appendChild(opt);
+  });
+  app.appendChild(options);
+}
+
+function renderSommSaysRun(seconds) {
+  seconds = [15, 30, 60, 90].includes(seconds) ? seconds : 30;
+  header("Sommelier Says");
+
+  if (typeof current.params.score !== "number") {
+    current.params.score = 0;
+    current.params.total = 0;
+    current.params.endsAt = Date.now() + seconds * 1000;
+  }
+  const remaining = Math.max(0, current.params.endsAt - Date.now());
+  if (remaining <= 0) { renderSommEnd(seconds, current.params.score, current.params.total); return; }
+
+  const timerWrap = document.createElement("div");
+  timerWrap.className = "timer-wrap";
+  timerWrap.innerHTML = `
+    <div class="timer-row"><span class="timer-score">&#9889; ${current.params.score}/${current.params.total}</span><span class="timer-count">${Math.ceil(remaining / 1000)}s</span></div>
+    <div class="timer-track"><div class="timer-fill" style="width:${(remaining / (seconds * 1000)) * 100}%;"></div></div>
+  `;
+  app.appendChild(timerWrap);
+  activeTimer = setInterval(() => {
+    const left = Math.max(0, current.params.endsAt - Date.now());
+    const countEl = timerWrap.querySelector(".timer-count");
+    const fillEl = timerWrap.querySelector(".timer-fill");
+    if (countEl) countEl.textContent = Math.ceil(left / 1000) + "s";
+    if (fillEl) fillEl.style.width = (left / (seconds * 1000)) * 100 + "%";
+    if (left <= 0) {
+      clearInterval(activeTimer); activeTimer = null;
+      renderSommEnd(seconds, current.params.score, current.params.total);
+    }
+  }, 250);
+
+  const statement = buildSommStatement();
+  const card = document.createElement("div");
+  card.className = "somm-card";
+  card.innerHTML = `<p class="somm-statement">${statement.text}</p>`;
+  app.appendChild(card);
+
+  const btnRow = document.createElement("div");
+  btnRow.className = "somm-btn-row";
+  const falseBtn = document.createElement("button");
+  falseBtn.className = "somm-btn somm-false";
+  falseBtn.textContent = "FALSE";
+  const trueBtn = document.createElement("button");
+  trueBtn.className = "somm-btn somm-true";
+  trueBtn.textContent = "TRUE";
+
+  function answer(saidTrue) {
+    current.params.total++;
+    const right = saidTrue === statement.isTrue;
+    if (right) current.params.score++;
+    card.classList.add(right ? "somm-flash-right" : "somm-flash-wrong");
+    setTimeout(() => render(), 260);
+  }
+  falseBtn.onclick = () => answer(false);
+  trueBtn.onclick = () => answer(true);
+  btnRow.appendChild(falseBtn);
+  btnRow.appendChild(trueBtn);
+  app.appendChild(btnRow);
+}
+
+function renderSommEnd(seconds, score, total) {
+  app.innerHTML = "";
+  header("Sommelier Says");
+  const bestKey = "p131-best-somm-" + seconds;
+  let best = 0;
+  try { best = parseInt(localStorage.getItem(bestKey)) || 0; } catch (e) {}
+  const isRecord = score > best;
+  if (isRecord) {
+    try { localStorage.setItem(bestKey, String(score)); } catch (e) {}
+    celebrate();
+  }
+
+  const wrap = document.createElement("div");
+  wrap.className = "speed-end";
+  wrap.innerHTML = `
+    <p class="speed-end-icon">&#9889;</p>
+    <p class="speed-end-score">${score}<span class="speed-end-total">/${total}</span></p>
+    <p class="speed-end-label">correct in ${seconds} seconds</p>
+    <p class="speed-end-best">${isRecord ? "&#127942; New personal best!" : `Personal best (${seconds}s): ${best}`}</p>
+  `;
+  app.appendChild(wrap);
+
+  const btnRow = document.createElement("div");
+  btnRow.className = "card-footer-nav";
+  const againBtn = document.createElement("button");
+  againBtn.className = "footer-btn footer-btn-home";
+  againBtn.textContent = "Run it back \u26A1";
+  againBtn.onclick = () => go("somm-says-run", { seconds });
+  const backBtn = document.createElement("button");
+  backBtn.className = "footer-btn";
+  backBtn.textContent = "Game Room";
+  backBtn.onclick = () => go("game-room");
+  btnRow.appendChild(backBtn);
+  btnRow.appendChild(againBtn);
+  app.appendChild(btnRow);
 }
 
 initTheme();

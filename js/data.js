@@ -293,7 +293,7 @@ const WINES = [
   },
   {
     id: "w18", name: "Madame de Beaucaillou", style: "red",
-    grape: "Merlot, Cabernet Sauvignon, Petit Verdot, Cabernet Franc", producer: "Second wine of Château Ducru-Beaucaillou", region: "Haut-Médoc, Bordeaux, France",
+    grape: "Merlot, Cabernet Sauvignon, Petit Verdot, Cabernet Franc", producer: "Château Ducru-Beaucaillou", region: "Haut-Médoc, Bordeaux, France",
     winemaker: "Winemaking team, Château Ducru-Beaucaillou",
     flavorTags: ["Blackcurrant", "Violet", "Morello Cherry", "Oak Spice"],
     structure: { sweetness: 1, acidity: 3, tannin: 3, alcohol: 3, body: 4 },

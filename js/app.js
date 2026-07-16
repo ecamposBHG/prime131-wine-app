@@ -214,6 +214,10 @@ function render() {
   else if (current.view === "pairing-explain") renderPairingExplain(current.params.wineId, current.params.dishId);
   else if (current.view === "test-me") renderTestMe();
   else if (current.view === "test-me-run") renderTestMeRun(current.params.mode);
+  else if (current.view === "game-room") renderGameRoom();
+  else if (current.view === "this-or-that") renderThisOrThat();
+  else if (current.view === "match-it") renderMatchIt(current.params.matchType);
+  else if (current.view === "match-it-picker") renderMatchItPicker();
   else if (current.view === "cocktail-list") renderCocktailList();
   else if (current.view === "cocktail-detail") renderCocktailDetail(current.params.cocktailId);
   window.scrollTo(0, 0);
@@ -324,9 +328,9 @@ function renderHome() {
       <div class="home-icon-circle">&#127860;</div>
       <div class="home-option-text"><p>Pair Food with Wine</p><span>Start from the dish</span></div>
     </div>
-    <div class="home-option" data-go="testme">
-      <div class="home-icon-circle">&#127919;</div>
-      <div class="home-option-text"><p>Quiz Tool</p><span>Test yourself on wines and food</span></div>
+    <div class="home-option" data-go="gameroom">
+      <div class="home-icon-circle">&#127918;</div>
+      <div class="home-option-text"><p>Game Room</p><span>Micro-learning games: quiz, match, judgment calls</span></div>
     </div>
   `;
   options.querySelector('[data-go="study"]').onclick = () => go("study-list");
@@ -334,7 +338,7 @@ function renderHome() {
   options.querySelector('[data-go="pairwf"]').onclick = () => go("pairwf-list");
   options.querySelector('[data-go="pairfw"]').onclick = () => go("pairfw-list");
   options.querySelector('[data-go="menu"]').onclick = () => go("menu-list");
-  options.querySelector('[data-go="testme"]').onclick = () => go("test-me");
+  options.querySelector('[data-go="gameroom"]').onclick = () => go("game-room");
   app.appendChild(options);
 }
 
@@ -392,19 +396,55 @@ function renderPairWineFoodList() {
   ));
 }
 
-function renderDishList(headerTitle, searchPlaceholder) {
+function renderDishList(headerTitle, searchPlaceholder, showAllergenFilter) {
   header(headerTitle);
   const wrap = document.createElement("div");
   const input = document.createElement("input");
   input.className = "search-input";
   input.placeholder = searchPlaceholder;
   wrap.appendChild(input);
+
+  let excludedAllergens = [];
+  if (showAllergenFilter) {
+    const allAllergens = [...new Set(DISHES.flatMap(d => d.allergensInRecipe || []))].sort();
+    const filterLabel = document.createElement("p");
+    filterLabel.className = "allergen-group-label";
+    filterLabel.style.marginTop = "4px";
+    filterLabel.textContent = "Hide dishes containing:";
+    wrap.appendChild(filterLabel);
+    const filterRow = document.createElement("div");
+    filterRow.className = "allergen-row";
+    allAllergens.forEach(a => {
+      const chip = document.createElement("button");
+      chip.className = "chip removable allergen-filter-chip";
+      chip.textContent = a.charAt(0).toUpperCase() + a.slice(1);
+      chip.onclick = () => {
+        if (excludedAllergens.includes(a)) {
+          excludedAllergens = excludedAllergens.filter(x => x !== a);
+          chip.classList.remove("filter-active");
+        } else {
+          excludedAllergens.push(a);
+          chip.classList.add("filter-active");
+        }
+        draw(input.value);
+      };
+      filterRow.appendChild(chip);
+    });
+    wrap.appendChild(filterRow);
+  }
+
   const listWrap = document.createElement("div");
   wrap.appendChild(listWrap);
 
   function draw(filter) {
     listWrap.innerHTML = "";
-    const filtered = DISHES.filter(d => d.name.toLowerCase().includes(filter.toLowerCase()));
+    let filtered = DISHES.filter(d => d.name.toLowerCase().includes(filter.toLowerCase()));
+    if (excludedAllergens.length) {
+      filtered = filtered.filter(d => {
+        const has = d.allergensInRecipe || [];
+        return !excludedAllergens.some(a => has.includes(a));
+      });
+    }
     const groups = groupBySection(filtered);
     SECTION_ORDER.forEach(section => {
       const dishes = groups[section];
@@ -435,7 +475,7 @@ function renderPairFoodWineList() {
 }
 
 function renderMenuList() {
-  renderDishList("Food menu", "Search the menu");
+  renderDishList("Food menu", "Search the menu", true);
 }
 
 function renderCocktailList() {
@@ -522,6 +562,8 @@ function renderCocktailDetail(cocktailId) {
       <p class="dish-flip-title">&#127864; Build</p>
       <p class="chefprep-text">${cocktail.directions}</p>
       ${cocktail.prep ? `<p class="chefprep-text" style="margin-top:8px;"><b style="color:#D9B98A;">House prep:</b> ${cocktail.prep}</p>` : ""}
+      ${cocktail.funFact ? `<p class="chefprep-text" style="margin-top:8px;"><b style="color:#D9B98A;">Fun fact:</b> ${cocktail.funFact}</p>` : ""}
+      ${cocktail.bestFor ? `<p class="chefprep-text" style="margin-top:8px;"><b style="color:#D9B98A;">Great for:</b> ${cocktail.bestFor}</p>` : ""}
     `;
   }
 
@@ -1103,6 +1145,13 @@ function renderTestMeRun(mode) {
     testQueues[mode].shift();
     if (status === "learning") testQueues[mode].push(item.id);
     if (!testQueues[mode].length) testQueues[mode] = buildTestQueue(mode);
+    const updated = getProgress();
+    const allKnown = pool.every(x => updated[x.id] === "known");
+    if (allKnown && markMilestone("testme-" + mode + "-complete")) {
+      celebrate();
+      setTimeout(() => render(), 1200);
+      return;
+    }
     render();
   }
 
@@ -1169,6 +1218,273 @@ function renderTestMeRun(mode) {
     render();
   };
   app.appendChild(resetLink);
+}
+
+/* ---------- Game Room ---------- */
+
+const MILESTONE_KEY = "p131-milestones";
+function getMilestones() {
+  try { return JSON.parse(localStorage.getItem(MILESTONE_KEY)) || {}; } catch (e) { return {}; }
+}
+function markMilestone(key) {
+  const m = getMilestones();
+  if (m[key]) return false;
+  m[key] = true;
+  try { localStorage.setItem(MILESTONE_KEY, JSON.stringify(m)); } catch (e) {}
+  return true;
+}
+
+function celebrate() {
+  const overlay = document.createElement("div");
+  overlay.className = "celebrate-overlay";
+  for (let i = 0; i < 24; i++) {
+    const piece = document.createElement("span");
+    piece.className = "confetti";
+    piece.textContent = ["\u{1F37E}", "\u{1F942}", "\u{1F377}", "\u2728"][i % 4];
+    piece.style.left = Math.random() * 100 + "%";
+    piece.style.animationDelay = (Math.random() * 0.6) + "s";
+    piece.style.fontSize = (16 + Math.random() * 14) + "px";
+    overlay.appendChild(piece);
+  }
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.remove(), 2600);
+}
+
+function renderGameRoom() {
+  header("Game Room");
+
+  const progress = getProgress();
+  const wineKnown = WINES.filter(w => progress[w.id] === "known").length;
+  const foodPool = quizPool("food");
+  const foodKnown = foodPool.filter(d => progress[d.id] === "known").length;
+
+  const status = document.createElement("div");
+  status.className = "milestone-strip";
+  status.innerHTML = `
+    <p class="milestone-line">&#127942; Wines known: ${wineKnown}/${WINES.length} &middot; Dishes known: ${foodKnown}/${foodPool.length}</p>
+  `;
+  app.appendChild(status);
+
+  const options = document.createElement("div");
+  options.className = "home-options";
+  options.innerHTML = `
+    <div class="home-option" data-go="testme">
+      <div class="home-icon-circle">&#127919;</div>
+      <div class="home-option-text"><p>Test Me</p><span>Guess the wine or dish, track what you know</span></div>
+    </div>
+    <div class="home-option" data-go="thisorthat">
+      <div class="home-icon-circle">&#9878;&#65039;</div>
+      <div class="home-option-text"><p>This or That</p><span>Two real options, one call &mdash; train your judgment</span></div>
+    </div>
+    <div class="home-option" data-go="matchit">
+      <div class="home-icon-circle">&#127183;</div>
+      <div class="home-option-text"><p>Match It</p><span>Flip and match wines to regions, flavors, and pairings</span></div>
+    </div>
+  `;
+  options.querySelector('[data-go="testme"]').onclick = () => go("test-me");
+  options.querySelector('[data-go="thisorthat"]').onclick = () => go("this-or-that");
+  options.querySelector('[data-go="matchit"]').onclick = () => go("match-it-picker");
+  app.appendChild(options);
+}
+
+/* ---------- This or That: judgment calls from real pairings ---------- */
+
+function buildThisOrThatRound() {
+  // Find dishes with 2+ paired wines: the first pairing is "primary" per data order
+  const candidates = DISHES.filter(d => d.pairedWineIds && d.pairedWineIds.length >= 2);
+  const dish = candidates[Math.floor(Math.random() * candidates.length)];
+  const correctWine = findWine(dish.pairedWineIds[0]);
+  // Distractor: a wine NOT paired with this dish
+  const nonPaired = WINES.filter(w => !dish.pairedWineIds.includes(w.id) && w.style === correctWine.style);
+  const fallback = WINES.filter(w => !dish.pairedWineIds.includes(w.id));
+  const pool = nonPaired.length ? nonPaired : fallback;
+  const distractor = pool[Math.floor(Math.random() * pool.length)];
+  return { dish, correctWine, distractor };
+}
+
+function renderThisOrThat() {
+  header("This or That");
+
+  const round = buildThisOrThatRound();
+  const { dish, correctWine, distractor } = round;
+  const options = Math.random() < 0.5 ? [correctWine, distractor] : [distractor, correctWine];
+
+  const prompt = document.createElement("div");
+  prompt.innerHTML = `
+    <p class="testme-counter">A guest orders the&hellip;</p>
+    <p class="hero-name" style="text-align:center; margin-bottom:4px;">${dish.name}</p>
+    <p class="hero-meta" style="text-align:center; margin-bottom:16px;">${dish.dropLine || dish.description || ""}</p>
+    <p class="testme-counter">Which pour do you reach for?</p>
+  `;
+  app.appendChild(prompt);
+
+  const optWrap = document.createElement("div");
+  optWrap.className = "home-options";
+
+  const explain = document.createElement("div");
+  explain.className = "tot-explain";
+  explain.style.display = "none";
+
+  options.forEach(wine => {
+    const opt = document.createElement("div");
+    opt.className = "home-option";
+    opt.innerHTML = `
+      <div class="home-icon-circle">${wine.style === "sake" ? "\u{1F376}" : wine.style === "sparkling" ? "\u{1F942}" : "\u{1F377}"}</div>
+      <div class="home-option-text"><p>${wine.name}</p><span>${wine.grape}</span></div>
+    `;
+    opt.onclick = () => {
+      if (explain.style.display !== "none") return;
+      const isCorrect = wine.id === correctWine.id;
+      opt.classList.add(isCorrect ? "tot-correct" : "tot-wrong");
+      const reason = pairingReason(correctWine, dish);
+      explain.innerHTML = `
+        <p class="tot-verdict">${isCorrect ? "&#9989; That's the one." : `&#10060; The stronger call is <b>${correctWine.name}</b>.`}</p>
+        <p class="pairing-reason">${reason.text}</p>
+        <button class="footer-btn footer-btn-home tot-next">Next round &rarr;</button>
+      `;
+      explain.style.display = "block";
+      explain.querySelector(".tot-next").onclick = () => render();
+    };
+    optWrap.appendChild(opt);
+  });
+
+  app.appendChild(optWrap);
+  app.appendChild(explain);
+}
+
+/* ---------- Match It: memory matching with rotating or chosen types ---------- */
+
+const MATCH_TYPES = [
+  { id: "region", label: "Wine \u2194 Region", icon: "\u{1F5FA}\uFE0F" },
+  { id: "flavor", label: "Wine \u2194 Flavor", icon: "\u{1F347}" },
+  { id: "pairing", label: "Wine \u2194 Dish", icon: "\u{1F37D}\uFE0F" }
+];
+
+function renderMatchItPicker() {
+  header("Match It");
+
+  const intro = document.createElement("p");
+  intro.className = "testme-counter";
+  intro.textContent = "Pick a match type, or let it rotate";
+  app.appendChild(intro);
+
+  const options = document.createElement("div");
+  options.className = "home-options";
+  const rotate = document.createElement("div");
+  rotate.className = "home-option";
+  rotate.innerHTML = `
+    <div class="home-icon-circle">&#128256;</div>
+    <div class="home-option-text"><p>Rotate</p><span>A different match type every round</span></div>
+  `;
+  rotate.onclick = () => go("match-it", { matchType: "rotate" });
+  options.appendChild(rotate);
+
+  MATCH_TYPES.forEach(t => {
+    const opt = document.createElement("div");
+    opt.className = "home-option";
+    opt.innerHTML = `
+      <div class="home-icon-circle">${t.icon}</div>
+      <div class="home-option-text"><p>${t.label}</p><span>Match only this type</span></div>
+    `;
+    opt.onclick = () => go("match-it", { matchType: t.id });
+    options.appendChild(opt);
+  });
+  app.appendChild(options);
+}
+
+function buildMatchPairs(typeId) {
+  const shuffled = [...WINES].sort(() => Math.random() - 0.5);
+  const pairs = [];
+  for (const w of shuffled) {
+    if (pairs.length >= 4) break;
+    if (typeId === "region") {
+      pairs.push({ a: w.name, b: w.region, key: w.id });
+    } else if (typeId === "flavor") {
+      pairs.push({ a: w.name, b: w.flavorTags[0], key: w.id });
+    } else {
+      if (!w.pairingDishIds.length) continue;
+      const dish = findDish(w.pairingDishIds[Math.floor(Math.random() * w.pairingDishIds.length)]);
+      if (!dish) continue;
+      pairs.push({ a: w.name, b: dish.name, key: w.id });
+    }
+  }
+  return pairs;
+}
+
+function renderMatchIt(matchType) {
+  const typeId = (matchType === "rotate" || !matchType)
+    ? MATCH_TYPES[Math.floor(Math.random() * MATCH_TYPES.length)].id
+    : matchType;
+  const typeDef = MATCH_TYPES.find(t => t.id === typeId);
+
+  header("Match It");
+
+  const label = document.createElement("p");
+  label.className = "testme-counter";
+  label.innerHTML = `${typeDef.icon} ${typeDef.label}`;
+  app.appendChild(label);
+
+  const pairs = buildMatchPairs(typeId);
+  let tiles = [];
+  pairs.forEach(p => {
+    tiles.push({ text: p.a, key: p.key, side: "a" });
+    tiles.push({ text: p.b, key: p.key, side: "b" });
+  });
+  tiles.sort(() => Math.random() - 0.5);
+
+  const grid = document.createElement("div");
+  grid.className = "match-grid";
+  let firstPick = null;
+  let lock = false;
+  let matchedCount = 0;
+
+  tiles.forEach(t => {
+    const tile = document.createElement("button");
+    tile.className = "match-tile";
+    tile.textContent = t.text;
+    tile.dataset.key = t.key;
+    tile.onclick = () => {
+      if (lock || tile.classList.contains("matched") || tile === firstPick) return;
+      tile.classList.add("picked");
+      if (!firstPick) {
+        firstPick = tile;
+        return;
+      }
+      lock = true;
+      if (firstPick.dataset.key === tile.dataset.key) {
+        firstPick.classList.remove("picked");
+        tile.classList.remove("picked");
+        firstPick.classList.add("matched");
+        tile.classList.add("matched");
+        matchedCount++;
+        firstPick = null;
+        lock = false;
+        if (matchedCount === pairs.length) {
+          const first = markMilestone("match-" + typeId + "-cleared");
+          celebrate();
+          setTimeout(() => {
+            const again = document.createElement("button");
+            again.className = "footer-btn footer-btn-home";
+            again.style.width = "100%";
+            again.style.marginTop = "14px";
+            again.textContent = "Play again \u2192";
+            again.onclick = () => render();
+            app.appendChild(again);
+          }, 600);
+        }
+      } else {
+        setTimeout(() => {
+          firstPick.classList.remove("picked");
+          tile.classList.remove("picked");
+          firstPick = null;
+          lock = false;
+        }, 650);
+      }
+    };
+    grid.appendChild(tile);
+  });
+
+  app.appendChild(grid);
 }
 
 initTheme();

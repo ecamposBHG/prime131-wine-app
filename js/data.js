@@ -434,7 +434,7 @@ const COCKTAILS = [
     ingredients: ["2 oz Haku Vodka", "1 oz Re\u00e0l Lychee", "1 oz Finest Call Single Pressed Lemon Juice"],
     garnish: "Popping Boba Pearls",
     directions: "Combine all ingredients in a cocktail shaker with ice. Shake and strain into martini glass. Garnish and serve.",
-    prep: ""
+    prep: "", funFact: "Haku Vodka is filtered through bamboo charcoal, a Japanese technique that gives it an unusually silky, soft texture for a vodka.", bestFor: "A guest who wants something playful and not too boozy-tasting to open the night."
   },
   {
     id: "c2", name: "Tequila Twilight", glassware: "Double Rocks", method: "Shake & Strain",
@@ -442,7 +442,7 @@ const COCKTAILS = [
     ingredients: ["1.5 oz Casamigos Blanco", "0.5 oz Cointreau Orange Liqueur", "1 oz Finest Call Single Pressed Lime Juice", "1 oz Sweetbird Dragon Fruit & Papaya Syrup"],
     garnish: "Dehydrated Dragon Fruit, Mint Sprig",
     directions: "Combine all ingredients in a cocktail shaker with ice. Shake and strain over fresh ice into Rocks Glass. Garnish and serve.",
-    prep: ""
+    prep: "", funFact: "Casamigos was founded in 2013 by George Clooney and two friends — the name translates to &ldquo;house of friends.&rdquo;", bestFor: "A tequila drinker who wants something bright and tropical, not smoky or agave-forward."
   },
   {
     id: "c3", name: "Yuzu Basil Martini", glassware: "Martini", method: "Shake & Strain",
@@ -450,7 +450,7 @@ const COCKTAILS = [
     ingredients: ["2 oz Ketel One Vodka", "0.5 oz Finest Call Single Pressed Lemon Juice", "0.5 oz Finest Call Single Pressed Lime Juice", "0.75 oz Yuzu & Ginger Puree (house prep)", "4 Basil Leaves (torn in half)"],
     garnish: "Basil Leaf, Fresh or Dehydrated Lemon Wheel",
     directions: "Combine all ingredients in a cocktail shaker with ice. Shake and strain into martini glass. Garnish and serve.",
-    prep: "Yuzu Ginger Puree: whisk or blend 1 bottle (16.9 oz) Re\u00e0l Yuzu with 1 bottle (16.9 oz) Re\u00e0l Ginger for 3-5 minutes until fully emulsified. Label, date, refrigerate. Shake well before use. Yields 33.8 oz."
+    prep: "Yuzu Ginger Puree: whisk or blend 1 bottle (16.9 oz) Re\u00e0l Yuzu with 1 bottle (16.9 oz) Re\u00e0l Ginger for 3-5 minutes until fully emulsified. Label, date, refrigerate. Shake well before use. Yields 33.8 oz.", funFact: "Yuzu is a Japanese citrus prized more for its fragrance than its tartness — it shows up as often in high-end cocktails as it does in Japanese kitchens.", bestFor: "A guest who finds a classic martini too austere and wants something more aromatic."
   },
   {
     id: "c4", name: "Negroni Bianco", glassware: "Rocks Glass", method: "Stir & Strain",
@@ -458,7 +458,7 @@ const COCKTAILS = [
     ingredients: ["1 oz Bombay Dry Gin", "1 oz Italicus", "1 oz Cinzano Bianco Vermouth"],
     garnish: "Large Format Ice, Lemon Peel, Rosemary Sprig",
     directions: "Stir all ingredients in a mixing glass with ice. Strain over large format ice cube. Garnish and serve.",
-    prep: ""
+    prep: "", funFact: "Italicus is a modern bergamot liqueur, launched in 2016 and credited with reviving interest in Italian aperitivo culture outside Italy.", bestFor: "A Negroni drinker who wants something lighter and more floral than the classic red version."
   },
   {
     id: "c5", name: "Mystic Garden", glassware: "Martini, Jewelry Box", method: "Shake & Strain",
@@ -466,7 +466,7 @@ const COCKTAILS = [
     ingredients: ["1.5 oz The Botanist Gin", "0.5 oz Cointreau Orange Liqueur", "0.5 oz Finest Call Single Pressed Lemon Juice", "0.5 oz Sweetbird Honeycomb Syrup", "2 oz Fever Tree Lime Yuzu Soda", "4 Basil Leaves (torn in half)"],
     garnish: "Basil and/or Mint Sprig, Dehydrated Lavender, Lemon Wheel, Flavored Smoke",
     directions: "Combine all ingredients (except Fever Tree) in a cocktail shaker with ice. Shake and strain into martini glass. Top with Fever Tree Lime Yuzu Soda. Garnish and fill bottom drawer with flavored smoke. Open tableside to release smoke and inform guest of interactive self garnish.",
-    prep: ""
+    prep: "", funFact: "The Botanist Gin is distilled on Islay — an island better known for smoky whisky — using a large number of hand-foraged local botanicals alongside the classic nine.", bestFor: "The guest who wants a show: the smoke-filled drawer is a genuine tableside moment."
   },
   {
     id: "c6", name: "Scottish Manhattan", glassware: "Martini", method: "Stir & Strain",
@@ -474,7 +474,7 @@ const COCKTAILS = [
     ingredients: ["2 oz Glenfiddich 12yr Single Malt", "1 oz Martini & Rossi Sweet Vermouth", "2 Dashes Angostura Bitters"],
     garnish: "Cherry",
     directions: "Combine all ingredients into mixing glass with ice. Stir and strain into martini glass. Garnish and serve.",
-    prep: ""
+    prep: "", funFact: "Glenfiddich means &ldquo;Valley of the Deer&rdquo; in Gaelic, and it's been one of the world's best-selling single malts for decades.", bestFor: "A Manhattan drinker who wants something smoky and malty instead of the usual bourbon or rye base."
   },
   {
     id: "c7", name: "Jade in the Shade", glassware: "Coupe", method: "Shake & Strain",
@@ -482,7 +482,7 @@ const COCKTAILS = [
     ingredients: ["2 oz Roku Gin", "1.5 oz Mint Matcha Syrup (house prep)", "1 oz Finest Call Single Pressed Lime Juice", "1 oz Egg White"],
     garnish: "Mint Leaf, Matcha Chocolate Shavings",
     directions: "Combine all ingredients in a cocktail shaker with ice. Shake and strain into coupe glass. Garnish and serve.",
-    prep: "Mint Matcha Syrup: whisk 1 bottle (33 oz) Sweetbird Mojito Mint Syrup with 2 tbsp high grade matcha powder until fully suspended. Label, date, refrigerate."
+    prep: "Mint Matcha Syrup: whisk 1 bottle (33 oz) Sweetbird Mojito Mint Syrup with 2 tbsp high grade matcha powder until fully suspended. Label, date, refrigerate.", funFact: "Matcha has been central to Japanese tea ceremony for centuries — prized as much for the ritual as the flavor.", bestFor: "A guest who wants something visually striking and less sweet than a typical shaken cocktail."
   },
   {
     id: "c8", name: "Gilded Goose", glassware: "Martini, Martini Tray Set (optional)", method: "Shake & Strain",
@@ -490,7 +490,7 @@ const COCKTAILS = [
     ingredients: ["2.5 oz Grey Goose Vodka", "0.5 oz Martini & Rossi Dry Vermouth", "0.5 oz Olive Brine"],
     garnish: "3 Skewered Olives, Fries (optional)",
     directions: "Combine vodka, vermouth, and olive brine into a shaker tin. Shake with ice and double strain into a chilled martini glass. Garnish and serve.",
-    prep: ""
+    prep: "", funFact: "The dirty martini's olive brine has been used to cut vodka's neutrality since the drink's classic era.", bestFor: "A savory-forward guest who finds sweeter cocktails uninteresting."
   },
   {
     id: "c9", name: "Cosmobelle", glassware: "Coupe", method: "Shake & Strain",
@@ -498,7 +498,7 @@ const COCKTAILS = [
     ingredients: ["1.5 oz Absolut Citron", "0.5 oz Cointreau Orange Liqueur", "1.5 oz Cranberry Juice", "0.5 oz Finest Call Single Pressed Lime Juice", "0.5 oz Sweetbird Dragon Fruit & Papaya Syrup"],
     garnish: "Dehydrated Dragon Fruit, Gold Sugar Half Rim",
     directions: "Combine all ingredients in a cocktail shaker with ice. Shake and strain into coupe glass. Garnish and serve.",
-    prep: ""
+    prep: "", funFact: "A modern riff on the 1990s Cosmopolitan — dragon fruit and papaya syrup update the classic citrus-cranberry formula.", bestFor: "A guest who loved Cosmos in their heyday and wants a fresher take."
   },
   {
     id: "c10", name: "Gold Fashioned", glassware: "Single Rocks Glass", method: "Stir & Strain",
@@ -506,7 +506,7 @@ const COCKTAILS = [
     ingredients: ["1.5 oz Jameson Irish Whiskey", "0.5 oz WhistlePig PiggyBack 6yr Rye", "0.25 oz Cabernet Simple Syrup (house prep)", "2 Dashes Angostura Bitters"],
     garnish: "Manicured Orange Peel, Luxardo Cherry, 24k Large Gold Flakes",
     directions: "Combine all ingredients into a mixing glass with ice. Stir and strain into single rocks glass over large format ice. Garnish and serve.",
-    prep: "Cabernet Simple Syrup: blend 1 bottle (25 oz) house Cabernet with 40 oz white sugar on medium for 5 minutes until fully dissolved and smooth. Label, date, store chilled. Yields ~66 oz."
+    prep: "Cabernet Simple Syrup: blend 1 bottle (25 oz) house Cabernet with 40 oz white sugar on medium for 5 minutes until fully dissolved and smooth. Label, date, store chilled. Yields ~66 oz.", funFact: "Pairing Irish whiskey with rye is unusual — Jameson's smoothness balances the spice WhistlePig's rye brings to the blend.", bestFor: "An Old Fashioned drinker who wants something a touch sweeter and more layered."
   },
   {
     id: "c11", name: "Golden 'B'", glassware: "Martini", method: "Shake & Strain",
@@ -514,7 +514,7 @@ const COCKTAILS = [
     ingredients: ["1.5 oz Maker's Mark Bourbon", "1 oz Finest Call Single Pressed Lemon Juice", "0.75 oz Gold Glitter Honeycomb Syrup (house prep)", "2 oz Sparkling Wine"],
     garnish: "Dehydrated Lemon Wheel, Gold Sugar Stripe",
     directions: "Combine all ingredients (minus sparkling wine) into a shaker tin. Shake with ice and strain into a martini glass. Top with sparkling wine. Garnish and serve.",
-    prep: "Gold Glitter Honeycomb Syrup: whisk 1 bottle (33 oz) Sweetbird Honeycomb Syrup with 2.5 g edible gold luster dust until fully suspended. Label, date. Yields 33 oz."
+    prep: "Gold Glitter Honeycomb Syrup: whisk 1 bottle (33 oz) Sweetbird Honeycomb Syrup with 2.5 g edible gold luster dust until fully suspended. Label, date. Yields 33 oz.", funFact: "Most whiskey sours lean on egg white for texture; this one skips it and lightens things with sparkling wine instead.", bestFor: "A celebratory, bourbon-curious guest who wants something festive rather than a standard sour."
   },
   {
     id: "c12", name: "Opulent Espresso Martini", glassware: "Coupe", method: "Shake & Strain",
@@ -522,6 +522,6 @@ const COCKTAILS = [
     ingredients: ["1.5 oz Vanilla Bean Infused Patr\u00f3n Reposado (house prep)", "0.5 oz Mr. Black Cold Brew Liqueur", "2.5 oz Berg House Espresso Martini Mix (house prep)"],
     garnish: "Three Gold Dusted Espresso Beans",
     directions: "Combine all ingredients into a shaker tin. Shake with ice and strain into a coupe glass. Garnish and serve.",
-    prep: "Vanilla Bean Patr\u00f3n: drop 2 split vanilla pods into a Patr\u00f3n Reposado bottle to infuse on the backbar; keep at least 2 infused bottles on hand. Espresso Martini Mix: dissolve 1 can (94g) Illy Instant Classico into 40 oz warm water, add 24 oz Maven Cold Brew and 1 bottle (33.8 oz) Sweetbird Vanilla Syrup, stir. Label, date, chill. Yields 64 oz."
+    prep: "Vanilla Bean Patr\u00f3n: drop 2 split vanilla pods into a Patr\u00f3n Reposado bottle to infuse on the backbar; keep at least 2 infused bottles on hand. Espresso Martini Mix: dissolve 1 can (94g) Illy Instant Classico into 40 oz warm water, add 24 oz Maven Cold Brew and 1 bottle (33.8 oz) Sweetbird Vanilla Syrup, stir. Label, date, chill. Yields 64 oz.", funFact: "Patrón Reposado rests in oak for several months before bottling, giving it a rounder character than blanco tequila — an unusual espresso martini base in place of vodka.", bestFor: "Dessert-course energy — a coffee lover who wants their after-dinner drink to double as dessert."
   }
 ];

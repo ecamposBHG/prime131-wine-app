@@ -1664,14 +1664,14 @@ function renderImposter() {
   tiles.forEach(w => {
     const tile = document.createElement("button");
     tile.className = "match-tile imposter-tile";
-    tile.innerHTML = `<b>${w.producer}</b>`;
+    tile.innerHTML = `<b>${w.name}</b>`;
     tile.onclick = () => {
       if (done) return;
       done = true;
       const correct = w.id === round.imposter.id;
       grid.querySelectorAll(".imposter-tile").forEach((t, i) => {
         t.classList.add("revealed");
-        t.innerHTML = `<b>${tiles[i].producer}</b><br><span class="imposter-sub">${tiles[i].name}</span>`;
+        t.innerHTML = `<b>${tiles[i].name}</b><br><span class="imposter-sub">${tiles[i].producer}</span>`;
       });
       tile.classList.add(correct ? "matched" : "tot-wrong-tile");
       if (!correct) {

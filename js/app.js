@@ -1028,7 +1028,7 @@ let testQueues = { wine: [], food: [] };
 
 function quizPool(mode) {
   if (mode === "food") {
-    return DISHES.filter(d => !d.id.includes("general") && (d.dropLine || d.description));
+    return DISHES.filter(d => d.quizClue);
   }
   return WINES;
 }
@@ -1152,7 +1152,8 @@ function renderTestMeRun(mode) {
         <p class="dish-flip-tag">Guess the dish &middot; tap to reveal</p>
         <p class="face-h3" style="margin-top:8px;"><span class="ic">&#128269;</span> Clues</p>
         <p class="face-desc" style="margin-bottom:10px;">${getSectionIcon(item.section)} ${item.section}</p>
-        <p class="chefprep-text">&ldquo;${item.dropLine || item.description}&rdquo;</p>
+        <p class="chefprep-text">${item.quizClue}</p>
+        <p class="empty-note" style="margin-top:6px; text-align:left; font-style:italic;">Which dish is this?</p>
       `;
     }
     return `

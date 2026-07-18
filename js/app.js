@@ -763,12 +763,12 @@ const PAIRING_REASONS = {
   "w12|d-burger": "Char-grilled beef, a special sauce with real chili flakes in it &ndash; Malbec's ripe fruit and moderate tannin is a straightforward, crowd-pleasing burger match, no subtlety required.",
 
   "w13|d-marinated-chicken": "The softest tannin of any red linked to this dish &ndash; genuinely the gentlest option if a guest is heat-sensitive and doesn't want any tannic bite stacked on top of the espelette and chili.",
-  "w13|d-bone-marrow": "Rich, fatty, finished with a sweet onion jam &ndash; Merlot's plum and cocoa notes are a classic match here, soft enough that they don't fight the almost dessert-like sweetness of the jam.",
   "w13|d-short-rib": "The gentlest of the three short rib pairings on this list &ndash; good for a guest who wants red wine with their braise but finds big tannin off-putting against something this tender.",
 
   "w14|d-ribeye": "The fattiest cut on the menu wants the wine with the most grip &ndash; Austin Hope's high tannin is built specifically to cut through this much marbling.",
   "w14|d-ny-strip-14": "Leaner than the ribeye but still a well-marbled Australian wagyu cut &ndash; same tannin-to-fat logic, just slightly less fat for the wine to work against.",
   "w14|d-short-rib": "The highest-tannin option paired with short rib on the list &ndash; the right call if the guest wants real structure against the glaze's sweetness rather than a softer red.",
+  "w14|d-bone-marrow": "Pure marrow fat plus braised short rib is about as rich as this menu gets &ndash; Austin Hope has the most tannin on the list, exactly what's needed to cut it, and the char on the rib picks up the wine's own dark chocolate and warm spice.",
 
   "w15|d-filet-8": "Filet is the leanest cut on the menu, so it doesn't want the biggest wine &ndash; Oberon's medium tannin is deliberately gentler than Caymus or Austin Hope, matched to a cut with less fat to push against.",
   "w15|d-bone-in-filet": "Slightly more richness than a standard filet thanks to the bone, but still a lean cut &ndash; same logic as the 8oz filet, it wants the softer of the two Wagner-family Cabernets.",
@@ -777,6 +777,7 @@ const PAIRING_REASONS = {
   "w16|d-tomahawk": "The biggest, most heavily marbled cut on the menu wants the biggest wine on the list &ndash; Caymus's full body and tannin were built for exactly this scale.",
   "w16|d-porterhouse": "Two cuts in one, strip and filet &ndash; Caymus's plush tannin handles the fattier strip side without being outclassed by a dish this large.",
   "w16|d-ny-strip-16": "Well-marbled but a notch below the tomahawk in scale &ndash; still wants a big wine, and Caymus's vanilla-oak character actually echoes the char from the wood-fire grill.",
+  "w16|d-bone-marrow": "Between the marrow fat and the braised short rib on top, this is one of the richest bites on the menu &ndash; Caymus has the density to match it pound for pound, and the sweet onion jam plays surprisingly well against the wine's own vanilla and mocha.",
 
   "w17|d-naan": "Babaganoush's smokiness and the tahini's nuttiness share a flavor world with the wine's own garrigue herb character &ndash; a real regional echo, not just a soft-tannin safety pick.",
   "w17|d-marinated-chicken": "The peppery spice already in this wine actually mirrors the espelette in the chicken's marinade &ndash; a genuine flavor-affinity match, on top of the soft tannin doing its usual job of not fighting the heat.",
@@ -784,7 +785,6 @@ const PAIRING_REASONS = {
 
   "w18|d-short-rib": "More restrained tannin than the Napa Cabs also linked to short rib &ndash; the right call for a guest who wants elegance over raw power with their braise.",
   "w18|d-bone-in-filet": "The bone adds a layer of richness beyond a standard filet, giving this more structured Bordeaux blend something to actually grip onto that a plain filet wouldn't offer alone.",
-  "w18|d-bone-marrow": "Violet and cassis notes are a classic Bordeaux answer to something this rich &ndash; refined enough not to be crushed by the almost dessert-sweet onion jam and the marrow itself.",
 
   "w19|d-tenderloin-8": "A blend brings more complexity to a very simple, unadorned cut than a single-varietal wine would &ndash; the cedar and dried herb notes give the dish a second layer it wouldn't otherwise have.",
   "w19|d-wagyu-skirt": "Cedar and dried herb echo the char and the savory edge of the chili vinaigrette without needing to be as big or tannic as a straight Cabernet.",

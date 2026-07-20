@@ -1745,11 +1745,59 @@ function renderTotEnd(focus, correct, total) {
 const MATCH_TYPES = [
   { id: "region", label: "Wine \u2194 Region", icon: "\u{1F5FA}\uFE0F" },
   { id: "flavor", label: "Wine \u2194 Flavor", icon: "\u{1F347}" },
-  { id: "pairing", label: "Wine \u2194 Dish", icon: "\u{1F37D}\uFE0F" }
+  { id: "pairing", label: "Wine \u2194 Dish", icon: "\u{1F37D}\uFE0F" },
+  { id: "food", label: "Dish \u2194 Allergen", icon: "\u26A0\uFE0F" }
 ];
+const MATCH_DIFFICULTIES = [
+  { pairs: 3, label: "3 pairs", sub: "Warm-up" },
+  { pairs: 4, label: "4 pairs", sub: "Standard" },
+  { pairs: 6, label: "6 pairs", sub: "Full board" }
+];
+
+/* Dedicated progress store: matching is a recognition/association skill, distinct from recall (Test Me) or judgment (This or That) */
+const MATCH_PROGRESS_KEY = "p131-match-progress";
+function getMatchProgress() {
+  try { return JSON.parse(localStorage.getItem(MATCH_PROGRESS_KEY)) || {}; } catch (e) { return {}; }
+}
+function setMatchProgress(itemId, status) {
+  const p = getMatchProgress();
+  p[itemId] = status;
+  try { localStorage.setItem(MATCH_PROGRESS_KEY, JSON.stringify(p)); } catch (e) {}
+}
+
+let matchPref = { pairs: 4 };
+
+function matchEligiblePool(typeId) {
+  if (typeId === "pairing") return WINES.filter(w => w.pairingDishIds.length);
+  if (typeId === "food") return DISHES.filter(d => d.quizClue && d.allergensInRecipe && d.allergensInRecipe.length);
+  return WINES;
+}
 
 function renderMatchItPicker() {
   header("Match It");
+
+  const progress = getMatchProgress();
+  const allWines = WINES.filter(w => progress[w.id] === "known").length;
+  const status = document.createElement("p");
+  status.className = "testme-counter";
+  status.textContent = `${allWines} of ${WINES.length} wines matched clean (no mistakes)`;
+  app.appendChild(status);
+
+  const diffLabel = document.createElement("p");
+  diffLabel.className = "testme-counter";
+  diffLabel.textContent = "Board size";
+  app.appendChild(diffLabel);
+
+  const diffRow = document.createElement("div");
+  diffRow.className = "home-options";
+  MATCH_DIFFICULTIES.forEach(d => {
+    const opt = document.createElement("div");
+    opt.className = "home-option" + (matchPref.pairs === d.pairs ? " tot-correct" : "");
+    opt.innerHTML = `<div class="home-icon-circle">&#127183;</div><div class="home-option-text"><p>${d.label}</p><span>${d.sub}</span></div>`;
+    opt.onclick = () => { matchPref.pairs = d.pairs; render(); };
+    diffRow.appendChild(opt);
+  });
+  app.appendChild(diffRow);
 
   const intro = document.createElement("p");
   intro.className = "testme-counter";
@@ -1780,20 +1828,33 @@ function renderMatchItPicker() {
   app.appendChild(options);
 }
 
-function buildMatchPairs(typeId) {
-  const shuffled = [...WINES].sort(() => Math.random() - 0.5);
+function buildMatchPairs(typeId, count) {
+  const progress = getMatchProgress();
+  const pool = matchEligiblePool(typeId);
+  const learning = [], unseen = [], known = [];
+  pool.forEach(item => {
+    const status = progress[item.id];
+    if (status === "learning") learning.push(item);
+    else if (status === "known") known.push(item);
+    else unseen.push(item);
+  });
+  const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5);
+  const ordered = [...shuffle(learning), ...shuffle(unseen), ...shuffle(known)];
+
   const pairs = [];
-  for (const w of shuffled) {
-    if (pairs.length >= 4) break;
+  for (const item of ordered) {
+    if (pairs.length >= count) break;
     if (typeId === "region") {
-      pairs.push({ a: w.name, b: w.region, key: w.id });
+      pairs.push({ a: item.name, b: item.region, key: item.id });
     } else if (typeId === "flavor") {
-      pairs.push({ a: w.name, b: w.flavorTags[0], key: w.id });
+      pairs.push({ a: item.name, b: item.flavorTags[0], key: item.id });
+    } else if (typeId === "food") {
+      const allergen = item.allergensInRecipe[0];
+      pairs.push({ a: item.name, b: allergen.charAt(0).toUpperCase() + allergen.slice(1), key: item.id });
     } else {
-      if (!w.pairingDishIds.length) continue;
-      const dish = findDish(w.pairingDishIds[Math.floor(Math.random() * w.pairingDishIds.length)]);
+      const dish = findDish(item.pairingDishIds[Math.floor(Math.random() * item.pairingDishIds.length)]);
       if (!dish) continue;
-      pairs.push({ a: w.name, b: dish.name, key: w.id });
+      pairs.push({ a: item.name, b: dish.name, key: item.id });
     }
   }
   return pairs;
@@ -1804,15 +1865,24 @@ function renderMatchIt(matchType) {
     ? MATCH_TYPES[Math.floor(Math.random() * MATCH_TYPES.length)].id
     : matchType;
   const typeDef = MATCH_TYPES.find(t => t.id === typeId);
+  const pairCount = matchPref.pairs;
 
   header("Match It");
 
   const label = document.createElement("p");
   label.className = "testme-counter";
-  label.innerHTML = `${typeDef.icon} ${typeDef.label}`;
+  label.innerHTML = `${typeDef.icon} ${typeDef.label} &middot; ${pairCount} pairs`;
   app.appendChild(label);
 
-  const pairs = buildMatchPairs(typeId);
+  const moveCounter = document.createElement("p");
+  moveCounter.className = "testme-counter";
+  let moves = 0;
+  let mistakes = 0;
+  moveCounter.textContent = "0 moves";
+  app.appendChild(moveCounter);
+
+  const pairs = buildMatchPairs(typeId, pairCount);
+  const mistakenKeys = new Set();
   let tiles = [];
   pairs.forEach(p => {
     tiles.push({ text: p.a, key: p.key, side: "a" });
@@ -1839,28 +1909,24 @@ function renderMatchIt(matchType) {
         return;
       }
       lock = true;
+      moves++;
+      moveCounter.textContent = moves + (moves === 1 ? " move" : " moves");
       if (firstPick.dataset.key === tile.dataset.key) {
         firstPick.classList.remove("picked");
         tile.classList.remove("picked");
         firstPick.classList.add("matched");
         tile.classList.add("matched");
+        setMatchProgress(tile.dataset.key, mistakenKeys.has(tile.dataset.key) ? "learning" : "known");
         matchedCount++;
         firstPick = null;
         lock = false;
         if (matchedCount === pairs.length) {
-          const first = markMilestone("match-" + typeId + "-cleared");
-          celebrate();
-          setTimeout(() => {
-            const again = document.createElement("button");
-            again.className = "footer-btn footer-btn-home";
-            again.style.width = "100%";
-            again.style.marginTop = "14px";
-            again.textContent = "Play again \u2192";
-            again.onclick = () => render();
-            app.appendChild(again);
-          }, 600);
+          setTimeout(() => renderMatchEnd(typeId, pairCount, moves, mistakes), 500);
         }
       } else {
+        mistakes++;
+        mistakenKeys.add(firstPick.dataset.key);
+        mistakenKeys.add(tile.dataset.key);
         setTimeout(() => {
           firstPick.classList.remove("picked");
           tile.classList.remove("picked");
@@ -1873,6 +1939,44 @@ function renderMatchIt(matchType) {
   });
 
   app.appendChild(grid);
+}
+
+function renderMatchEnd(typeId, pairCount, moves, mistakes) {
+  app.innerHTML = "";
+  header("Match It");
+  const bestKey = "p131-best-match-" + typeId + "-" + pairCount;
+  let best = null;
+  try { const v = localStorage.getItem(bestKey); best = v ? parseInt(v) : null; } catch (e) {}
+  const isRecord = best === null || moves < best;
+  if (isRecord) {
+    try { localStorage.setItem(bestKey, String(moves)); } catch (e) {}
+    celebrate();
+  }
+  markMilestone("match-" + typeId + "-" + pairCount + "-cleared");
+
+  const wrap = document.createElement("div");
+  wrap.className = "speed-end";
+  wrap.innerHTML = `
+    <p class="speed-end-icon">&#127183;</p>
+    <p class="speed-end-score">${moves}</p>
+    <p class="speed-end-label">moves \u00b7 ${mistakes} mismatch${mistakes === 1 ? "" : "es"}</p>
+    <p class="speed-end-best">${isRecord ? "&#127942; New personal best!" : `Personal best: ${best} moves`}</p>
+  `;
+  app.appendChild(wrap);
+
+  const btnRow = document.createElement("div");
+  btnRow.className = "card-footer-nav";
+  const againBtn = document.createElement("button");
+  againBtn.className = "footer-btn footer-btn-home";
+  againBtn.textContent = "Play again \u2192";
+  againBtn.onclick = () => go("match-it", { matchType: typeId });
+  const backBtn = document.createElement("button");
+  backBtn.className = "footer-btn";
+  backBtn.textContent = "Game Room";
+  backBtn.onclick = () => go("game-room");
+  btnRow.appendChild(backBtn);
+  btnRow.appendChild(againBtn);
+  app.appendChild(btnRow);
 }
 
 /* ---------- Speed round end screen ---------- */

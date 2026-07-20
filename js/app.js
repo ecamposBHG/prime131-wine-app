@@ -1531,18 +1531,18 @@ function contrastReason(correctWine, distractorWine) {
   const dVal = distractorWine.structure[trait.trait];
   const cVal = correctWine.structure[trait.trait];
   const lack = {
-    tannin: `it doesn't have enough tannin to cut through the richness here the way ${correctWine.name} does`,
-    acidity: `its acidity isn't bright enough to keep up with this dish the way ${correctWine.name}'s does`,
-    body: `it's too light on its own to stand up to this dish the way ${correctWine.name} does`
+    tannin: `${distractorWine.name} doesn't have enough tannin to cut through the richness here the way ${correctWine.name} does.`,
+    acidity: `${distractorWine.name}'s acidity isn't bright enough to keep up with this dish the way ${correctWine.name}'s does.`,
+    body: `${distractorWine.name} is too light on its own to stand up to this dish the way ${correctWine.name} does.`
   };
   const excess = {
-    tannin: `its tannin would actually overpower this dish rather than complement it &mdash; more grip than this needs`,
-    acidity: `it's sharper than this dish calls for, cutting against flavors that don't need cutting`,
-    body: `it's heavier than this dish can support &mdash; it would bury the more delicate parts of the plate`
+    tannin: `${distractorWine.name}'s tannin would actually overpower this dish rather than complement it &mdash; more grip than this needs.`,
+    acidity: `${distractorWine.name} is sharper than this dish calls for, cutting against flavors that don't need cutting.`,
+    body: `${distractorWine.name} is heavier than this dish can support &mdash; it would bury the more delicate parts of the plate.`
   };
-  if (dVal < cVal) return "Here's the gap: " + (lack[trait.trait] || "it doesn't have quite the structure this dish is asking for") + ".";
-  if (dVal > cVal) return "Here's the gap: " + (excess[trait.trait] || "it brings more structure than this dish is actually asking for") + ".";
-  return `Here's the gap: the structure is close, but ${correctWine.name} still has the edge on real flavor affinity with this dish.`;
+  if (dVal < cVal) return lack[trait.trait] || `${distractorWine.name} doesn't have quite the structure this dish is asking for.`;
+  if (dVal > cVal) return excess[trait.trait] || `${distractorWine.name} brings more structure than this dish is actually asking for.`;
+  return `${distractorWine.name} is close in style, but ${correctWine.name} still has the edge on real flavor affinity with this dish.`;
 }
 
 function totToggleRow() {
@@ -1678,6 +1678,7 @@ function renderThisOrThatRun() {
       explain.innerHTML = `
         <p class="tot-verdict">${isCorrect ? "&#9989; That's the one." : `&#10060; The stronger call is <b>${correctWine.name}</b>.`}</p>
         <p class="pairing-reason">${reason.text}</p>
+        <p class="tot-contrast-label">Why not the ${distractor.name}?</p>
         <p class="pairing-reason tot-contrast">${contrastReason(correctWine, distractor)}</p>
         <button class="footer-btn footer-btn-home tot-next">Next round &rarr;</button>
       `;

@@ -216,6 +216,7 @@ function render() {
   else if (current.view === "dish-detail") renderDishDetail(current.params.dishId);
   else if (current.view === "pairing-explain") renderPairingExplain(current.params.wineId, current.params.dishId);
   else if (current.view === "test-me") renderTestMe();
+  else if (current.view === "test-me-focus") renderTestMeFocus(current.params.mode);
   else if (current.view === "test-me-run") renderTestMeRun(current.params.mode);
   else if (current.view === "game-room") renderGameRoom();
   else if (current.view === "this-or-that") renderThisOrThat();
@@ -1024,19 +1025,29 @@ function renderPairingExplain(wineId, dishId) {
 }
 
 /* Test Me — flashcard drill with device-local progress */
-let testQueues = { wine: [], food: [] };
-
-function quizPool(mode) {
+function quizPool(mode, focus) {
   if (mode === "food") {
-    return DISHES.filter(d => d.quizClue);
+    let pool = DISHES.filter(d => d.quizClue);
+    if (focus && focus !== "all") pool = pool.filter(d => d.section === focus);
+    return pool;
   }
-  return WINES;
+  if (mode === "mixed") {
+    return [...WINES, ...DISHES.filter(d => d.quizClue)];
+  }
+  let pool = WINES;
+  if (focus && focus !== "all") pool = pool.filter(w => w.style === focus);
+  return pool;
 }
 
-function buildTestQueue(mode) {
+function isWineItem(item) { return item.id.charAt(0) === "w" && /^\d+$/.test(item.id.slice(1)); }
+
+let testQueues = {};
+function queueKey(mode, focus) { return mode === "mixed" ? "mixed" : mode + ":" + (focus || "all"); }
+
+function buildTestQueue(mode, focus) {
   const progress = getProgress();
   const learning = [], unseen = [], known = [];
-  quizPool(mode).forEach(item => {
+  quizPool(mode, focus).forEach(item => {
     const status = progress[item.id];
     if (status === "learning") learning.push(item.id);
     else if (status === "known") known.push(item.id);
@@ -1086,24 +1097,71 @@ function renderTestMe() {
       <div class="home-icon-circle">&#127860;</div>
       <div class="home-option-text"><p>Food</p><span>Guess the dish from its description</span></div>
     </div>
+    <div class="home-option" data-go="mixed">
+      <div class="home-icon-circle">&#128260;</div>
+      <div class="home-option-text"><p>Mixed</p><span>Wine and food shuffled together</span></div>
+    </div>
   `;
-  options.querySelector('[data-go="wine"]').onclick = () => go("test-me-run", { mode: "wine" });
-  options.querySelector('[data-go="food"]').onclick = () => go("test-me-run", { mode: "food" });
+  options.querySelector('[data-go="wine"]').onclick = () => go("test-me-focus", { mode: "wine" });
+  options.querySelector('[data-go="food"]').onclick = () => go("test-me-focus", { mode: "food" });
+  options.querySelector('[data-go="mixed"]').onclick = () => go("test-me-run", { mode: "mixed" });
+  app.appendChild(options);
+}
+
+function renderTestMeFocus(mode) {
+  header("Quiz tool");
+
+  const intro = document.createElement("p");
+  intro.className = "testme-counter";
+  intro.textContent = mode === "food" ? "Focus on one section, or test the whole menu" : "Focus on one style, or test the whole list";
+  app.appendChild(intro);
+
+  const options = document.createElement("div");
+  options.className = "home-options";
+
+  const allOpt = document.createElement("div");
+  allOpt.className = "home-option";
+  allOpt.innerHTML = `
+    <div class="home-icon-circle">&#127760;</div>
+    <div class="home-option-text"><p>${mode === "food" ? "All dishes" : "All wines"}</p><span>Everything in the pool</span></div>
+  `;
+  allOpt.onclick = () => go("test-me-run", { mode, focus: "all" });
+  options.appendChild(allOpt);
+
+  const categories = mode === "food"
+    ? SECTION_ORDER.filter(s => DISHES.some(d => d.section === s && d.quizClue))
+    : STYLE_ORDER.filter(s => WINES.some(w => w.style === s));
+
+  categories.forEach(cat => {
+    const opt = document.createElement("div");
+    opt.className = "home-option";
+    const label = mode === "food" ? cat : STYLE_LABELS[cat];
+    const icon = mode === "food" ? getSectionIcon(cat) : "\u{1F377}";
+    opt.innerHTML = `
+      <div class="home-icon-circle">${icon}</div>
+      <div class="home-option-text"><p>${label}</p><span>Just this ${mode === "food" ? "section" : "style"}</span></div>
+    `;
+    opt.onclick = () => go("test-me-run", { mode, focus: cat });
+    options.appendChild(opt);
+  });
+
   app.appendChild(options);
 }
 
 function renderTestMeRun(mode) {
-  mode = mode === "food" ? "food" : "wine";
+  mode = ["food", "mixed"].includes(mode) ? mode : "wine";
+  const focus = current.params.focus || "all";
   header("Quiz tool");
 
   const isSpeed = speedPref.testme;
+  const qKey = queueKey(mode, focus);
 
-  if (!testQueues[mode].length) testQueues[mode] = buildTestQueue(mode);
-  const itemId = testQueues[mode][0];
-  const isFood = mode === "food";
+  if (!testQueues[qKey] || !testQueues[qKey].length) testQueues[qKey] = buildTestQueue(mode, focus);
+  const itemId = testQueues[qKey][0];
+  const isFood = mode === "mixed" ? itemId.startsWith("d-") : mode === "food";
   const item = isFood ? findDish(itemId) : findWine(itemId);
-  if (!item) { testQueues[mode] = []; go("test-me", {}, false); return; }
-  const pool = quizPool(mode);
+  if (!item) { testQueues[qKey] = []; go("test-me", {}, false); return; }
+  const pool = quizPool(mode, focus);
   const progress = getProgress();
   const knownCount = pool.filter(x => progress[x.id] === "known").length;
 
@@ -1144,37 +1202,41 @@ function renderTestMeRun(mode) {
 
   const card = document.createElement("div");
   card.className = "testme-card";
-  let revealed = false;
+  let phase = "clue"; // clue -> predicting -> revealed (predicting skipped in speed mode)
+  let predicted = null;
 
-  function clueHTML() {
+  function clueBlockHTML() {
     if (isFood) {
       return `
-        <p class="dish-flip-tag">Guess the dish &middot; tap to reveal</p>
+        <p class="dish-flip-tag">Guess the dish &middot; tap to ${isSpeed ? "reveal" : "continue"}</p>
         <p class="face-h3" style="margin-top:8px;"><span class="ic">&#128269;</span> Clues</p>
         <p class="face-desc" style="margin-bottom:10px;">${getSectionIcon(item.section)} ${item.section}</p>
         <p class="chefprep-text">${item.quizClue}</p>
-        <p class="empty-note" style="margin-top:6px; text-align:left; font-style:italic;">Which dish is this?</p>
       `;
     }
     return `
-      <p class="dish-flip-tag">Guess the wine &middot; tap to reveal</p>
+      <p class="dish-flip-tag">Guess the wine &middot; tap to ${isSpeed ? "reveal" : "continue"}</p>
       <p class="face-h3" style="margin-top:8px;"><span class="ic">&#128269;</span> Clues</p>
       <p class="face-desc" style="margin-bottom:10px;">${STYLE_LABELS[item.style]} &middot; ${item.region}</p>
       <div class="flavor-grid">${item.flavorTags.map(t => `<div class="flavor-item"><div class="icon">${getFlavorIcon(t)}</div><p>${t}</p></div>`).join("")}</div>
       ${structureBars(item.structure)}
     `;
   }
-  function answerHTML() {
+
+  function answerBlockHTML() {
+    const connector = `<div class="answer-connector"><span>&#8595;</span></div>`;
     if (isFood) {
       return `
-        <p class="dish-flip-tag">Answer</p>
+        ${connector}
+        <p class="dish-flip-tag">That's&hellip;</p>
         <p class="testme-answer-name">${item.name}</p>
         <p class="face-desc">${item.section}</p>
         <p class="face-desc" style="margin-top:12px; color:var(--bronze-500);">Swipe right if you knew it, left if you're still learning &mdash; or use the buttons below.</p>
       `;
     }
     return `
-      <p class="dish-flip-tag">Answer</p>
+      ${connector}
+      <p class="dish-flip-tag">That's&hellip;</p>
       <p class="testme-answer-name">${item.name}</p>
       <p class="face-desc">${item.grape}</p>
       <p class="face-desc">Producer: ${item.producer}</p>
@@ -1184,34 +1246,80 @@ function renderTestMeRun(mode) {
 
   const inner = document.createElement("div");
   inner.className = "dish-flip-inner";
-  inner.innerHTML = clueHTML();
+  const clueBlock = document.createElement("div");
+  clueBlock.className = "clue-block";
+  clueBlock.innerHTML = clueBlockHTML();
+  const answerBlock = document.createElement("div");
+  answerBlock.className = "answer-block";
+  answerBlock.style.display = "none";
+  inner.appendChild(clueBlock);
+  inner.appendChild(answerBlock);
   card.appendChild(inner);
 
-  card.onclick = () => {
-    if (revealed) return;
-    revealed = true;
-    inner.innerHTML = answerHTML();
+  function reveal() {
+    phase = "revealed";
+    answerBlock.innerHTML = answerBlockHTML();
+    answerBlock.style.display = "block";
     btnRow.style.display = "flex";
+  }
+
+  const predictRow = document.createElement("div");
+  predictRow.className = "predict-row";
+  predictRow.style.display = "none";
+  predictRow.innerHTML = `
+    <button class="predict-btn predict-unsure">Not sure</button>
+    <button class="predict-btn predict-know">I know this</button>
+  `;
+  predictRow.querySelector(".predict-unsure").onclick = (e) => { e.stopPropagation(); predicted = false; predictRow.style.display = "none"; reveal(); };
+  predictRow.querySelector(".predict-know").onclick = (e) => { e.stopPropagation(); predicted = true; predictRow.style.display = "none"; reveal(); };
+
+  card.onclick = () => {
+    if (phase === "clue") {
+      if (isSpeed) { reveal(); return; }
+      phase = "predicting";
+      predictRow.style.display = "flex";
+      return;
+    }
   };
+
+  function calibrationMessage(pred, status) {
+    if (pred === true && status === "known") return { cls: "cal-good", text: "&#10003; Nailed it \u2014 you called that." };
+    if (pred === true && status === "learning") return { cls: "cal-warn", text: "Worth another look \u2014 you were more sure than it turned out." };
+    if (pred === false && status === "known") return { cls: "cal-good", text: "You knew more than you gave yourself credit for." };
+    return { cls: "cal-neutral", text: "Fair call \u2014 flagged for review." };
+  }
 
   function advance(status) {
     setWineProgress(item.id, status);
-    testQueues[mode].shift();
-    if (status === "learning") testQueues[mode].push(item.id);
-    if (!testQueues[mode].length) testQueues[mode] = buildTestQueue(mode);
-    if (isSpeed) {
-      if (status === "known") current.params.score++;
+    const doFinalize = () => {
+      testQueues[qKey].shift();
+      if (status === "learning") testQueues[qKey].push(item.id);
+      if (!testQueues[qKey].length) testQueues[qKey] = buildTestQueue(mode, focus);
+      if (isSpeed) {
+        if (status === "known") current.params.score++;
+        render();
+        return;
+      }
+      const updated = getProgress();
+      const allKnown = pool.every(x => updated[x.id] === "known");
+      if (allKnown && markMilestone("testme-" + mode + "-" + focus + "-complete")) {
+        celebrate();
+        setTimeout(() => render(), 1200);
+        return;
+      }
       render();
-      return;
+    };
+    if (!isSpeed && predicted !== null) {
+      const msg = calibrationMessage(predicted, status);
+      const toast = document.createElement("div");
+      toast.className = "calibration-toast " + msg.cls;
+      toast.textContent = msg.text;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 1400);
+      setTimeout(doFinalize, 500);
+    } else {
+      doFinalize();
     }
-    const updated = getProgress();
-    const allKnown = pool.every(x => updated[x.id] === "known");
-    if (allKnown && markMilestone("testme-" + mode + "-complete")) {
-      celebrate();
-      setTimeout(() => render(), 1200);
-      return;
-    }
-    render();
   }
 
   /* Swipe with live drag feedback: card follows the finger, tilts, and hints
@@ -1223,7 +1331,7 @@ function renderTestMeRun(mode) {
     dragging = false;
   }, { passive: true });
   card.addEventListener("touchmove", (e) => {
-    if (!revealed || touchStartX === null) return;
+    if (phase !== "revealed" || touchStartX === null) return;
     const dx = e.touches[0].clientX - touchStartX;
     if (Math.abs(dx) > 8) dragging = true;
     if (!dragging) return;
@@ -1233,7 +1341,7 @@ function renderTestMeRun(mode) {
     inner.classList.toggle("drag-left", dx < -40);
   }, { passive: true });
   card.addEventListener("touchend", (e) => {
-    if (!revealed || touchStartX === null) { touchStartX = null; return; }
+    if (phase !== "revealed" || touchStartX === null) { touchStartX = null; return; }
     const dx = e.changedTouches[0].clientX - touchStartX;
     touchStartX = null;
     if (dx > 60) {
@@ -1252,6 +1360,7 @@ function renderTestMeRun(mode) {
   });
 
   app.appendChild(card);
+  app.appendChild(predictRow);
 
   const btnRow = document.createElement("div");
   btnRow.className = "card-footer-nav";
@@ -1273,7 +1382,7 @@ function renderTestMeRun(mode) {
   resetLink.textContent = "Reset my progress";
   resetLink.onclick = () => {
     resetProgress();
-    testQueues = { wine: [], food: [] };
+    testQueues = {};
     render();
   };
   app.appendChild(resetLink);
@@ -1575,7 +1684,7 @@ function renderSpeedEnd(mode, score) {
   wrap.innerHTML = `
     <p class="speed-end-icon">&#9889;</p>
     <p class="speed-end-score">${score}</p>
-    <p class="speed-end-label">${mode === "food" ? "dishes" : "wines"} nailed in 60 seconds</p>
+    <p class="speed-end-label">${mode === "food" ? "dishes" : mode === "mixed" ? "items" : "wines"} nailed in 60 seconds</p>
     <p class="speed-end-best">${isRecord ? "&#127942; New personal best!" : `Personal best: ${best}`}</p>
   `;
   app.appendChild(wrap);

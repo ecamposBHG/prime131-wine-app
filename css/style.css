@@ -336,6 +336,31 @@ body.dark .testme-answer-name { color: #F5F1E8; }
   text-decoration: underline; cursor: pointer; margin-top: 18px;
 }
 
+/* Confidence prediction */
+.predict-row { display: none; gap: 10px; margin-top: 12px; }
+.predict-btn {
+  flex: 1; padding: 16px; border-radius: 12px; font-size: 15px; font-weight: 600;
+  font-family: var(--font-body); cursor: pointer;
+}
+.predict-unsure { background: var(--washi-100); border: 2px solid var(--shoyu-300); color: var(--shoyu-500); }
+.predict-know { background: var(--bronze-500); border: 2px solid var(--bronze-500); color: var(--shoyu-700); }
+
+/* Answer reconnects to clue */
+.answer-connector { text-align: center; font-size: 18px; color: var(--bronze-500); margin: 14px 0 10px; }
+.answer-block { border-top: 1px dashed var(--shoyu-500); padding-top: 4px; margin-top: 4px; }
+
+/* Calibration toast */
+.calibration-toast {
+  position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%);
+  padding: 12px 20px; border-radius: 12px; font-size: 14px; font-weight: 500;
+  z-index: 90; max-width: 85%; text-align: center; box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  animation: toast-in 0.25s ease;
+}
+@keyframes toast-in { from { opacity: 0; transform: translateX(-50%) translateY(8px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+.calibration-toast.cal-good { background: var(--wasabi-500); color: var(--washi-100); }
+.calibration-toast.cal-warn { background: var(--bronze-500); color: var(--shoyu-700); }
+.calibration-toast.cal-neutral { background: var(--sumi-700); color: var(--washi-100); }
+
 /* Milestone celebration */
 .celebrate-overlay {
   position: fixed; inset: 0; pointer-events: none; z-index: 100; overflow: hidden;

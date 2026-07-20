@@ -220,6 +220,8 @@ function render() {
   else if (current.view === "test-me-run") renderTestMeRun(current.params.mode);
   else if (current.view === "game-room") renderGameRoom();
   else if (current.view === "this-or-that") renderThisOrThat();
+  else if (current.view === "this-or-that-focus") renderThisOrThatFocus();
+  else if (current.view === "this-or-that-run") renderThisOrThatRun();
   else if (current.view === "imposter") renderImposter();
   else if (current.view === "somm-says") renderSommSays();
   else if (current.view === "somm-says-run") renderSommSaysRun(current.params.seconds);
@@ -1467,25 +1469,181 @@ function renderGameRoom() {
 
 /* ---------- This or That: judgment calls from real pairings ---------- */
 
-function buildThisOrThatRound() {
-  // Find dishes with 2+ paired wines: the first pairing is "primary" per data order
-  const candidates = DISHES.filter(d => d.pairedWineIds && d.pairedWineIds.length >= 2);
-  const dish = candidates[Math.floor(Math.random() * candidates.length)];
+/* This or That: dedicated progress store (a different skill than Test Me's recall) */
+const TOT_PROGRESS_KEY = "p131-tot-progress";
+function getTotProgress() {
+  try { return JSON.parse(localStorage.getItem(TOT_PROGRESS_KEY)) || {}; } catch (e) { return {}; }
+}
+function setTotProgress(dishId, status) {
+  const p = getTotProgress();
+  p[dishId] = status;
+  try { localStorage.setItem(TOT_PROGRESS_KEY, JSON.stringify(p)); } catch (e) {}
+}
+
+let totPref = { difficulty: "easy", rounds: 10 };
+let totQueues = {};
+
+function totPool(focus) {
+  let pool = DISHES.filter(d => d.pairedWineIds && d.pairedWineIds.length >= 2);
+  if (focus && focus !== "all") pool = pool.filter(d => d.section === focus);
+  return pool;
+}
+
+function structDist(a, b) {
+  const s1 = a.structure, s2 = b.structure;
+  return Math.abs(s1.tannin - s2.tannin) + Math.abs(s1.acidity - s2.acidity) + Math.abs(s1.body - s2.body) + Math.abs(s1.alcohol - s2.alcohol);
+}
+
+function buildTotQueue(focus) {
+  const progress = getTotProgress();
+  const learning = [], unseen = [], known = [];
+  totPool(focus).forEach(d => {
+    const status = progress[d.id];
+    if (status === "learning") learning.push(d.id);
+    else if (status === "known") known.push(d.id);
+    else unseen.push(d.id);
+  });
+  const shuffle = (arr) => {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  };
+  return [...shuffle(learning), ...shuffle(unseen), ...shuffle(known)];
+}
+
+function buildThisOrThatRound(dish, difficulty) {
   const correctWine = findWine(dish.pairedWineIds[0]);
-  // Distractor: a wine NOT paired with this dish
-  const nonPaired = WINES.filter(w => !dish.pairedWineIds.includes(w.id) && w.style === correctWine.style);
-  const fallback = WINES.filter(w => !dish.pairedWineIds.includes(w.id));
-  const pool = nonPaired.length ? nonPaired : fallback;
-  const distractor = pool[Math.floor(Math.random() * pool.length)];
+  const sameStyle = WINES.filter(w => !dish.pairedWineIds.includes(w.id) && w.style === correctWine.style);
+  const pool = sameStyle.length ? sameStyle : WINES.filter(w => !dish.pairedWineIds.includes(w.id));
+  const sorted = [...pool].sort((a, b) =>
+    difficulty === "hard"
+      ? structDist(a, correctWine) - structDist(b, correctWine)
+      : structDist(b, correctWine) - structDist(a, correctWine)
+  );
+  const distractor = sorted[0] || pool[Math.floor(Math.random() * pool.length)];
   return { dish, correctWine, distractor };
+}
+
+function contrastReason(correctWine, distractorWine) {
+  const trait = getDominantTrait(correctWine);
+  const dVal = distractorWine.structure[trait.trait];
+  const cVal = correctWine.structure[trait.trait];
+  const lack = {
+    tannin: `it doesn't have enough tannin to cut through the richness here the way ${correctWine.name} does`,
+    acidity: `its acidity isn't bright enough to keep up with this dish the way ${correctWine.name}'s does`,
+    body: `it's too light on its own to stand up to this dish the way ${correctWine.name} does`
+  };
+  const excess = {
+    tannin: `its tannin would actually overpower this dish rather than complement it &mdash; more grip than this needs`,
+    acidity: `it's sharper than this dish calls for, cutting against flavors that don't need cutting`,
+    body: `it's heavier than this dish can support &mdash; it would bury the more delicate parts of the plate`
+  };
+  if (dVal < cVal) return "Here's the gap: " + (lack[trait.trait] || "it doesn't have quite the structure this dish is asking for") + ".";
+  if (dVal > cVal) return "Here's the gap: " + (excess[trait.trait] || "it brings more structure than this dish is actually asking for") + ".";
+  return `Here's the gap: the structure is close, but ${correctWine.name} still has the edge on real flavor affinity with this dish.`;
+}
+
+function totToggleRow() {
+  const row = document.createElement("div");
+  row.className = "speed-toggle" + (totPref.difficulty === "hard" ? " active" : "");
+  row.innerHTML = `<span class="speed-icon">&#9878;&#65039;</span><span class="speed-text">Difficulty: ${totPref.difficulty === "hard" ? "Hard \u2014 closest structural match" : "Easy \u2014 obvious mismatch"}</span><span class="speed-state">${totPref.difficulty === "hard" ? "HARD" : "EASY"}</span>`;
+  row.onclick = () => {
+    totPref.difficulty = totPref.difficulty === "hard" ? "easy" : "hard";
+    render();
+  };
+  return row;
 }
 
 function renderThisOrThat() {
   header("This or That");
 
-  const round = buildThisOrThatRound();
-  const { dish, correctWine, distractor } = round;
+  const progress = getTotProgress();
+  const allPool = totPool("all");
+  const knownCount = allPool.filter(d => progress[d.id] === "known").length;
+  const status = document.createElement("p");
+  status.className = "testme-counter";
+  status.textContent = `${knownCount} of ${allPool.length} judgment calls mastered`;
+  app.appendChild(status);
+
+  app.appendChild(totToggleRow());
+
+  const roundsLabel = document.createElement("p");
+  roundsLabel.className = "testme-counter";
+  roundsLabel.textContent = "How many rounds?";
+  app.appendChild(roundsLabel);
+
+  const options = document.createElement("div");
+  options.className = "home-options";
+  [5, 10, 15].forEach(n => {
+    const opt = document.createElement("div");
+    opt.className = "home-option";
+    opt.innerHTML = `
+      <div class="home-icon-circle">&#9878;&#65039;</div>
+      <div class="home-option-text"><p>${n} rounds</p><span>${n <= 5 ? "Quick session" : n <= 10 ? "The standard" : "Full focus session"}</span></div>
+    `;
+    opt.onclick = () => { totPref.rounds = n; go("this-or-that-focus"); };
+    options.appendChild(opt);
+  });
+  app.appendChild(options);
+}
+
+function renderThisOrThatFocus() {
+  header("This or That");
+
+  const intro = document.createElement("p");
+  intro.className = "testme-counter";
+  intro.textContent = "Focus on one section, or test the whole menu";
+  app.appendChild(intro);
+
+  const options = document.createElement("div");
+  options.className = "home-options";
+
+  const allOpt = document.createElement("div");
+  allOpt.className = "home-option";
+  allOpt.innerHTML = `<div class="home-icon-circle">&#127760;</div><div class="home-option-text"><p>All dishes</p><span>Everything in the pool</span></div>`;
+  allOpt.onclick = () => go("this-or-that-run", { focus: "all" });
+  options.appendChild(allOpt);
+
+  const categories = SECTION_ORDER.filter(s => totPool(s).length >= 1);
+  categories.forEach(cat => {
+    const opt = document.createElement("div");
+    opt.className = "home-option";
+    opt.innerHTML = `<div class="home-icon-circle">${getSectionIcon(cat)}</div><div class="home-option-text"><p>${cat}</p><span>Just this section</span></div>`;
+    opt.onclick = () => go("this-or-that-run", { focus: cat });
+    options.appendChild(opt);
+  });
+  app.appendChild(options);
+}
+
+function renderThisOrThatRun() {
+  const focus = current.params.focus || "all";
+  const qKey = focus;
+  header("This or That");
+
+  if (typeof current.params.roundNum !== "number") {
+    current.params.roundNum = 1;
+    current.params.correct = 0;
+  }
+  if (!totQueues[qKey] || !totQueues[qKey].length) totQueues[qKey] = buildTotQueue(focus);
+
+  if (current.params.roundNum > totPref.rounds) {
+    renderTotEnd(focus, current.params.correct, totPref.rounds);
+    return;
+  }
+
+  const dishId = totQueues[qKey][0];
+  const dish = findDish(dishId);
+  if (!dish) { totQueues[qKey] = []; go("game-room", {}, false); return; }
+  const round = buildThisOrThatRound(dish, totPref.difficulty);
+  const { correctWine, distractor } = round;
   const options = Math.random() < 0.5 ? [correctWine, distractor] : [distractor, correctWine];
+
+  const progressLine = document.createElement("p");
+  progressLine.className = "testme-counter";
+  progressLine.textContent = `Round ${current.params.roundNum} of ${totPref.rounds} \u00b7 ${current.params.correct} correct so far`;
+  app.appendChild(progressLine);
 
   const prompt = document.createElement("div");
   prompt.innerHTML = `
@@ -1514,20 +1672,71 @@ function renderThisOrThat() {
       if (explain.style.display !== "none") return;
       const isCorrect = wine.id === correctWine.id;
       opt.classList.add(isCorrect ? "tot-correct" : "tot-wrong");
+      setTotProgress(dish.id, isCorrect ? "known" : "learning");
+      if (isCorrect) current.params.correct++;
       const reason = pairingReason(correctWine, dish);
       explain.innerHTML = `
         <p class="tot-verdict">${isCorrect ? "&#9989; That's the one." : `&#10060; The stronger call is <b>${correctWine.name}</b>.`}</p>
         <p class="pairing-reason">${reason.text}</p>
+        <p class="pairing-reason tot-contrast">${contrastReason(correctWine, distractor)}</p>
         <button class="footer-btn footer-btn-home tot-next">Next round &rarr;</button>
       `;
       explain.style.display = "block";
-      explain.querySelector(".tot-next").onclick = () => render();
+      explain.querySelector(".tot-next").onclick = () => {
+        totQueues[qKey].shift();
+        if (!isCorrect) totQueues[qKey].push(dish.id);
+        if (!totQueues[qKey].length) totQueues[qKey] = buildTotQueue(focus);
+        current.params.roundNum++;
+        render();
+      };
     };
     optWrap.appendChild(opt);
   });
 
   app.appendChild(optWrap);
   app.appendChild(explain);
+}
+
+function renderTotEnd(focus, correct, total) {
+  app.innerHTML = "";
+  header("This or That");
+  const bestKey = "p131-best-tot-" + totPref.difficulty + "-" + total;
+  let best = 0;
+  try { best = parseInt(localStorage.getItem(bestKey)) || 0; } catch (e) {}
+  const isRecord = correct > best;
+  if (isRecord) {
+    try { localStorage.setItem(bestKey, String(correct)); } catch (e) {}
+    celebrate();
+  }
+  const progress = getTotProgress();
+  const pool = totPool(focus);
+  if (pool.length && pool.every(d => progress[d.id] === "known")) {
+    markMilestone("tot-" + focus + "-complete");
+  }
+
+  const wrap = document.createElement("div");
+  wrap.className = "speed-end";
+  wrap.innerHTML = `
+    <p class="speed-end-icon">&#9878;&#65039;</p>
+    <p class="speed-end-score">${correct}<span class="speed-end-total">/${total}</span></p>
+    <p class="speed-end-label">correct calls &middot; ${totPref.difficulty} difficulty</p>
+    <p class="speed-end-best">${isRecord ? "&#127942; New personal best!" : `Personal best (${totPref.difficulty}, ${total} rounds): ${best}`}</p>
+  `;
+  app.appendChild(wrap);
+
+  const btnRow = document.createElement("div");
+  btnRow.className = "card-footer-nav";
+  const againBtn = document.createElement("button");
+  againBtn.className = "footer-btn footer-btn-home";
+  againBtn.textContent = "Run it back \u2696\ufe0f";
+  againBtn.onclick = () => go("this-or-that-run", { focus });
+  const backBtn = document.createElement("button");
+  backBtn.className = "footer-btn";
+  backBtn.textContent = "Game Room";
+  backBtn.onclick = () => go("game-room");
+  btnRow.appendChild(backBtn);
+  btnRow.appendChild(againBtn);
+  app.appendChild(btnRow);
 }
 
 /* ---------- Match It: memory matching with rotating or chosen types ---------- */

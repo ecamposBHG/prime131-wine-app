@@ -222,7 +222,8 @@ function render() {
   else if (current.view === "this-or-that") renderThisOrThat();
   else if (current.view === "this-or-that-focus") renderThisOrThatFocus();
   else if (current.view === "this-or-that-run") renderThisOrThatRun();
-  else if (current.view === "imposter") renderImposter();
+  else if (current.view === "imposter") renderImposterSetup();
+  else if (current.view === "imposter-run") renderImposter();
   else if (current.view === "somm-says") renderSommSays();
   else if (current.view === "somm-says-run") renderSommSaysRun(current.params.seconds);
   else if (current.view === "match-it") renderMatchIt(current.params.matchType);
@@ -2020,57 +2021,137 @@ function renderSpeedEnd(mode, score) {
 
 /* ---------- Imposter: three share a trait, one doesn't ---------- */
 
-function buildImposterRound() {
+/* Dedicated per-rule-type progress store: the skill here is spotting a category of pattern, not memorizing one item */
+const IMPOSTER_PROGRESS_KEY = "p131-imposter-progress";
+function getImposterProgress() {
+  try { return JSON.parse(localStorage.getItem(IMPOSTER_PROGRESS_KEY)) || {}; } catch (e) { return {}; }
+}
+function setImposterProgress(ruleType, status) {
+  const p = getImposterProgress();
+  p[ruleType] = status;
+  try { localStorage.setItem(IMPOSTER_PROGRESS_KEY, JSON.stringify(p)); } catch (e) {}
+}
+
+let imposterPref = { difficulty: "easy", rounds: 10 };
+
+function buildImposterRules(difficulty) {
   const rules = [];
-  const napa = WINES.filter(w => w.region.includes("Napa"));
-  if (napa.length >= 3) rules.push({
-    pick: napa, exclude: WINES.filter(w => !w.region.includes("Napa")),
-    why: "The other three are all from Napa Valley."
-  });
-  const bigTannin = WINES.filter(w => w.structure.tannin >= 3);
-  if (bigTannin.length >= 3) rules.push({
-    pick: bigTannin, exclude: WINES.filter(w => w.structure.tannin <= 1),
-    why: "The other three are structured, tannic reds &mdash; the imposter barely has any grip."
-  });
-  const highAcid = WINES.filter(w => w.structure.acidity >= 4);
-  if (highAcid.length >= 3) rules.push({
-    pick: highAcid, exclude: WINES.filter(w => w.structure.acidity <= 2),
-    why: "The other three are all high-acid, fresh-style pours &mdash; the imposter is soft and round."
-  });
-  const fullBody = WINES.filter(w => w.structure.body >= 4);
-  if (fullBody.length >= 3) rules.push({
-    pick: fullBody, exclude: WINES.filter(w => w.structure.body <= 2),
-    why: "The other three are all full-bodied &mdash; the imposter is noticeably lighter on the palate."
-  });
-  const lightBody = WINES.filter(w => w.structure.body <= 2);
-  if (lightBody.length >= 3) rules.push({
-    pick: lightBody, exclude: WINES.filter(w => w.structure.body >= 4),
-    why: "The other three are all light-bodied &mdash; the imposter is much fuller and richer."
-  });
+
+  rules.push({ type: "region", pick: WINES.filter(w => w.region.includes("Napa")),
+    exclude: WINES.filter(w => !w.region.includes("Napa")),
+    why: "The other three are all from Napa Valley." });
+
+  if (difficulty === "hard") {
+    rules.push({ type: "tannin", pick: WINES.filter(w => w.structure.tannin === 3), exclude: WINES.filter(w => w.structure.tannin === 2),
+      why: "The other three all sit right at medium(+) tannin &mdash; the imposter is a notch softer, at medium." });
+    rules.push({ type: "acidity", pick: WINES.filter(w => w.structure.acidity === 3), exclude: WINES.filter(w => w.structure.acidity === 2),
+      why: "The other three all sit right at medium acidity &mdash; the imposter is a notch softer." });
+    rules.push({ type: "body", pick: WINES.filter(w => w.structure.body === 3), exclude: WINES.filter(w => w.structure.body === 2),
+      why: "The other three are all medium body &mdash; the imposter is a notch lighter." });
+  } else {
+    rules.push({ type: "tannin", pick: WINES.filter(w => w.structure.tannin >= 3), exclude: WINES.filter(w => w.structure.tannin <= 1),
+      why: "The other three are structured, tannic reds &mdash; the imposter barely has any grip." });
+    rules.push({ type: "acidity", pick: WINES.filter(w => w.structure.acidity >= 4), exclude: WINES.filter(w => w.structure.acidity <= 2),
+      why: "The other three are all high-acid, fresh-style pours &mdash; the imposter is soft and round." });
+    rules.push({ type: "body", pick: WINES.filter(w => w.structure.body >= 4), exclude: WINES.filter(w => w.structure.body <= 2),
+      why: "The other three are all full-bodied &mdash; the imposter is noticeably lighter on the palate." });
+    rules.push({ type: "body", pick: WINES.filter(w => w.structure.body <= 2), exclude: WINES.filter(w => w.structure.body >= 4),
+      why: "The other three are all light-bodied &mdash; the imposter is much fuller and richer." });
+  }
+
   DISHES.filter(d => d.pairedWineIds && d.pairedWineIds.length >= 3).forEach(dish => {
-    rules.push({
-      pick: dish.pairedWineIds.map(findWine).filter(Boolean),
+    rules.push({ type: "pairing", pick: dish.pairedWineIds.map(findWine).filter(Boolean),
       exclude: WINES.filter(w => !dish.pairedWineIds.includes(w.id)),
-      why: `The other three are all listed pairings for the ${dish.name}.`
-    });
+      why: `The other three are all listed pairings for the ${dish.name}.` });
   });
 
-  for (let attempt = 0; attempt < 10; attempt++) {
-    const rule = rules[Math.floor(Math.random() * rules.length)];
-    if (rule.pick.length < 3 || !rule.exclude.length) continue;
-    const trio = [...rule.pick].sort(() => Math.random() - 0.5).slice(0, 3);
-    const imposter = rule.exclude[Math.floor(Math.random() * rule.exclude.length)];
-    return { trio, imposter, why: rule.why };
-  }
-  return null;
+  const foodPool = DISHES.filter(d => d.quizClue);
+  const allergenSet = [...new Set(foodPool.flatMap(d => d.allergensInRecipe || []))];
+  allergenSet.forEach(a => {
+    const has = foodPool.filter(d => (d.allergensInRecipe || []).includes(a));
+    const notHave = foodPool.filter(d => !(d.allergensInRecipe || []).includes(a));
+    if (has.length >= 3 && notHave.length >= 1) {
+      rules.push({ type: "allergen", pick: has, exclude: notHave, itemType: "food",
+        why: `The other three all contain ${a} &mdash; the imposter doesn't.` });
+    }
+  });
+
+  ["sparkling", "white", "red", "sake"].forEach(style => {
+    const has = foodPool.filter(d => d.pairedWineIds.length && findWine(d.pairedWineIds[0])?.style === style);
+    const notHave = foodPool.filter(d => d.pairedWineIds.length && findWine(d.pairedWineIds[0])?.style !== style);
+    if (has.length >= 3 && notHave.length >= 1) {
+      rules.push({ type: "wine-style", pick: has, exclude: notHave, itemType: "food",
+        why: `The other three are all primarily paired with a ${STYLE_LABELS[style].toLowerCase()} &mdash; the imposter's primary pairing is a different style.` });
+    }
+  });
+
+  return rules.filter(r => r.pick.length >= 3 && r.exclude.length >= 1);
+}
+
+function buildImposterRound(difficulty) {
+  const rules = buildImposterRules(difficulty);
+  const progress = getImposterProgress();
+  const types = [...new Set(rules.map(r => r.type))];
+  const learning = types.filter(t => progress[t] === "learning");
+  const other = types.filter(t => progress[t] !== "learning");
+  const orderedTypes = Math.random() < 0.6 && learning.length ? learning : (learning.length && Math.random() < 0.35 ? learning : other.length ? other : types);
+  const chosenType = orderedTypes[Math.floor(Math.random() * orderedTypes.length)];
+  const candidates = rules.filter(r => r.type === chosenType);
+  const rule = candidates[Math.floor(Math.random() * candidates.length)];
+  const trio = [...rule.pick].sort(() => Math.random() - 0.5).slice(0, 3);
+  const imposter = rule.exclude[Math.floor(Math.random() * rule.exclude.length)];
+  return { trio, imposter, why: rule.why, type: rule.type, itemType: rule.itemType || "wine" };
+}
+
+function imposterToggleRow() {
+  const row = document.createElement("div");
+  row.className = "speed-toggle" + (imposterPref.difficulty === "hard" ? " active" : "");
+  row.innerHTML = `<span class="speed-icon">&#128373;&#65039;</span><span class="speed-text">Difficulty: ${imposterPref.difficulty === "hard" ? "Hard \u2014 tight structural gaps" : "Easy \u2014 obvious mismatches"}</span><span class="speed-state">${imposterPref.difficulty === "hard" ? "HARD" : "EASY"}</span>`;
+  row.onclick = () => { imposterPref.difficulty = imposterPref.difficulty === "hard" ? "easy" : "hard"; render(); };
+  return row;
+}
+
+function renderImposterSetup() {
+  header("Imposter");
+  app.appendChild(imposterToggleRow());
+
+  const roundsLabel = document.createElement("p");
+  roundsLabel.className = "testme-counter";
+  roundsLabel.textContent = "How many rounds?";
+  app.appendChild(roundsLabel);
+
+  const options = document.createElement("div");
+  options.className = "home-options";
+  [5, 10, 15].forEach(n => {
+    const opt = document.createElement("div");
+    opt.className = "home-option";
+    opt.innerHTML = `<div class="home-icon-circle">&#128373;&#65039;</div><div class="home-option-text"><p>${n} rounds</p><span>${n <= 5 ? "Quick session" : n <= 10 ? "The standard" : "Full session"}</span></div>`;
+    opt.onclick = () => { imposterPref.rounds = n; go("imposter-run"); };
+    options.appendChild(opt);
+  });
+  app.appendChild(options);
 }
 
 function renderImposter() {
+  if (typeof current.params.roundNum !== "number") {
+    current.params.roundNum = 1;
+    current.params.correct = 0;
+  }
   header("Imposter");
 
-  const round = buildImposterRound();
+  if (current.params.roundNum > imposterPref.rounds) {
+    renderImposterEnd(current.params.correct, imposterPref.rounds);
+    return;
+  }
+
+  const round = buildImposterRound(imposterPref.difficulty);
   if (!round) { go("game-room", {}, false); return; }
   const tiles = [...round.trio, round.imposter].sort(() => Math.random() - 0.5);
+
+  const progressLine = document.createElement("p");
+  progressLine.className = "testme-counter";
+  progressLine.textContent = `Round ${current.params.roundNum} of ${imposterPref.rounds} \u00b7 ${current.params.correct} correct so far`;
+  app.appendChild(progressLine);
 
   const intro = document.createElement("p");
   intro.className = "testme-counter";
@@ -2085,17 +2166,23 @@ function renderImposter() {
   explain.className = "tot-explain";
   explain.style.display = "none";
 
-  tiles.forEach(w => {
+  tiles.forEach(item => {
     const tile = document.createElement("button");
     tile.className = "match-tile imposter-tile";
-    tile.innerHTML = `<b>${w.name}</b>`;
+    const displayName = round.itemType === "food" ? item.name : item.producer;
+    tile.innerHTML = `<b>${displayName}</b>`;
     tile.onclick = () => {
       if (done) return;
       done = true;
-      const correct = w.id === round.imposter.id;
+      const correct = item.id === round.imposter.id;
+      setImposterProgress(round.type, correct ? "known" : "learning");
+      if (correct) current.params.correct++;
       grid.querySelectorAll(".imposter-tile").forEach((t, i) => {
         t.classList.add("revealed");
-        t.innerHTML = `<b>${tiles[i].name}</b><br><span class="imposter-sub">${tiles[i].producer}</span>`;
+        const full = tiles[i];
+        t.innerHTML = round.itemType === "food"
+          ? `<b>${full.name}</b>`
+          : `<b>${full.producer}</b><br><span class="imposter-sub">${full.name}</span>`;
       });
       tile.classList.add(correct ? "matched" : "tot-wrong-tile");
       if (!correct) {
@@ -2109,13 +2196,53 @@ function renderImposter() {
         <button class="footer-btn footer-btn-home tot-next">Next round &rarr;</button>
       `;
       explain.style.display = "block";
-      explain.querySelector(".tot-next").onclick = () => render();
+      explain.querySelector(".tot-next").onclick = () => {
+        current.params.roundNum++;
+        render();
+      };
     };
     grid.appendChild(tile);
   });
 
   app.appendChild(grid);
   app.appendChild(explain);
+}
+
+function renderImposterEnd(correct, total) {
+  app.innerHTML = "";
+  header("Imposter");
+  const bestKey = "p131-best-imposter-" + imposterPref.difficulty + "-" + total;
+  let best = 0;
+  try { best = parseInt(localStorage.getItem(bestKey)) || 0; } catch (e) {}
+  const isRecord = correct > best;
+  if (isRecord) {
+    try { localStorage.setItem(bestKey, String(correct)); } catch (e) {}
+    celebrate();
+  }
+
+  const wrap = document.createElement("div");
+  wrap.className = "speed-end";
+  wrap.innerHTML = `
+    <p class="speed-end-icon">&#128373;&#65039;</p>
+    <p class="speed-end-score">${correct}<span class="speed-end-total">/${total}</span></p>
+    <p class="speed-end-label">imposters found \u00b7 ${imposterPref.difficulty} difficulty</p>
+    <p class="speed-end-best">${isRecord ? "&#127942; New personal best!" : `Personal best (${imposterPref.difficulty}, ${total} rounds): ${best}`}</p>
+  `;
+  app.appendChild(wrap);
+
+  const btnRow = document.createElement("div");
+  btnRow.className = "card-footer-nav";
+  const againBtn = document.createElement("button");
+  againBtn.className = "footer-btn footer-btn-home";
+  againBtn.textContent = "Run it back \u{1F575}\uFE0F";
+  againBtn.onclick = () => go("imposter-run");
+  const backBtn = document.createElement("button");
+  backBtn.className = "footer-btn";
+  backBtn.textContent = "Game Room";
+  backBtn.onclick = () => go("game-room");
+  btnRow.appendChild(backBtn);
+  btnRow.appendChild(againBtn);
+  app.appendChild(btnRow);
 }
 
 /* ---------- Sommelier Says: rapid-fire true/false against the clock ---------- */

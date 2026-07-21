@@ -1034,6 +1034,9 @@ function quizPool(mode, focus) {
     if (focus && focus !== "all") pool = pool.filter(d => d.section === focus);
     return pool;
   }
+  if (mode === "cocktail") {
+    return COCKTAILS;
+  }
   if (mode === "mixed") {
     return [...WINES, ...DISHES.filter(d => d.quizClue)];
   }
@@ -1043,6 +1046,7 @@ function quizPool(mode, focus) {
 }
 
 function isWineItem(item) { return item.id.charAt(0) === "w" && /^\d+$/.test(item.id.slice(1)); }
+function isCocktailItem(item) { return item.id.charAt(0) === "c" && /^\d+$/.test(item.id.slice(1)); }
 
 let testQueues = {};
 function queueKey(mode, focus) { return mode === "mixed" ? "mixed" : mode + ":" + (focus || "all"); }
@@ -1100,6 +1104,10 @@ function renderTestMe() {
       <div class="home-icon-circle">&#127860;</div>
       <div class="home-option-text"><p>Food</p><span>Guess the dish from its description</span></div>
     </div>
+    <div class="home-option" data-go="cocktail">
+      <div class="home-icon-circle">&#127864;</div>
+      <div class="home-option-text"><p>Cocktails</p><span>Guess the cocktail from its profile</span></div>
+    </div>
     <div class="home-option" data-go="mixed">
       <div class="home-icon-circle">&#128260;</div>
       <div class="home-option-text"><p>Mixed</p><span>Wine and food shuffled together</span></div>
@@ -1107,6 +1115,7 @@ function renderTestMe() {
   `;
   options.querySelector('[data-go="wine"]').onclick = () => go("test-me-focus", { mode: "wine" });
   options.querySelector('[data-go="food"]').onclick = () => go("test-me-focus", { mode: "food" });
+  options.querySelector('[data-go="cocktail"]').onclick = () => go("test-me-run", { mode: "cocktail" });
   options.querySelector('[data-go="mixed"]').onclick = () => go("test-me-run", { mode: "mixed" });
   app.appendChild(options);
 }
@@ -1152,7 +1161,7 @@ function renderTestMeFocus(mode) {
 }
 
 function renderTestMeRun(mode) {
-  mode = ["food", "mixed"].includes(mode) ? mode : "wine";
+  mode = ["food", "mixed", "cocktail"].includes(mode) ? mode : "wine";
   const focus = current.params.focus || "all";
   header("Quiz tool");
 
@@ -1161,8 +1170,12 @@ function renderTestMeRun(mode) {
 
   if (!testQueues[qKey] || !testQueues[qKey].length) testQueues[qKey] = buildTestQueue(mode, focus);
   const itemId = testQueues[qKey][0];
-  const isFood = mode === "mixed" ? itemId.startsWith("d-") : mode === "food";
-  const item = isFood ? findDish(itemId) : findWine(itemId);
+  let itemKind;
+  if (mode === "mixed") itemKind = itemId.startsWith("d-") ? "food" : "wine";
+  else itemKind = mode === "food" ? "food" : mode === "cocktail" ? "cocktail" : "wine";
+  const isFood = itemKind === "food";
+  const isCocktail = itemKind === "cocktail";
+  const item = isFood ? findDish(itemId) : isCocktail ? findCocktail(itemId) : findWine(itemId);
   if (!item) { testQueues[qKey] = []; go("test-me", {}, false); return; }
   const pool = quizPool(mode, focus);
   const progress = getProgress();
@@ -1217,6 +1230,14 @@ function renderTestMeRun(mode) {
         <p class="chefprep-text">${item.quizClue}</p>
       `;
     }
+    if (isCocktail) {
+      return `
+        <p class="dish-flip-tag">Guess the cocktail &middot; tap to ${isSpeed ? "reveal" : "continue"}</p>
+        <p class="face-h3" style="margin-top:8px;"><span class="ic">&#128269;</span> Clues</p>
+        <p class="face-desc" style="margin-bottom:10px;">${item.glassware} &middot; ${item.method}</p>
+        <div class="flavor-grid">${item.flavorTags.map(t => `<div class="flavor-item"><div class="icon">${getFlavorIcon(t)}</div><p>${t}</p></div>`).join("")}</div>
+      `;
+    }
     return `
       <p class="dish-flip-tag">Guess the wine &middot; tap to ${isSpeed ? "reveal" : "continue"}</p>
       <p class="face-h3" style="margin-top:8px;"><span class="ic">&#128269;</span> Clues</p>
@@ -1234,6 +1255,15 @@ function renderTestMeRun(mode) {
         <p class="dish-flip-tag">That's&hellip;</p>
         <p class="testme-answer-name">${item.name}</p>
         <p class="face-desc">${item.section}</p>
+        <p class="face-desc" style="margin-top:12px; color:var(--bronze-500);">Swipe right if you knew it, left if you're still learning &mdash; or use the buttons below.</p>
+      `;
+    }
+    if (isCocktail) {
+      return `
+        ${connector}
+        <p class="dish-flip-tag">That's&hellip;</p>
+        <p class="testme-answer-name">${item.name}</p>
+        <p class="face-desc">Garnish: ${item.garnish}</p>
         <p class="face-desc" style="margin-top:12px; color:var(--bronze-500);">Swipe right if you knew it, left if you're still learning &mdash; or use the buttons below.</p>
       `;
     }
@@ -1747,7 +1777,8 @@ const MATCH_TYPES = [
   { id: "region", label: "Wine \u2194 Region", icon: "\u{1F5FA}\uFE0F" },
   { id: "flavor", label: "Wine \u2194 Flavor", icon: "\u{1F347}" },
   { id: "pairing", label: "Wine \u2194 Dish", icon: "\u{1F37D}\uFE0F" },
-  { id: "food", label: "Dish \u2194 Allergen", icon: "\u26A0\uFE0F" }
+  { id: "food", label: "Dish \u2194 Allergen", icon: "\u26A0\uFE0F" },
+  { id: "cocktail", label: "Cocktail \u2194 Flavor", icon: "\u{1F378}" }
 ];
 const MATCH_DIFFICULTIES = [
   { pairs: 3, label: "3 pairs", sub: "Warm-up" },
@@ -1771,6 +1802,7 @@ let matchPref = { pairs: 4 };
 function matchEligiblePool(typeId) {
   if (typeId === "pairing") return WINES.filter(w => w.pairingDishIds.length);
   if (typeId === "food") return DISHES.filter(d => d.quizClue && d.allergensInRecipe && d.allergensInRecipe.length);
+  if (typeId === "cocktail") return COCKTAILS;
   return WINES;
 }
 
@@ -1852,6 +1884,8 @@ function buildMatchPairs(typeId, count) {
     } else if (typeId === "food") {
       const allergen = item.allergensInRecipe[0];
       pairs.push({ a: item.name, b: allergen.charAt(0).toUpperCase() + allergen.slice(1), key: item.id });
+    } else if (typeId === "cocktail") {
+      pairs.push({ a: item.name, b: item.flavorTags[0], key: item.id });
     } else {
       const dish = findDish(item.pairingDishIds[Math.floor(Math.random() * item.pairingDishIds.length)]);
       if (!dish) continue;
@@ -1999,7 +2033,7 @@ function renderSpeedEnd(mode, score) {
   wrap.innerHTML = `
     <p class="speed-end-icon">&#9889;</p>
     <p class="speed-end-score">${score}</p>
-    <p class="speed-end-label">${mode === "food" ? "dishes" : mode === "mixed" ? "items" : "wines"} nailed in 60 seconds</p>
+    <p class="speed-end-label">${mode === "food" ? "dishes" : mode === "mixed" ? "items" : mode === "cocktail" ? "cocktails" : "wines"} nailed in 60 seconds</p>
     <p class="speed-end-best">${isRecord ? "&#127942; New personal best!" : `Personal best: ${best}`}</p>
   `;
   app.appendChild(wrap);
@@ -2082,6 +2116,24 @@ function buildImposterRules(difficulty) {
     if (has.length >= 3 && notHave.length >= 1) {
       rules.push({ type: "wine-style", pick: has, exclude: notHave, itemType: "food",
         why: `The other three are all primarily paired with a ${STYLE_LABELS[style].toLowerCase()} &mdash; the imposter's primary pairing is a different style.` });
+    }
+  });
+
+  const glassFamily = (g) => g.includes("Martini") ? "Martini" : g.includes("Rocks") ? "Rocks" : g.includes("Coupe") ? "Coupe" : null;
+  ["Shake & Strain", "Stir & Strain"].forEach(method => {
+    const has = COCKTAILS.filter(c => c.method === method);
+    const notHave = COCKTAILS.filter(c => c.method !== method);
+    if (has.length >= 3 && notHave.length >= 1) {
+      rules.push({ type: "cocktail-method", pick: has, exclude: notHave, itemType: "cocktail",
+        why: `The other three are all ${method === "Shake & Strain" ? "shaken" : "stirred"} cocktails &mdash; the imposter is built the other way.` });
+    }
+  });
+  ["Martini", "Rocks", "Coupe"].forEach(fam => {
+    const has = COCKTAILS.filter(c => glassFamily(c.glassware) === fam);
+    const notHave = COCKTAILS.filter(c => glassFamily(c.glassware) !== fam);
+    if (has.length >= 3 && notHave.length >= 1) {
+      rules.push({ type: "cocktail-glass", pick: has, exclude: notHave, itemType: "cocktail",
+        why: `The other three are all served in a ${fam.toLowerCase()} glass &mdash; the imposter comes in something different.` });
     }
   });
 
@@ -2169,7 +2221,7 @@ function renderImposter() {
   tiles.forEach(item => {
     const tile = document.createElement("button");
     tile.className = "match-tile imposter-tile";
-    const displayName = round.itemType === "food" ? item.name : item.producer;
+    const displayName = (round.itemType === "food" || round.itemType === "cocktail") ? item.name : item.producer;
     tile.innerHTML = `<b>${displayName}</b>`;
     tile.onclick = () => {
       if (done) return;
@@ -2180,7 +2232,7 @@ function renderImposter() {
       grid.querySelectorAll(".imposter-tile").forEach((t, i) => {
         t.classList.add("revealed");
         const full = tiles[i];
-        t.innerHTML = round.itemType === "food"
+        t.innerHTML = (round.itemType === "food" || round.itemType === "cocktail")
           ? `<b>${full.name}</b>`
           : `<b>${full.producer}</b><br><span class="imposter-sub">${full.name}</span>`;
       });
@@ -2259,7 +2311,36 @@ function setSommProgress(type, status) {
 }
 let sommPref = { difficulty: "easy" };
 
+function buildCocktailStatement(difficulty) {
+  const cocktail = COCKTAILS[Math.floor(Math.random() * COCKTAILS.length)];
+  const isTrue = Math.random() < 0.5;
+  const types = ["cocktail-glass", "cocktail-method"];
+  const progress = getSommProgress();
+  const learningTypes = types.filter(t => progress[t] === "learning");
+  const pickFrom = learningTypes.length && Math.random() < 0.6 ? learningTypes : types;
+  const type = pickFrom[Math.floor(Math.random() * pickFrom.length)];
+
+  function otherCocktail(fieldFn) {
+    let candidates = COCKTAILS.filter(c => c.id !== cocktail.id && fieldFn(c) !== fieldFn(cocktail));
+    if (difficulty === "hard") {
+      const sameMethod = candidates.filter(c => c.method === cocktail.method);
+      if (sameMethod.length) candidates = sameMethod;
+    }
+    if (!candidates.length) return cocktail;
+    return candidates[Math.floor(Math.random() * candidates.length)];
+  }
+
+  if (type === "cocktail-glass") {
+    const shown = isTrue ? cocktail.glassware : otherCocktail(c => c.glassware).glassware;
+    return { type, text: `The ${cocktail.name} is served in a ${shown}.`, isTrue, correctText: `The ${cocktail.name} is served in a ${cocktail.glassware}.` };
+  }
+  const shown = isTrue ? cocktail.method : otherCocktail(c => c.method).method;
+  return { type, text: `The ${cocktail.name} is built ${shown}.`, isTrue, correctText: `The ${cocktail.name} is built ${cocktail.method}.` };
+}
+
 function buildSommStatement(difficulty) {
+  if (Math.random() < 0.3) return buildCocktailStatement(difficulty);
+
   const wine = WINES[Math.floor(Math.random() * WINES.length)];
   const isTrue = Math.random() < 0.5;
   const types = ["region", "grape", "pairing"];

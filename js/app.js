@@ -2247,43 +2247,80 @@ function renderImposterEnd(correct, total) {
 
 /* ---------- Sommelier Says: rapid-fire true/false against the clock ---------- */
 
-function buildSommStatement() {
+/* Dedicated per-statement-type progress store: the skill is discriminating fact categories, not memorizing one wine */
+const SOMM_PROGRESS_KEY = "p131-somm-progress";
+function getSommProgress() {
+  try { return JSON.parse(localStorage.getItem(SOMM_PROGRESS_KEY)) || {}; } catch (e) { return {}; }
+}
+function setSommProgress(type, status) {
+  const p = getSommProgress();
+  p[type] = status;
+  try { localStorage.setItem(SOMM_PROGRESS_KEY, JSON.stringify(p)); } catch (e) {}
+}
+let sommPref = { difficulty: "easy" };
+
+function buildSommStatement(difficulty) {
   const wine = WINES[Math.floor(Math.random() * WINES.length)];
   const isTrue = Math.random() < 0.5;
   const types = ["region", "grape", "pairing"];
   if (!wine.winemaker.toLowerCase().includes("team") && !wine.winemaker.toLowerCase().includes("toji")) types.push("winemaker");
-  const type = types[Math.floor(Math.random() * types.length)];
+
+  const progress = getSommProgress();
+  const learningTypes = types.filter(t => progress[t] === "learning");
+  const pickFrom = learningTypes.length && Math.random() < 0.6 ? learningTypes : types;
+  const type = pickFrom[Math.floor(Math.random() * pickFrom.length)];
 
   function otherWine(fieldFn) {
-    const candidates = WINES.filter(w => w.id !== wine.id && fieldFn(w) !== fieldFn(wine));
+    let candidates = WINES.filter(w => w.id !== wine.id && fieldFn(w) !== fieldFn(wine));
+    if (difficulty === "hard") {
+      const sameStyle = candidates.filter(w => w.style === wine.style);
+      if (sameStyle.length) candidates = sameStyle;
+    }
     if (!candidates.length) return wine;
     return candidates[Math.floor(Math.random() * candidates.length)];
   }
 
   if (type === "region") {
     const shown = isTrue ? wine.region : otherWine(w => w.region).region;
-    return { text: `${wine.name} comes from ${shown}.`, isTrue };
+    return { type, text: `${wine.name} comes from ${shown}.`, isTrue, correctText: `${wine.name} comes from ${wine.region}.` };
   }
   if (type === "grape") {
     const shown = isTrue ? wine.grape : otherWine(w => w.grape).grape;
-    return { text: `${wine.name} is made from ${shown}.`, isTrue };
+    return { type, text: `${wine.name} is made from ${shown}.`, isTrue, correctText: `${wine.name} is made from ${wine.grape}.` };
   }
   if (type === "winemaker") {
-    const namedOthers = WINES.filter(w => w.id !== wine.id && !w.winemaker.toLowerCase().includes("team") && !w.winemaker.toLowerCase().includes("toji") && w.winemaker !== wine.winemaker);
+    let namedOthers = WINES.filter(w => w.id !== wine.id && !w.winemaker.toLowerCase().includes("team") && !w.winemaker.toLowerCase().includes("toji") && w.winemaker !== wine.winemaker);
+    if (difficulty === "hard") {
+      const sameStyle = namedOthers.filter(w => w.style === wine.style);
+      if (sameStyle.length) namedOthers = sameStyle;
+    }
     if (isTrue || !namedOthers.length) {
-      return { text: `${wine.name} is made by ${wine.winemaker}.`, isTrue: true };
+      return { type, text: `${wine.name} is made by ${wine.winemaker}.`, isTrue: true, correctText: `${wine.name} is made by ${wine.winemaker}.` };
     }
     const other = namedOthers[Math.floor(Math.random() * namedOthers.length)];
-    return { text: `${wine.name} is made by ${other.winemaker}.`, isTrue: false };
+    return { type, text: `${wine.name} is made by ${other.winemaker}.`, isTrue: false, correctText: `${wine.name} is made by ${wine.winemaker}.` };
   }
   // pairing
-  if (isTrue && wine.pairingDishIds.length) {
-    const dish = findDish(wine.pairingDishIds[Math.floor(Math.random() * wine.pairingDishIds.length)]);
-    return { text: `${wine.name} is a listed pairing for the ${dish.name}.`, isTrue: true };
+  const correctDish = wine.pairingDishIds.length ? findDish(wine.pairingDishIds[Math.floor(Math.random() * wine.pairingDishIds.length)]) : null;
+  const correctPairingText = correctDish ? `${wine.name} is a listed pairing for the ${correctDish.name}.` : `${wine.name} has no listed pairings yet.`;
+  if (isTrue && correctDish) {
+    return { type, text: correctPairingText, isTrue: true, correctText: correctPairingText };
   }
-  const nonPaired = DISHES.filter(d => d.pairedWineIds && d.pairedWineIds.length && !wine.pairingDishIds.includes(d.id));
+  let nonPaired = DISHES.filter(d => d.pairedWineIds && d.pairedWineIds.length && !wine.pairingDishIds.includes(d.id));
+  if (difficulty === "hard") {
+    const sameStylePool = nonPaired.filter(d => findWine(d.pairedWineIds[0])?.style === wine.style);
+    if (sameStylePool.length) nonPaired = sameStylePool;
+  }
   const dish = nonPaired[Math.floor(Math.random() * nonPaired.length)];
-  return { text: `${wine.name} is a listed pairing for the ${dish.name}.`, isTrue: false };
+  return { type, text: `${wine.name} is a listed pairing for the ${dish.name}.`, isTrue: false, correctText: correctPairingText };
+}
+
+function sommToggleRow() {
+  const row = document.createElement("div");
+  row.className = "speed-toggle" + (sommPref.difficulty === "hard" ? " active" : "");
+  row.innerHTML = `<span class="speed-icon">&#9889;</span><span class="speed-text">Difficulty: ${sommPref.difficulty === "hard" ? "Hard \u2014 false swaps stay same style" : "Easy \u2014 false swaps from anywhere"}</span><span class="speed-state">${sommPref.difficulty === "hard" ? "HARD" : "EASY"}</span>`;
+  row.onclick = () => { sommPref.difficulty = sommPref.difficulty === "hard" ? "easy" : "hard"; render(); };
+  return row;
 }
 
 function renderSommSays() {
@@ -2291,8 +2328,15 @@ function renderSommSays() {
 
   const intro = document.createElement("p");
   intro.className = "testme-counter";
-  intro.textContent = "True or false, as fast as you can. How long do you want?";
+  intro.textContent = "True or false, as fast as you can.";
   app.appendChild(intro);
+
+  app.appendChild(sommToggleRow());
+
+  const durLabel = document.createElement("p");
+  durLabel.className = "testme-counter";
+  durLabel.textContent = "How long do you want?";
+  app.appendChild(durLabel);
 
   const options = document.createElement("div");
   options.className = "home-options";
@@ -2316,10 +2360,13 @@ function renderSommSaysRun(seconds) {
   if (typeof current.params.score !== "number") {
     current.params.score = 0;
     current.params.total = 0;
+    current.params.streak = 0;
+    current.params.bestStreak = 0;
+    current.params.missed = [];
     current.params.endsAt = Date.now() + seconds * 1000;
   }
   const remaining = Math.max(0, current.params.endsAt - Date.now());
-  if (remaining <= 0) { renderSommEnd(seconds, current.params.score, current.params.total); return; }
+  if (remaining <= 0) { renderSommEnd(seconds, current.params); return; }
 
   const timerWrap = document.createElement("div");
   timerWrap.className = "timer-wrap";
@@ -2336,11 +2383,18 @@ function renderSommSaysRun(seconds) {
     if (fillEl) fillEl.style.width = (left / (seconds * 1000)) * 100 + "%";
     if (left <= 0) {
       clearInterval(activeTimer); activeTimer = null;
-      renderSommEnd(seconds, current.params.score, current.params.total);
+      renderSommEnd(seconds, current.params);
     }
   }, 250);
 
-  const statement = buildSommStatement();
+  if (current.params.streak >= 2) {
+    const streakLine = document.createElement("p");
+    streakLine.className = "somm-streak";
+    streakLine.textContent = `\u{1F525} ${current.params.streak} in a row`;
+    app.appendChild(streakLine);
+  }
+
+  const statement = buildSommStatement(sommPref.difficulty);
   const card = document.createElement("div");
   card.className = "somm-card";
   card.innerHTML = `<p class="somm-statement">${statement.text}</p>`;
@@ -2358,7 +2412,15 @@ function renderSommSaysRun(seconds) {
   function answer(saidTrue) {
     current.params.total++;
     const right = saidTrue === statement.isTrue;
-    if (right) current.params.score++;
+    setSommProgress(statement.type, right ? "known" : "learning");
+    if (right) {
+      current.params.score++;
+      current.params.streak++;
+      if (current.params.streak > current.params.bestStreak) current.params.bestStreak = current.params.streak;
+    } else {
+      current.params.streak = 0;
+      current.params.missed.push({ shown: statement.text, correct: statement.correctText });
+    }
     card.classList.add(right ? "somm-flash-right" : "somm-flash-wrong");
     setTimeout(() => render(), 260);
   }
@@ -2369,10 +2431,11 @@ function renderSommSaysRun(seconds) {
   app.appendChild(btnRow);
 }
 
-function renderSommEnd(seconds, score, total) {
+function renderSommEnd(seconds, params) {
+  const { score, total, missed, bestStreak } = params;
   app.innerHTML = "";
   header("Sommelier Says");
-  const bestKey = "p131-best-somm-" + seconds;
+  const bestKey = "p131-best-somm-" + sommPref.difficulty + "-" + seconds;
   let best = 0;
   try { best = parseInt(localStorage.getItem(bestKey)) || 0; } catch (e) {}
   const isRecord = score > best;
@@ -2386,10 +2449,26 @@ function renderSommEnd(seconds, score, total) {
   wrap.innerHTML = `
     <p class="speed-end-icon">&#9889;</p>
     <p class="speed-end-score">${score}<span class="speed-end-total">/${total}</span></p>
-    <p class="speed-end-label">correct in ${seconds} seconds</p>
-    <p class="speed-end-best">${isRecord ? "&#127942; New personal best!" : `Personal best (${seconds}s): ${best}`}</p>
+    <p class="speed-end-label">correct in ${seconds} seconds &middot; best streak ${bestStreak || 0}</p>
+    <p class="speed-end-best">${isRecord ? "&#127942; New personal best!" : `Personal best (${sommPref.difficulty}, ${seconds}s): ${best}`}</p>
   `;
   app.appendChild(wrap);
+
+  if (missed && missed.length) {
+    const reviewTitle = document.createElement("p");
+    reviewTitle.className = "detail-h3";
+    reviewTitle.innerHTML = `<span>&#128269;</span> What you missed`;
+    app.appendChild(reviewTitle);
+    missed.forEach(m => {
+      const block = document.createElement("div");
+      block.className = "somm-review-block";
+      block.innerHTML = `
+        <p class="somm-review-shown">${m.shown}</p>
+        <p class="somm-review-correct">&#10003; ${m.correct}</p>
+      `;
+      app.appendChild(block);
+    });
+  }
 
   const btnRow = document.createElement("div");
   btnRow.className = "card-footer-nav";

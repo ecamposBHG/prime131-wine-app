@@ -463,6 +463,18 @@ body.dark .testme-answer-name { color: #F5F1E8; }
 .somm-false { background: var(--washi-100); border: 2px solid #A5533B; color: #A5533B; }
 .somm-true { background: var(--wasabi-500); border: 2px solid var(--wasabi-500); color: var(--washi-100); }
 
+.somm-streak {
+  text-align: center; font-family: var(--font-mono); font-size: 14px; font-weight: 600;
+  color: var(--bronze-600); margin: 0 0 10px;
+}
+.somm-review-block {
+  background: var(--washi-200); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;
+}
+.somm-review-shown {
+  font-size: 12px; color: var(--shoyu-500); margin: 0 0 4px; text-decoration: line-through; text-decoration-color: #A5533B;
+}
+.somm-review-correct { font-size: 13px; color: var(--wasabi-500); font-weight: 500; margin: 0; }
+
 /* Imposter */
 .imposter-tile { min-height: 90px; }
 .imposter-sub { font-size: 10px; font-weight: 400; color: var(--shoyu-300); }

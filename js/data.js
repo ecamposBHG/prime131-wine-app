@@ -429,7 +429,7 @@ const SECTION_ORDER = ["Raw Bar", "Starters", "Soups & Salads", "Entrées", "Sus
 
 const COCKTAILS = [
   {
-    id: "c1", name: "Lycheetini", glassware: "Martini", method: "Shake & Strain",
+    id: "c1", name: "Lycheetini", glassware: "Martini", method: "Shake & Strain", category: "house",
     flavorTags: ["Lychee", "Citrus", "Floral", "Sweet"],
     ingredients: ["2 oz Haku Vodka", "1 oz Re\u00e0l Lychee", "1 oz Finest Call Single Pressed Lemon Juice"],
     garnish: "Popping Boba Pearls",
@@ -437,7 +437,7 @@ const COCKTAILS = [
     prep: "", funFact: "Haku Vodka is filtered through bamboo charcoal, a Japanese technique that gives it an unusually silky, soft texture for a vodka.", bestFor: "A guest who wants something playful and not too boozy-tasting to open the night."
   },
   {
-    id: "c2", name: "Tequila Twilight", glassware: "Double Rocks", method: "Shake & Strain",
+    id: "c2", name: "Tequila Twilight", glassware: "Double Rocks", method: "Shake & Strain", category: "house",
     flavorTags: ["Dragon Fruit", "Papaya", "Lime", "Agave"],
     ingredients: ["1.5 oz Casamigos Blanco", "0.5 oz Cointreau Orange Liqueur", "1 oz Finest Call Single Pressed Lime Juice", "1 oz Sweetbird Dragon Fruit & Papaya Syrup"],
     garnish: "Dehydrated Dragon Fruit, Mint Sprig",
@@ -445,7 +445,7 @@ const COCKTAILS = [
     prep: "", funFact: "Casamigos was founded in 2013 by George Clooney and two friends — the name translates to &ldquo;house of friends.&rdquo;", bestFor: "A tequila drinker who wants something bright and tropical, not smoky or agave-forward."
   },
   {
-    id: "c3", name: "Yuzu Basil Martini", glassware: "Martini", method: "Shake & Strain",
+    id: "c3", name: "Yuzu Basil Martini", glassware: "Martini", method: "Shake & Strain", category: "house",
     flavorTags: ["Yuzu", "Ginger", "Basil", "Bright Citrus"],
     ingredients: ["2 oz Ketel One Vodka", "0.5 oz Finest Call Single Pressed Lemon Juice", "0.5 oz Finest Call Single Pressed Lime Juice", "0.75 oz Yuzu & Ginger Puree (house prep)", "4 Basil Leaves (torn in half)"],
     garnish: "Basil Leaf, Fresh or Dehydrated Lemon Wheel",
@@ -453,7 +453,7 @@ const COCKTAILS = [
     prep: "Yuzu Ginger Puree: whisk or blend 1 bottle (16.9 oz) Re\u00e0l Yuzu with 1 bottle (16.9 oz) Re\u00e0l Ginger for 3-5 minutes until fully emulsified. Label, date, refrigerate. Shake well before use. Yields 33.8 oz.", funFact: "Yuzu is a Japanese citrus prized more for its fragrance than its tartness — it shows up as often in high-end cocktails as it does in Japanese kitchens.", bestFor: "A guest who finds a classic martini too austere and wants something more aromatic."
   },
   {
-    id: "c4", name: "Negroni Bianco", glassware: "Rocks Glass", method: "Stir & Strain",
+    id: "c4", name: "Negroni Bianco", glassware: "Rocks Glass", method: "Stir & Strain", category: "house",
     flavorTags: ["Bergamot", "Floral", "Herbal", "Bittersweet"],
     ingredients: ["1 oz Bombay Dry Gin", "1 oz Italicus", "1 oz Cinzano Bianco Vermouth"],
     garnish: "Large Format Ice, Lemon Peel, Rosemary Sprig",
@@ -461,7 +461,7 @@ const COCKTAILS = [
     prep: "", funFact: "Italicus is a modern bergamot liqueur, launched in 2016 and credited with reviving interest in Italian aperitivo culture outside Italy.", bestFor: "A Negroni drinker who wants something lighter and more floral than the classic red version."
   },
   {
-    id: "c5", name: "Mystic Garden", glassware: "Martini, Jewelry Box", method: "Shake & Strain",
+    id: "c5", name: "Mystic Garden", glassware: "Martini, Jewelry Box", method: "Shake & Strain", category: "house",
     flavorTags: ["Herbal", "Honey", "Yuzu", "Smoke"],
     ingredients: ["1.5 oz The Botanist Gin", "0.5 oz Cointreau Orange Liqueur", "0.5 oz Finest Call Single Pressed Lemon Juice", "0.5 oz Sweetbird Honeycomb Syrup", "2 oz Fever Tree Lime Yuzu Soda", "4 Basil Leaves (torn in half)"],
     garnish: "Basil and/or Mint Sprig, Dehydrated Lavender, Lemon Wheel, Flavored Smoke",
@@ -469,7 +469,7 @@ const COCKTAILS = [
     prep: "", funFact: "The Botanist Gin is distilled on Islay — an island better known for smoky whisky — using a large number of hand-foraged local botanicals alongside the classic nine.", bestFor: "The guest who wants a show: the smoke-filled drawer is a genuine tableside moment."
   },
   {
-    id: "c6", name: "Scottish Manhattan", glassware: "Martini", method: "Stir & Strain",
+    id: "c6", name: "Scottish Manhattan", glassware: "Martini", method: "Stir & Strain", category: "house",
     flavorTags: ["Malt", "Dried Fruit", "Baking Spice", "Bitters"],
     ingredients: ["2 oz Glenfiddich 12yr Single Malt", "1 oz Martini & Rossi Sweet Vermouth", "2 Dashes Angostura Bitters"],
     garnish: "Cherry",
@@ -477,7 +477,7 @@ const COCKTAILS = [
     prep: "", funFact: "Glenfiddich means &ldquo;Valley of the Deer&rdquo; in Gaelic, and it's been one of the world's best-selling single malts for decades.", bestFor: "A Manhattan drinker who wants something smoky and malty instead of the usual bourbon or rye base."
   },
   {
-    id: "c7", name: "Jade in the Shade", glassware: "Coupe", method: "Shake & Strain",
+    id: "c7", name: "Jade in the Shade", glassware: "Coupe", method: "Shake & Strain", category: "house",
     flavorTags: ["Matcha", "Mint", "Lime", "Silky"],
     ingredients: ["2 oz Roku Gin", "1.5 oz Mint Matcha Syrup (house prep)", "1 oz Finest Call Single Pressed Lime Juice", "1 oz Egg White"],
     garnish: "Mint Leaf, Matcha Chocolate Shavings",
@@ -485,7 +485,7 @@ const COCKTAILS = [
     prep: "Mint Matcha Syrup: whisk 1 bottle (33 oz) Sweetbird Mojito Mint Syrup with 2 tbsp high grade matcha powder until fully suspended. Label, date, refrigerate.", funFact: "Matcha has been central to Japanese tea ceremony for centuries — prized as much for the ritual as the flavor.", bestFor: "A guest who wants something visually striking and less sweet than a typical shaken cocktail."
   },
   {
-    id: "c8", name: "Gilded Goose", glassware: "Martini, Martini Tray Set (optional)", method: "Shake & Strain",
+    id: "c8", name: "Gilded Goose", glassware: "Martini, Martini Tray Set (optional)", method: "Shake & Strain", category: "house",
     flavorTags: ["Briny", "Olive", "Dry", "Crisp"],
     ingredients: ["2.5 oz Grey Goose Vodka", "0.5 oz Martini & Rossi Dry Vermouth", "0.5 oz Olive Brine"],
     garnish: "3 Skewered Olives, Fries (optional)",
@@ -493,7 +493,7 @@ const COCKTAILS = [
     prep: "", funFact: "The dirty martini's olive brine has been used to cut vodka's neutrality since the drink's classic era.", bestFor: "A savory-forward guest who finds sweeter cocktails uninteresting."
   },
   {
-    id: "c9", name: "Cosmobelle", glassware: "Coupe", method: "Shake & Strain",
+    id: "c9", name: "Cosmobelle", glassware: "Coupe", method: "Shake & Strain", category: "house",
     flavorTags: ["Cranberry", "Citrus", "Dragon Fruit", "Sweet-Tart"],
     ingredients: ["1.5 oz Absolut Citron", "0.5 oz Cointreau Orange Liqueur", "1.5 oz Cranberry Juice", "0.5 oz Finest Call Single Pressed Lime Juice", "0.5 oz Sweetbird Dragon Fruit & Papaya Syrup"],
     garnish: "Dehydrated Dragon Fruit, Gold Sugar Half Rim",
@@ -501,7 +501,7 @@ const COCKTAILS = [
     prep: "", funFact: "A modern riff on the 1990s Cosmopolitan — dragon fruit and papaya syrup update the classic citrus-cranberry formula.", bestFor: "A guest who loved Cosmos in their heyday and wants a fresher take."
   },
   {
-    id: "c10", name: "Gold Fashioned", glassware: "Single Rocks Glass", method: "Stir & Strain",
+    id: "c10", name: "Gold Fashioned", glassware: "Single Rocks Glass", method: "Stir & Strain", category: "house",
     flavorTags: ["Whiskey", "Cabernet", "Oak Spice", "Bitters"],
     ingredients: ["1.5 oz Jameson Irish Whiskey", "0.5 oz WhistlePig PiggyBack 6yr Rye", "0.25 oz Cabernet Simple Syrup (house prep)", "2 Dashes Angostura Bitters"],
     garnish: "Manicured Orange Peel, Luxardo Cherry, 24k Large Gold Flakes",
@@ -509,7 +509,7 @@ const COCKTAILS = [
     prep: "Cabernet Simple Syrup: blend 1 bottle (25 oz) house Cabernet with 40 oz white sugar on medium for 5 minutes until fully dissolved and smooth. Label, date, store chilled. Yields ~66 oz.", funFact: "Pairing Irish whiskey with rye is unusual — Jameson's smoothness balances the spice WhistlePig's rye brings to the blend.", bestFor: "An Old Fashioned drinker who wants something a touch sweeter and more layered."
   },
   {
-    id: "c11", name: "Golden 'B'", glassware: "Martini", method: "Shake & Strain",
+    id: "c11", name: "Golden 'B'", glassware: "Martini", method: "Shake & Strain", category: "house",
     flavorTags: ["Honey", "Lemon", "Bourbon", "Sparkling"],
     ingredients: ["1.5 oz Maker's Mark Bourbon", "1 oz Finest Call Single Pressed Lemon Juice", "0.75 oz Gold Glitter Honeycomb Syrup (house prep)", "2 oz Sparkling Wine"],
     garnish: "Dehydrated Lemon Wheel, Gold Sugar Stripe",
@@ -517,11 +517,254 @@ const COCKTAILS = [
     prep: "Gold Glitter Honeycomb Syrup: whisk 1 bottle (33 oz) Sweetbird Honeycomb Syrup with 2.5 g edible gold luster dust until fully suspended. Label, date. Yields 33 oz.", funFact: "Most whiskey sours lean on egg white for texture; this one skips it and lightens things with sparkling wine instead.", bestFor: "A celebratory, bourbon-curious guest who wants something festive rather than a standard sour."
   },
   {
-    id: "c12", name: "Opulent Espresso Martini", glassware: "Coupe", method: "Shake & Strain",
+    id: "c12", name: "Opulent Espresso Martini", glassware: "Coupe", method: "Shake & Strain", category: "house",
     flavorTags: ["Espresso", "Vanilla", "Agave", "Roasted"],
     ingredients: ["1.5 oz Vanilla Bean Infused Patr\u00f3n Reposado (house prep)", "0.5 oz Mr. Black Cold Brew Liqueur", "2.5 oz Berg House Espresso Martini Mix (house prep)"],
     garnish: "Three Gold Dusted Espresso Beans",
     directions: "Combine all ingredients into a shaker tin. Shake with ice and strain into a coupe glass. Garnish and serve.",
     prep: "Vanilla Bean Patr\u00f3n: drop 2 split vanilla pods into a Patr\u00f3n Reposado bottle to infuse on the backbar; keep at least 2 infused bottles on hand. Espresso Martini Mix: dissolve 1 can (94g) Illy Instant Classico into 40 oz warm water, add 24 oz Maven Cold Brew and 1 bottle (33.8 oz) Sweetbird Vanilla Syrup, stir. Label, date, chill. Yields 64 oz.", funFact: "Patrón Reposado rests in oak for several months before bottling, giving it a rounder character than blanco tequila — an unusual espresso martini base in place of vodka.", bestFor: "Dessert-course energy — a coffee lover who wants their after-dinner drink to double as dessert."
+  }
+];
+
+const CLASSIC_COCKTAILS = [
+  {
+    id: "cc1", name: "Whiskey Sour", category: "classic", spirit: "Whiskey", glassware: "Rocks", method: "Shake & Strain",
+    flavorTags: ["Citrus", "Oak", "Sweet-Tart", "Silky"],
+    ingredients: ["2 oz Bourbon", "3/4 oz Fresh Lemon Juice", "3/4 oz Simple Syrup", "1/2 oz Egg White (optional)"],
+    garnish: "Brandied Cherry, Lemon Twist",
+    directions: "Dry shake all ingredients without ice (if using egg white), then shake again with ice. Strain over fresh ice into a rocks glass. Garnish and serve.",
+    prep: "",
+    funFact: "One of the oldest documented cocktail families — \"sours\" date to the mid-1800s and follow the same base-plus-sour-plus-sweet formula that still defines the category today.",
+    bestFor: "A guest who wants something classic and balanced, not too boozy-forward."
+  },
+  {
+    id: "cc2", name: "Sazerac", category: "classic", spirit: "Whiskey", glassware: "Rocks (no ice)", method: "Stir & Strain",
+    flavorTags: ["Anise", "Spice", "Herbal", "Rye"],
+    ingredients: ["2 oz Rye Whiskey", "1/4 oz Simple Syrup", "3 dashes Peychaud's Bitters", "Absinthe Rinse"],
+    garnish: "Expressed Lemon Peel (discarded, not left in glass)",
+    directions: "Rinse a chilled rocks glass with absinthe, discard excess. Stir rye, simple syrup, and bitters with ice, then strain into the prepared glass. Express lemon peel over the top and discard.",
+    prep: "",
+    funFact: "Widely regarded as one of the oldest American cocktails, born in 19th-century New Orleans. It was originally made with cognac, but switched to rye whiskey after a phylloxera outbreak devastated French vineyards and cognac became scarce.",
+    bestFor: "A guest who wants a serious, old-school, spirit-forward drink."
+  },
+  {
+    id: "cc3", name: "Mint Julep", category: "classic", spirit: "Whiskey", glassware: "Julep Tin", method: "Muddle & Build",
+    flavorTags: ["Mint", "Bourbon", "Sweet", "Herbal"],
+    ingredients: ["2.5 oz Bourbon", "1/2 oz Simple Syrup", "8-10 Fresh Mint Leaves"],
+    garnish: "Mint Bouquet, Powdered Sugar (optional)",
+    directions: "Gently muddle mint with simple syrup in the tin. Add bourbon and pack tightly with crushed ice. Swizzle until the tin frosts over. Top with more crushed ice and garnish with a full mint bouquet.",
+    prep: "",
+    funFact: "The official drink of the Kentucky Derby — over 120,000 are served at Churchill Downs across Derby weekend alone.",
+    bestFor: "Warm-weather sipping, a guest who wants something refreshing but still whiskey-forward."
+  },
+  {
+    id: "cc4", name: "Vieux Carr\u00e9", category: "classic", spirit: "Whiskey", glassware: "Rocks", method: "Stir & Strain",
+    flavorTags: ["Herbal", "Spice", "Dried Fruit", "Rich"],
+    ingredients: ["3/4 oz Rye Whiskey", "3/4 oz Cognac", "3/4 oz Sweet Vermouth", "1 tsp B\u00e9n\u00e9dictine", "2 dashes Peychaud's Bitters", "2 dashes Angostura Bitters"],
+    garnish: "Lemon Twist or Cherry",
+    directions: "Stir all ingredients with ice until well chilled. Strain over a large ice cube into a rocks glass. Garnish and serve.",
+    prep: "",
+    funFact: "Created in the 1930s at the Hotel Monteleone in New Orleans' French Quarter — \"Vieux Carr\u00e9\" is French for \"old square,\" the historic name for that neighborhood. It's one of the few classics to blend two full base spirits, rye and cognac, in equal measure.",
+    bestFor: "A guest who wants something complex and boozy, layered rather than simple."
+  },
+  {
+    id: "cc5", name: "Martini (Gin)", category: "classic", spirit: "Gin", glassware: "Martini", method: "Stir & Strain",
+    flavorTags: ["Juniper", "Botanical", "Dry", "Crisp"],
+    ingredients: ["2.5 oz Gin", "1/2 oz Dry Vermouth"],
+    garnish: "Olive or Lemon Twist",
+    directions: "Stir gin and vermouth with ice until well chilled. Strain into a chilled martini glass. Garnish and serve.",
+    prep: "",
+    funFact: "One of the most iconic cocktails ever made, with an origin story disputed for over a century. The modern bone-dry style didn't become the default until well into the 20th century.",
+    bestFor: "A purist gin drinker who wants nothing but spirit and a whisper of vermouth."
+  },
+  {
+    id: "cc6", name: "Negroni", category: "classic", spirit: "Gin", glassware: "Rocks", method: "Stir & Strain",
+    flavorTags: ["Bitter", "Herbal", "Citrus", "Bittersweet"],
+    ingredients: ["1 oz Gin", "1 oz Campari", "1 oz Sweet Vermouth"],
+    garnish: "Orange Peel",
+    directions: "Stir all ingredients with ice until well chilled. Strain over a large ice cube into a rocks glass. Garnish and serve.",
+    prep: "",
+    funFact: "Said to have been invented in Florence in 1919, when Count Camillo Negroni asked a bartender to strengthen his Americano by swapping the soda water for gin.",
+    bestFor: "A guest who genuinely likes bitter, aperitivo-style drinks — not a sweet-drink crowd-pleaser."
+  },
+  {
+    id: "cc7", name: "Tom Collins", category: "classic", spirit: "Gin", glassware: "Collins", method: "Shake & Strain, Top",
+    flavorTags: ["Citrus", "Effervescent", "Crisp", "Light"],
+    ingredients: ["2 oz Gin", "3/4 oz Fresh Lemon Juice", "1/2 oz Simple Syrup", "Soda Water, to top"],
+    garnish: "Lemon Wheel, Cherry",
+    directions: "Shake gin, lemon juice, and simple syrup with ice. Strain over fresh ice into a Collins glass and top with soda water. Garnish and serve.",
+    prep: "",
+    funFact: "Named after the \"Tom Collins hoax,\" a bar prank that swept America in 1874, where people were told a man named Tom Collins was badmouthing them at a nearby bar.",
+    bestFor: "A refreshing, tall, low-intensity option for a guest who wants something long and easy."
+  },
+  {
+    id: "cc8", name: "French 75", category: "classic", spirit: "Gin", glassware: "Champagne Flute", method: "Shake & Strain, Top",
+    flavorTags: ["Citrus", "Sparkling", "Bright", "Floral"],
+    ingredients: ["1 oz Gin", "1/2 oz Fresh Lemon Juice", "1/2 oz Simple Syrup", "Champagne, to top"],
+    garnish: "Lemon Twist",
+    directions: "Shake gin, lemon juice, and simple syrup with ice. Strain into a champagne flute and top with champagne. Garnish and serve.",
+    prep: "",
+    funFact: "Named after the powerful French 75mm field gun from World War I, supposedly for how hard the drink was said to hit.",
+    bestFor: "A celebratory, elegant option — similar energy to the Golden 'B' on the house list."
+  },
+  {
+    id: "cc9", name: "Daiquiri", category: "classic", spirit: "Rum", glassware: "Coupe", method: "Shake & Strain",
+    flavorTags: ["Lime", "Rum", "Bright", "Clean"],
+    ingredients: ["2 oz White Rum", "1 oz Fresh Lime Juice", "3/4 oz Simple Syrup"],
+    garnish: "Lime Wheel (optional)",
+    directions: "Shake all ingredients with ice until well chilled. Strain into a chilled coupe glass. Garnish and serve.",
+    prep: "",
+    funFact: "Named after a Cuban mining town, the Daiquiri became famous stateside partly because Ernest Hemingway was known to drink them by the pitcher at El Floridita in Havana.",
+    bestFor: "A guest who wants the simplest, most classic possible sour — no frills."
+  },
+  {
+    id: "cc10", name: "Mojito", category: "classic", spirit: "Rum", glassware: "Highball", method: "Muddle & Build, Top",
+    flavorTags: ["Mint", "Lime", "Effervescent", "Herbal"],
+    ingredients: ["2 oz White Rum", "3/4 oz Fresh Lime Juice", "3/4 oz Simple Syrup", "8-10 Fresh Mint Leaves", "Soda Water, to top"],
+    garnish: "Mint Sprig, Lime Wheel",
+    directions: "Gently muddle mint with lime juice and simple syrup in the glass. Add rum and fill with ice. Top with soda water and stir gently. Garnish and serve.",
+    prep: "",
+    funFact: "Believed to trace back to 16th-century Cuba, evolving from an earlier drink called \"El Draque,\" reputedly linked to Sir Francis Drake.",
+    bestFor: "A warm-weather, low-intensity refresher."
+  },
+  {
+    id: "cc11", name: "Dark 'n' Stormy", category: "classic", spirit: "Rum", glassware: "Highball", method: "Build",
+    flavorTags: ["Ginger", "Molasses", "Spice", "Effervescent"],
+    ingredients: ["2 oz Dark Rum", "Ginger Beer, to top"],
+    garnish: "Lime Wedge",
+    directions: "Add rum to a highball glass filled with ice. Top with ginger beer. Garnish with a lime wedge and serve.",
+    prep: "",
+    funFact: "Gosling's Rum trademarked the name \"Dark 'n' Stormy\" itself — one of the only cocktail names ever protected as a registered trademark.",
+    bestFor: "A guest who likes ginger beer and wants something bold but easy-drinking."
+  },
+  {
+    id: "cc12", name: "Mai Tai", category: "classic", spirit: "Rum", glassware: "Rocks", method: "Shake & Strain",
+    flavorTags: ["Almond", "Orange", "Tropical", "Rum-Forward"],
+    ingredients: ["1 oz Aged Rum", "1 oz Overproof Rum", "1/2 oz Orange Cura\u00e7ao", "1/4 oz Orgeat", "3/4 oz Fresh Lime Juice"],
+    garnish: "Mint Sprig, Spent Lime Shell",
+    directions: "Shake all ingredients with ice until well chilled. Strain over crushed ice into a rocks glass. Garnish and serve.",
+    prep: "",
+    funFact: "Created by Trader Vic in 1944. The name comes from the Tahitian exclamation \"Maita'i roa a'e!\" — \"out of this world, the best\" — reportedly said by a guest tasting the very first one.",
+    bestFor: "A guest who wants a real tiki classic, rich and layered, not artificially sweet."
+  },
+  {
+    id: "cc13", name: "Paloma", category: "classic", spirit: "Tequila", glassware: "Highball", method: "Build",
+    flavorTags: ["Grapefruit", "Citrus", "Effervescent", "Crisp"],
+    ingredients: ["2 oz Tequila Blanco", "1/2 oz Fresh Lime Juice", "Grapefruit Soda, to top", "Salt, for rim"],
+    garnish: "Grapefruit Wedge, Salt Rim",
+    directions: "Salt half the rim of a highball glass. Fill with ice, add tequila and lime juice, then top with grapefruit soda. Stir gently, garnish, and serve.",
+    prep: "",
+    funFact: "More popular in Mexico by volume than the Margarita, though far less famous internationally.",
+    bestFor: "A refreshing, lower-intensity tequila option for someone who doesn't want a full Margarita."
+  },
+  {
+    id: "cc14", name: "Margarita", category: "classic", spirit: "Tequila", glassware: "Rocks", method: "Shake & Strain",
+    flavorTags: ["Lime", "Orange", "Agave", "Bright"],
+    ingredients: ["2 oz Tequila Blanco", "1 oz Fresh Lime Juice", "3/4 oz Orange Liqueur", "Salt, for rim"],
+    garnish: "Lime Wheel, Salt Rim",
+    directions: "Salt half the rim of a rocks glass. Shake all ingredients with ice until well chilled. Strain over fresh ice into the glass. Garnish and serve.",
+    prep: "",
+    funFact: "Its exact origin is one of the most disputed in cocktail history, with at least four separate people credited across Mexico and the US in the 1930s and '40s.",
+    bestFor: "The most universally requested tequila cocktail — a safe, crowd-pleasing default."
+  },
+  {
+    id: "cc15", name: "Oaxacan Old Fashioned", category: "classic", spirit: "Tequila", glassware: "Rocks", method: "Stir & Strain",
+    flavorTags: ["Smoke", "Agave", "Spice", "Bold"],
+    ingredients: ["1.5 oz Reposado Tequila", "1/2 oz Mezcal", "1 barspoon Agave Syrup", "2 dashes Angostura Bitters"],
+    garnish: "Orange Peel",
+    directions: "Stir all ingredients with ice until well chilled. Strain over a large ice cube into a rocks glass. Express orange peel over the top and drop in.",
+    prep: "",
+    funFact: "A modern riff on the classic Old Fashioned that swaps whiskey for tequila and mezcal, popularized during the 2000s craft cocktail movement.",
+    bestFor: "A guest who normally drinks Old Fashioneds and wants to try something smokier."
+  },
+  {
+    id: "cc16", name: "Martini (Vodka)", category: "classic", spirit: "Vodka", glassware: "Martini", method: "Stir & Strain",
+    flavorTags: ["Clean", "Crisp", "Neutral", "Dry"],
+    ingredients: ["2.5 oz Vodka", "1/2 oz Dry Vermouth"],
+    garnish: "Olive or Lemon Twist",
+    directions: "Stir vodka and vermouth with ice until well chilled (or shake, if the guest prefers it \"Bond-style\"). Strain into a chilled martini glass. Garnish and serve.",
+    prep: "",
+    funFact: "The vodka martini overtook the gin martini in American popularity by the mid-20th century, a shift partly credited to James Bond's \"shaken, not stirred\" order.",
+    bestFor: "A guest who wants the Martini ritual without gin's botanical intensity."
+  },
+  {
+    id: "cc17", name: "Moscow Mule", category: "classic", spirit: "Vodka", glassware: "Copper Mug", method: "Build",
+    flavorTags: ["Ginger", "Lime", "Effervescent", "Crisp"],
+    ingredients: ["2 oz Vodka", "1/2 oz Fresh Lime Juice", "Ginger Beer, to top"],
+    garnish: "Lime Wheel, Candied Ginger",
+    directions: "Add vodka and lime juice to a copper mug filled with ice. Top with ginger beer and stir gently. Garnish and serve.",
+    prep: "",
+    funFact: "Invented in the 1940s partly as a marketing push to sell surplus ginger beer and unfamiliar vodka in the US — the copper mug itself was part of the original promotional gimmick.",
+    bestFor: "A guest who wants something zippy and easy, especially if they already like ginger beer drinks."
+  },
+  {
+    id: "cc18", name: "Cosmopolitan", category: "classic", spirit: "Vodka", glassware: "Coupe", method: "Shake & Strain",
+    flavorTags: ["Cranberry", "Citrus", "Tart", "Pink"],
+    ingredients: ["1.5 oz Citrus Vodka", "1/2 oz Orange Liqueur", "1/2 oz Fresh Lime Juice", "1/4 oz Cranberry Juice"],
+    garnish: "Lime Wheel or Orange Twist",
+    directions: "Shake all ingredients with ice until well chilled. Strain into a chilled coupe glass. Garnish and serve.",
+    prep: "",
+    funFact: "Became a defining pop-culture cocktail in the late 1990s largely through Sex and the City, though earlier versions of the drink existed at least a decade prior.",
+    bestFor: "A guest who wants something classic, pink, and nostalgic."
+  },
+  {
+    id: "cc19", name: "White Russian", category: "classic", spirit: "Vodka", glassware: "Rocks", method: "Build",
+    flavorTags: ["Coffee", "Cream", "Sweet", "Rich"],
+    ingredients: ["2 oz Vodka", "1 oz Coffee Liqueur", "1 oz Heavy Cream (floated)"],
+    garnish: "None",
+    directions: "Add vodka and coffee liqueur to a rocks glass filled with ice. Float heavy cream on top by pouring gently over the back of a spoon. Serve without stirring.",
+    prep: "",
+    funFact: "Gained lasting pop-culture fame decades after its creation thanks to The Big Lebowski, where The Dude drinks one in nearly every scene.",
+    bestFor: "A dessert-course drinker — similar energy to the Opulent Espresso Martini on the house list."
+  },
+  {
+    id: "cc20", name: "Sidecar", category: "classic", spirit: "Brandy/Cognac", glassware: "Coupe", method: "Shake & Strain",
+    flavorTags: ["Orange", "Citrus", "Oak", "Balanced"],
+    ingredients: ["2 oz Cognac", "3/4 oz Orange Liqueur", "3/4 oz Fresh Lemon Juice"],
+    garnish: "Orange Twist, Sugar Rim (optional)",
+    directions: "Shake all ingredients with ice until well chilled. Strain into a chilled coupe glass (sugar-rimmed if desired). Garnish and serve.",
+    prep: "",
+    funFact: "Believed to have been created around World War I, possibly named after the motorcycle sidecar a regular customer arrived in.",
+    bestFor: "A guest who wants a classic, brandy-forward sour."
+  },
+  {
+    id: "cc21", name: "Between the Sheets", category: "classic", spirit: "Brandy/Cognac", glassware: "Coupe", method: "Shake & Strain",
+    flavorTags: ["Citrus", "Rum", "Oak", "Bright"],
+    ingredients: ["3/4 oz Cognac", "3/4 oz White Rum", "3/4 oz Orange Liqueur", "3/4 oz Fresh Lemon Juice"],
+    garnish: "Lemon Twist",
+    directions: "Shake all ingredients with ice until well chilled. Strain into a chilled coupe glass. Garnish and serve.",
+    prep: "",
+    funFact: "A close cousin of the Sidecar, essentially splitting the base spirit between cognac and rum. Its suggestive name dates back to the 1930s.",
+    bestFor: "A Sidecar fan who wants something a little lighter and more playful."
+  },
+  {
+    id: "cc22", name: "Paper Plane", category: "classic", spirit: "Whiskey", glassware: "Coupe", method: "Shake & Strain",
+    flavorTags: ["Bitter", "Citrus", "Herbal", "Balanced"],
+    ingredients: ["3/4 oz Bourbon", "3/4 oz Aperol", "3/4 oz Amaro Nonino", "3/4 oz Fresh Lemon Juice"],
+    garnish: "None",
+    directions: "Shake all ingredients with ice until well chilled. Strain into a chilled coupe glass and serve.",
+    prep: "",
+    funFact: "Created in 2008 by bartender Sam Ross for the opening menu at The Violet Hour in Chicago, and named after the M.I.A. song \"Paper Planes.\" The 1:1:1:1 ratio is exactly why it spread so fast among bartenders — easy to remember, easy to scale.",
+    bestFor: "A guest who wants something bitter, citrusy, and modern rather than a straightforward Old Fashioned."
+  },
+  {
+    id: "cc23", name: "Last Word", category: "classic", spirit: "Gin", glassware: "Coupe", method: "Shake & Strain",
+    flavorTags: ["Herbal", "Citrus", "Bittersweet", "Complex"],
+    ingredients: ["3/4 oz Gin", "3/4 oz Green Chartreuse", "3/4 oz Maraschino Liqueur", "3/4 oz Fresh Lime Juice"],
+    garnish: "None (Brandied Cherry optional)",
+    directions: "Shake all ingredients with ice until well chilled. Strain into a chilled coupe glass and serve.",
+    prep: "",
+    funFact: "Created at the Detroit Athletic Club sometime in the 1910s or '20s, then fell into obscurity for decades until a Seattle bartender rediscovered and popularized it in the mid-2000s.",
+    bestFor: "A guest who wants something herbal and complex rather than another straightforward Martini."
+  },
+  {
+    id: "cc24", name: "Closing Argument", category: "classic", spirit: "Tequila", glassware: "Coupe", method: "Shake & Strain",
+    flavorTags: ["Smoke", "Herbal", "Cherry", "Tart"],
+    ingredients: ["3/4 oz Mezcal", "3/4 oz Green Chartreuse", "3/4 oz Maraschino Liqueur", "3/4 oz Fresh Lime Juice"],
+    garnish: "Lime Twist or Maraschino Cherry",
+    directions: "Shake all ingredients with ice until well chilled. Strain into a chilled coupe glass. Garnish and serve.",
+    prep: "",
+    funFact: "A mezcal-based riff on the Last Word, swapping in smoke for gin's botanicals while keeping the same equal-parts herbal-citrus structure.",
+    bestFor: "A guest who likes the Last Word but wants something smokier and more agave-forward."
   }
 ];

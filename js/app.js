@@ -228,7 +228,9 @@ function render() {
   else if (current.view === "somm-says-run") renderSommSaysRun(current.params.seconds);
   else if (current.view === "match-it") renderMatchIt(current.params.matchType);
   else if (current.view === "match-it-picker") renderMatchItPicker();
+  else if (current.view === "cocktail-type") renderCocktailTypeChooser();
   else if (current.view === "cocktail-list") renderCocktailList();
+  else if (current.view === "classic-cocktail-list") renderClassicCocktailList();
   else if (current.view === "cocktail-detail") renderCocktailDetail(current.params.cocktailId);
   window.scrollTo(0, 0);
 }
@@ -344,7 +346,7 @@ function renderHome() {
     </div>
   `;
   options.querySelector('[data-go="study"]').onclick = () => go("study-list");
-  options.querySelector('[data-go="cocktails"]').onclick = () => go("cocktail-list");
+  options.querySelector('[data-go="cocktails"]').onclick = () => go("cocktail-type");
   options.querySelector('[data-go="pairwf"]').onclick = () => go("pairwf-list");
   options.querySelector('[data-go="pairfw"]').onclick = () => go("pairfw-list");
   options.querySelector('[data-go="menu"]').onclick = () => go("menu-list");
@@ -488,8 +490,71 @@ function renderMenuList() {
   renderDishList("Food menu", "Search the menu", true);
 }
 
-function renderCocktailList() {
+function renderCocktailTypeChooser() {
   header("Cocktails");
+
+  const options = document.createElement("div");
+  options.className = "home-options";
+  options.innerHTML = `
+    <div class="home-option" data-go="house">
+      <div class="home-icon-circle">&#127864;</div>
+      <div class="home-option-text"><p>House Cocktails</p><span>Prime 131's own recipe book</span></div>
+    </div>
+    <div class="home-option" data-go="classic">
+      <div class="home-icon-circle">&#127865;</div>
+      <div class="home-option-text"><p>Classic Cocktails</p><span>Timeless recipes, by base spirit</span></div>
+    </div>
+  `;
+  options.querySelector('[data-go="house"]').onclick = () => go("cocktail-list");
+  options.querySelector('[data-go="classic"]').onclick = () => go("classic-cocktail-list");
+  app.appendChild(options);
+}
+
+const SPIRIT_ORDER = ["Whiskey", "Gin", "Rum", "Tequila", "Vodka", "Brandy/Cognac"];
+const SPIRIT_ICON_MAP = {
+  "Whiskey": "\u{1F943}", "Gin": "\u{1F378}", "Rum": "\u{1F379}",
+  "Tequila": "\u{1FAD1}", "Vodka": "\u2744\uFE0F", "Brandy/Cognac": "\u{1F942}"
+};
+
+function renderClassicCocktailList() {
+  header("Classic Cocktails");
+  const wrap = document.createElement("div");
+  const input = document.createElement("input");
+  input.className = "search-input";
+  input.placeholder = "Search classic cocktails";
+  wrap.appendChild(input);
+  const listWrap = document.createElement("div");
+  wrap.appendChild(listWrap);
+
+  function draw(filter) {
+    listWrap.innerHTML = "";
+    const filtered = CLASSIC_COCKTAILS.filter(c => c.name.toLowerCase().includes(filter.toLowerCase()));
+    SPIRIT_ORDER.forEach(spirit => {
+      const group = filtered.filter(c => c.spirit === spirit);
+      if (!group.length) return;
+      const label = document.createElement("p");
+      label.className = "section-label";
+      label.textContent = spirit;
+      listWrap.appendChild(label);
+      group.forEach(c => {
+        const row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML = `<span class="list-row-main"><span class="dish-icon">${SPIRIT_ICON_MAP[spirit] || "\u{1F378}"}</span>${c.name}</span>`;
+        row.onclick = () => go("cocktail-detail", { cocktailId: c.id });
+        listWrap.appendChild(row);
+      });
+    });
+    if (!filtered.length) {
+      listWrap.innerHTML = `<p class="empty-note">No cocktails match that search.</p>`;
+    }
+  }
+  draw("");
+  input.oninput = () => draw(input.value);
+  app.appendChild(wrap);
+}
+
+function renderCocktailList() {
+  header("House Cocktails");
   const wrap = document.createElement("div");
   const input = document.createElement("input");
   input.className = "search-input";
@@ -517,7 +582,7 @@ function renderCocktailList() {
   app.appendChild(wrap);
 }
 
-function findCocktail(id) { return COCKTAILS.find(c => c.id === id); }
+function findCocktail(id) { return COCKTAILS.find(c => c.id === id) || CLASSIC_COCKTAILS.find(c => c.id === id); }
 
 function renderCocktailDetail(cocktailId) {
   const cocktail = findCocktail(cocktailId);

@@ -271,6 +271,13 @@ button, input {
 .ingredient-list li::before { content: "\2013"; position: absolute; left: 0; color: var(--bronze-500); }
 .chefprep-text { font-size: 14px; color: var(--washi-100); line-height: 1.65; margin: 0 0 10px; }
 
+/* Cocktail follow-up questions */
+.followup-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.followup-chip {
+  font-size: 12px; padding: 6px 11px; border-radius: 12px;
+  background: var(--bronze-500); color: var(--shoyu-700); font-weight: 500;
+}
+
 /* Dark theme — token overrides, remembered per device */
 body.dark {
   --washi-100: #1B1918;

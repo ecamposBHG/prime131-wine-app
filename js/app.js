@@ -628,6 +628,10 @@ function renderCocktailDetail(cocktailId) {
       return `
         <p class="dish-flip-tag">1/2 &middot; tap to flip</p>
         <p class="dish-flip-title">&#129380; Ingredients</p>
+        ${cocktail.followUp && cocktail.followUp.length ? `
+          <p class="detail-h3" style="margin-top:0; color:var(--washi-100);"><span>&#128172;</span> Ask the guest</p>
+          <div class="followup-list">${cocktail.followUp.map(q => `<div class="followup-chip">${q}</div>`).join("")}</div>
+        ` : ""}
         <ul class="ingredient-list">${cocktail.ingredients.map(i => `<li>${i}</li>`).join("")}</ul>
         <p class="chefprep-text" style="margin-top:auto;"><b style="color:#D9B98A;">Garnish:</b> ${cocktail.garnish}</p>
       `;

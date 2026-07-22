@@ -474,7 +474,7 @@ const COCKTAILS = [
     ingredients: ["2 oz Glenfiddich 12yr Single Malt", "1 oz Martini & Rossi Sweet Vermouth", "2 Dashes Angostura Bitters"],
     garnish: "Cherry",
     directions: "Combine all ingredients into mixing glass with ice. Stir and strain into martini glass. Garnish and serve.",
-    prep: "", funFact: "Glenfiddich means &ldquo;Valley of the Deer&rdquo; in Gaelic, and it's been one of the world's best-selling single malts for decades.", bestFor: "A Manhattan drinker who wants something smoky and malty instead of the usual bourbon or rye base."
+    prep: "", funFact: "Glenfiddich means &ldquo;Valley of the Deer&rdquo; in Gaelic, and it's been one of the world's best-selling single malts for decades.", bestFor: "A Manhattan drinker who wants something smoky and malty instead of the usual bourbon or rye base.", followUp: ["Up or on the rocks?"]
   },
   {
     id: "c7", name: "Jade in the Shade", glassware: "Coupe", method: "Shake & Strain", category: "house",
@@ -482,7 +482,7 @@ const COCKTAILS = [
     ingredients: ["2 oz Roku Gin", "1.5 oz Mint Matcha Syrup (house prep)", "1 oz Finest Call Single Pressed Lime Juice", "1 oz Egg White"],
     garnish: "Mint Leaf, Matcha Chocolate Shavings",
     directions: "Combine all ingredients in a cocktail shaker with ice. Shake and strain into coupe glass. Garnish and serve.",
-    prep: "Mint Matcha Syrup: whisk 1 bottle (33 oz) Sweetbird Mojito Mint Syrup with 2 tbsp high grade matcha powder until fully suspended. Label, date, refrigerate.", funFact: "Matcha has been central to Japanese tea ceremony for centuries — prized as much for the ritual as the flavor.", bestFor: "A guest who wants something visually striking and less sweet than a typical shaken cocktail."
+    prep: "Mint Matcha Syrup: whisk 1 bottle (33 oz) Sweetbird Mojito Mint Syrup with 2 tbsp high grade matcha powder until fully suspended. Label, date, refrigerate.", funFact: "Matcha has been central to Japanese tea ceremony for centuries — prized as much for the ritual as the flavor.", bestFor: "A guest who wants something visually striking and less sweet than a typical shaken cocktail.", followUp: ["With or without egg white?"]
   },
   {
     id: "c8", name: "Gilded Goose", glassware: "Martini, Martini Tray Set (optional)", method: "Shake & Strain", category: "house",
@@ -535,7 +535,7 @@ const CLASSIC_COCKTAILS = [
     directions: "Dry shake all ingredients without ice (if using egg white), then shake again with ice. Strain over fresh ice into a rocks glass. Garnish and serve.",
     prep: "",
     funFact: "One of the oldest documented cocktail families — \"sours\" date to the mid-1800s and follow the same base-plus-sour-plus-sweet formula that still defines the category today.",
-    bestFor: "A guest who wants something classic and balanced, not too boozy-forward."
+    bestFor: "A guest who wants something classic and balanced, not too boozy-forward.", followUp: ["With or without egg white?", "Bourbon or rye?"]
   },
   {
     id: "cc2", name: "Sazerac", category: "classic", spirit: "Whiskey", glassware: "Rocks (no ice)", method: "Stir & Strain",
@@ -545,7 +545,7 @@ const CLASSIC_COCKTAILS = [
     directions: "Rinse a chilled rocks glass with absinthe, discard excess. Stir rye, simple syrup, and bitters with ice, then strain into the prepared glass. Express lemon peel over the top and discard.",
     prep: "",
     funFact: "Widely regarded as one of the oldest American cocktails, born in 19th-century New Orleans. It was originally made with cognac, but switched to rye whiskey after a phylloxera outbreak devastated French vineyards and cognac became scarce.",
-    bestFor: "A guest who wants a serious, old-school, spirit-forward drink."
+    bestFor: "A guest who wants a serious, old-school, spirit-forward drink.", followUp: ["Rye or Cognac?"]
   },
   {
     id: "cc3", name: "Mint Julep", category: "classic", spirit: "Whiskey", glassware: "Julep Tin", method: "Muddle & Build",
@@ -575,7 +575,7 @@ const CLASSIC_COCKTAILS = [
     directions: "Stir gin and vermouth with ice until well chilled. Strain into a chilled martini glass. Garnish and serve.",
     prep: "",
     funFact: "One of the most iconic cocktails ever made, with an origin story disputed for over a century. The modern bone-dry style didn't become the default until well into the 20th century.",
-    bestFor: "A purist gin drinker who wants nothing but spirit and a whisper of vermouth."
+    bestFor: "A purist gin drinker who wants nothing but spirit and a whisper of vermouth.", followUp: ["Dry or dirty?", "Up or on the rocks?", "Olive or twist?", "Shaken or stirred?"]
   },
   {
     id: "cc6", name: "Negroni", category: "classic", spirit: "Gin", glassware: "Rocks", method: "Stir & Strain",
@@ -585,7 +585,7 @@ const CLASSIC_COCKTAILS = [
     directions: "Stir all ingredients with ice until well chilled. Strain over a large ice cube into a rocks glass. Garnish and serve.",
     prep: "",
     funFact: "Said to have been invented in Florence in 1919, when Count Camillo Negroni asked a bartender to strengthen his Americano by swapping the soda water for gin.",
-    bestFor: "A guest who genuinely likes bitter, aperitivo-style drinks — not a sweet-drink crowd-pleaser."
+    bestFor: "A guest who genuinely likes bitter, aperitivo-style drinks — not a sweet-drink crowd-pleaser.", followUp: ["On the rocks (traditional) or strained up?"]
   },
   {
     id: "cc7", name: "Tom Collins", category: "classic", spirit: "Gin", glassware: "Collins", method: "Shake & Strain, Top",
@@ -605,7 +605,7 @@ const CLASSIC_COCKTAILS = [
     directions: "Shake gin, lemon juice, and simple syrup with ice. Strain into a champagne flute and top with champagne. Garnish and serve.",
     prep: "",
     funFact: "Named after the powerful French 75mm field gun from World War I, supposedly for how hard the drink was said to hit.",
-    bestFor: "A celebratory, elegant option — similar energy to the Golden 'B' on the house list."
+    bestFor: "A celebratory, elegant option — similar energy to the Golden 'B' on the house list.", followUp: ["Gin or Cognac base?"]
   },
   {
     id: "cc9", name: "Daiquiri", category: "classic", spirit: "Rum", glassware: "Coupe", method: "Shake & Strain",
@@ -615,7 +615,7 @@ const CLASSIC_COCKTAILS = [
     directions: "Shake all ingredients with ice until well chilled. Strain into a chilled coupe glass. Garnish and serve.",
     prep: "",
     funFact: "Named after a Cuban mining town, the Daiquiri became famous stateside partly because Ernest Hemingway was known to drink them by the pitcher at El Floridita in Havana.",
-    bestFor: "A guest who wants the simplest, most classic possible sour — no frills."
+    bestFor: "A guest who wants the simplest, most classic possible sour — no frills.", followUp: ["White or aged rum?"]
   },
   {
     id: "cc10", name: "Mojito", category: "classic", spirit: "Rum", glassware: "Highball", method: "Muddle & Build, Top",
@@ -655,7 +655,7 @@ const CLASSIC_COCKTAILS = [
     directions: "Salt half the rim of a highball glass. Fill with ice, add tequila and lime juice, then top with grapefruit soda. Stir gently, garnish, and serve.",
     prep: "",
     funFact: "More popular in Mexico by volume than the Margarita, though far less famous internationally.",
-    bestFor: "A refreshing, lower-intensity tequila option for someone who doesn't want a full Margarita."
+    bestFor: "A refreshing, lower-intensity tequila option for someone who doesn't want a full Margarita.", followUp: ["Grapefruit soda, or fresh juice + soda water?"]
   },
   {
     id: "cc14", name: "Margarita", category: "classic", spirit: "Tequila", glassware: "Rocks", method: "Shake & Strain",
@@ -665,7 +665,7 @@ const CLASSIC_COCKTAILS = [
     directions: "Salt half the rim of a rocks glass. Shake all ingredients with ice until well chilled. Strain over fresh ice into the glass. Garnish and serve.",
     prep: "",
     funFact: "Its exact origin is one of the most disputed in cocktail history, with at least four separate people credited across Mexico and the US in the 1930s and '40s.",
-    bestFor: "The most universally requested tequila cocktail — a safe, crowd-pleasing default."
+    bestFor: "The most universally requested tequila cocktail — a safe, crowd-pleasing default.", followUp: ["Salt or no salt?", "On the rocks or blended?", "Blanco, reposado, or añejo tequila?"]
   },
   {
     id: "cc15", name: "Oaxacan Old Fashioned", category: "classic", spirit: "Tequila", glassware: "Rocks", method: "Stir & Strain",
@@ -685,7 +685,7 @@ const CLASSIC_COCKTAILS = [
     directions: "Stir vodka and vermouth with ice until well chilled (or shake, if the guest prefers it \"Bond-style\"). Strain into a chilled martini glass. Garnish and serve.",
     prep: "",
     funFact: "The vodka martini overtook the gin martini in American popularity by the mid-20th century, a shift partly credited to James Bond's \"shaken, not stirred\" order.",
-    bestFor: "A guest who wants the Martini ritual without gin's botanical intensity."
+    bestFor: "A guest who wants the Martini ritual without gin's botanical intensity.", followUp: ["Dry or dirty?", "Up or on the rocks?", "Olive or twist?", "Shaken or stirred?"]
   },
   {
     id: "cc17", name: "Moscow Mule", category: "classic", spirit: "Vodka", glassware: "Copper Mug", method: "Build",
@@ -725,7 +725,7 @@ const CLASSIC_COCKTAILS = [
     directions: "Shake all ingredients with ice until well chilled. Strain into a chilled coupe glass (sugar-rimmed if desired). Garnish and serve.",
     prep: "",
     funFact: "Believed to have been created around World War I, possibly named after the motorcycle sidecar a regular customer arrived in.",
-    bestFor: "A guest who wants a classic, brandy-forward sour."
+    bestFor: "A guest who wants a classic, brandy-forward sour.", followUp: ["Sugar rim or no rim?"]
   },
   {
     id: "cc21", name: "Between the Sheets", category: "classic", spirit: "Brandy/Cognac", glassware: "Coupe", method: "Shake & Strain",

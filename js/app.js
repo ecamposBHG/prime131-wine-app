@@ -973,6 +973,16 @@ function renderDishDetail(dishId) {
   name.textContent = dish.name;
   container.appendChild(name);
 
+  if (dish.pronunciation || dish.translation) {
+    const pronLine = document.createElement("p");
+    pronLine.className = "hero-meta";
+    pronLine.innerHTML = [
+      dish.pronunciation ? `<i>${dish.pronunciation}</i>` : "",
+      dish.translation ? dish.translation : ""
+    ].filter(Boolean).join(" &middot; ");
+    container.appendChild(pronLine);
+  }
+
   if (dish.dropLine) {
     const dropLine = document.createElement("p");
     dropLine.className = "drop-line";
@@ -987,6 +997,18 @@ function renderDishDetail(dishId) {
 
   if (dish.ingredients && dish.chefPrep) {
     container.appendChild(renderDishFlipCard(dish));
+  }
+
+  if (dish.funFact) {
+    const factTitle = document.createElement("p");
+    factTitle.className = "detail-h3";
+    factTitle.innerHTML = `<span>&#10024;</span> Fun fact`;
+    container.appendChild(factTitle);
+    const factText = document.createElement("p");
+    factText.className = "hero-meta";
+    factText.style.cssText = "margin-bottom:14px; line-height:1.55; color:var(--shoyu-500);";
+    factText.textContent = dish.funFact;
+    container.appendChild(factText);
   }
 
   if (dish.allergensInRecipe && dish.allergensInRecipe.length) {

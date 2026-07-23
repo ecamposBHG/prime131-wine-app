@@ -961,6 +961,42 @@ function renderDishFlipCard(dish) {
   return flipcard;
 }
 
+function renderRawCutFlipCard(dish) {
+  const flipcard = document.createElement("div");
+  flipcard.className = "dish-flipcard";
+  const inner = document.createElement("div");
+  inner.className = "dish-flip-inner";
+
+  function faceHTML(idx) {
+    if (idx === 0) {
+      return `
+        <p class="dish-flip-tag">1/2 &middot; tap to flip</p>
+        <p class="dish-flip-title">&#127843; What it is</p>
+        <p class="chefprep-text">${dish.whatItIs}</p>
+      `;
+    }
+    return `
+      <p class="dish-flip-tag">2/2 &middot; tap to flip</p>
+      <p class="dish-flip-title">&#128161; Good to know</p>
+      <p class="chefprep-text">${dish.goodToKnow}</p>
+    `;
+  }
+
+  inner.innerHTML = faceHTML(0);
+  flipcard.appendChild(inner);
+  let faceIndex = 0;
+  flipcard.onclick = () => {
+    flipcard.classList.add("flipping");
+    setTimeout(() => {
+      faceIndex = (faceIndex + 1) % 2;
+      inner.className = "dish-flip-inner" + (faceIndex === 1 ? " chefprep" : "");
+      inner.innerHTML = faceHTML(faceIndex);
+      flipcard.classList.remove("flipping");
+    }, 200);
+  };
+  return flipcard;
+}
+
 function renderDishDetail(dishId) {
   const dish = findDish(dishId);
   if (!dish) { go("pairfw-list", {}, false); return; }
@@ -997,9 +1033,11 @@ function renderDishDetail(dishId) {
 
   if (dish.ingredients && dish.chefPrep) {
     container.appendChild(renderDishFlipCard(dish));
+  } else if (dish.whatItIs && dish.goodToKnow) {
+    container.appendChild(renderRawCutFlipCard(dish));
   }
 
-  if (dish.funFact) {
+  if (dish.funFact && !dish.whatItIs) {
     const factTitle = document.createElement("p");
     factTitle.className = "detail-h3";
     factTitle.innerHTML = `<span>&#10024;</span> Fun fact`;

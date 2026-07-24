@@ -228,6 +228,9 @@ function render() {
   else if (current.view === "cocktail-list") renderCocktailList();
   else if (current.view === "classic-cocktail-list") renderClassicCocktailList();
   else if (current.view === "cocktail-detail") renderCocktailDetail(current.params.cocktailId);
+  else if (current.view === "wine-type") renderWineTypeChooser();
+  else if (current.view === "wine-bottle-list") renderByTheBottleList();
+  else if (current.view === "liquor-list") renderLiquorList();
   window.scrollTo(0, 0);
 }
 
@@ -318,33 +321,23 @@ function renderHome() {
   options.innerHTML = `
     <div class="home-option" data-go="menu">
       <div class="home-icon-circle">&#128220;</div>
-      <div class="home-option-text"><p>Food Menu</p><span>Browse the full food menu</span></div>
+      <div class="home-option-text"><p>Food</p><span>Browse the full food menu</span></div>
     </div>
-    <div class="home-option" data-go="study">
+    <div class="home-option" data-go="wine">
       <div class="home-icon-circle">&#127863;</div>
-      <div class="home-option-text"><p>Wine BTG</p><span>Learn the by-the-glass list</span></div>
+      <div class="home-option-text"><p>Wine</p><span>By the glass, by the bottle, and pairing tools</span></div>
     </div>
-    <div class="home-option" data-go="cocktails">
+    <div class="home-option" data-go="bar">
       <div class="home-icon-circle">&#127864;</div>
-      <div class="home-option-text"><p>Cocktails</p><span>Recipes, builds, and flavor profiles</span></div>
-    </div>
-    <div class="home-option" data-go="pairwf">
-      <div class="home-icon-circle">&#127815;</div>
-      <div class="home-option-text"><p>Pair Wine with Food</p><span>Start from the bottle</span></div>
-    </div>
-    <div class="home-option" data-go="pairfw">
-      <div class="home-icon-circle">&#127860;</div>
-      <div class="home-option-text"><p>Pair Food with Wine</p><span>Start from the dish</span></div>
+      <div class="home-option-text"><p>Bar</p><span>Cocktails and the back bar</span></div>
     </div>
     <div class="home-option" data-go="gameroom">
       <div class="home-icon-circle">&#127918;</div>
       <div class="home-option-text"><p>Game Room</p><span>Micro-learning games: quiz, match, judgment calls</span></div>
     </div>
   `;
-  options.querySelector('[data-go="study"]').onclick = () => go("study-list");
-  options.querySelector('[data-go="cocktails"]').onclick = () => go("cocktail-type");
-  options.querySelector('[data-go="pairwf"]').onclick = () => go("pairwf-list");
-  options.querySelector('[data-go="pairfw"]').onclick = () => go("pairfw-list");
+  options.querySelector('[data-go="wine"]').onclick = () => go("wine-type");
+  options.querySelector('[data-go="bar"]').onclick = () => go("cocktail-type");
   options.querySelector('[data-go="menu"]').onclick = () => go("menu-list");
   options.querySelector('[data-go="gameroom"]').onclick = () => go("game-room");
   app.appendChild(options);
@@ -388,8 +381,47 @@ function renderSearchableWineList(onSelect, placeholder) {
   return wrap;
 }
 
+function renderWineTypeChooser() {
+  header("Wine");
+
+  const options = document.createElement("div");
+  options.className = "home-options";
+  options.innerHTML = `
+    <div class="home-option" data-go="glass">
+      <div class="home-icon-circle">&#127863;</div>
+      <div class="home-option-text"><p>By The Glass</p><span>Learn the full BTG list</span></div>
+    </div>
+    <div class="home-option" data-go="bottle">
+      <div class="home-icon-circle">&#127866;</div>
+      <div class="home-option-text"><p>By The Bottle</p><span>The full bottle list</span></div>
+    </div>
+    <div class="home-option" data-go="pairwf">
+      <div class="home-icon-circle">&#127815;</div>
+      <div class="home-option-text"><p>Pair Wine with Food</p><span>Start from the bottle</span></div>
+    </div>
+    <div class="home-option" data-go="pairfw">
+      <div class="home-icon-circle">&#127860;</div>
+      <div class="home-option-text"><p>Pair Food with Wine</p><span>Start from the dish</span></div>
+    </div>
+  `;
+  options.querySelector('[data-go="glass"]').onclick = () => go("study-list");
+  options.querySelector('[data-go="bottle"]').onclick = () => go("wine-bottle-list");
+  options.querySelector('[data-go="pairwf"]').onclick = () => go("pairwf-list");
+  options.querySelector('[data-go="pairfw"]').onclick = () => go("pairfw-list");
+  app.appendChild(options);
+}
+
+function renderByTheBottleList() {
+  header("By The Bottle");
+  const empty = document.createElement("p");
+  empty.className = "empty-note";
+  empty.style.padding = "40px 0";
+  empty.textContent = "The bottle list hasn't been added yet.";
+  app.appendChild(empty);
+}
+
 function renderStudyList() {
-  header("Wine BTG");
+  header("By The Glass");
   app.appendChild(renderSearchableWineList(
     (wineId) => go("study-card", { wineId }),
     "Search wines"
@@ -502,7 +534,7 @@ function renderMenuList() {
 }
 
 function renderCocktailTypeChooser() {
-  header("Cocktails");
+  header("Bar");
 
   const options = document.createElement("div");
   options.className = "home-options";
@@ -515,10 +547,74 @@ function renderCocktailTypeChooser() {
       <div class="home-icon-circle">&#127865;</div>
       <div class="home-option-text"><p>Classic Cocktails</p><span>Timeless recipes, by base spirit</span></div>
     </div>
+    <div class="home-option" data-go="liquor">
+      <div class="home-icon-circle">&#127866;</div>
+      <div class="home-option-text"><p>Liquor</p><span>The back bar, by category</span></div>
+    </div>
   `;
   options.querySelector('[data-go="house"]').onclick = () => go("cocktail-list");
   options.querySelector('[data-go="classic"]').onclick = () => go("classic-cocktail-list");
+  options.querySelector('[data-go="liquor"]').onclick = () => go("liquor-list");
   app.appendChild(options);
+}
+
+function renderLiquorList() {
+  header("Liquor");
+  const wrap = document.createElement("div");
+  const input = document.createElement("input");
+  input.className = "search-input";
+  input.placeholder = "Search the back bar";
+  wrap.appendChild(input);
+  const listWrap = document.createElement("div");
+  wrap.appendChild(listWrap);
+
+  const manualExpanded = new Set();
+
+  function draw(filter) {
+    listWrap.innerHTML = "";
+    const filterLower = filter.toLowerCase();
+    const hasActiveFilter = filterLower.trim().length > 0;
+
+    SPIRIT_ORDER.forEach(category => {
+      const items = LIQUOR.filter(l => l.category === category && l.name.toLowerCase().includes(filterLower));
+      if (hasActiveFilter && !items.length) return;
+
+      const isExpanded = hasActiveFilter || manualExpanded.has(category);
+
+      const label = document.createElement("button");
+      label.className = "section-label section-toggle";
+      label.innerHTML = `<span>${category}</span><span class="section-chevron">${isExpanded ? "\u25BE" : "\u25B8"}</span>`;
+      label.onclick = () => {
+        if (hasActiveFilter) return;
+        if (manualExpanded.has(category)) manualExpanded.delete(category);
+        else manualExpanded.add(category);
+        draw(input.value);
+      };
+      listWrap.appendChild(label);
+
+      if (!isExpanded) return;
+
+      if (!items.length) {
+        const empty = document.createElement("p");
+        empty.className = "empty-note";
+        empty.style.textAlign = "left";
+        empty.style.fontStyle = "italic";
+        empty.textContent = "No bottles added yet.";
+        listWrap.appendChild(empty);
+        return;
+      }
+
+      items.forEach(l => {
+        const row = document.createElement("div");
+        row.className = "list-row";
+        row.innerHTML = `<span class="list-row-main"><span class="dish-icon">${SPIRIT_ICON_MAP[category] || "\u{1F943}"}</span>${l.name}</span>`;
+        listWrap.appendChild(row);
+      });
+    });
+  }
+  draw("");
+  input.oninput = () => draw(input.value);
+  app.appendChild(wrap);
 }
 
 // SPIRIT_ORDER and SPIRIT_ICON_MAP now live in config.js (per-restaurant configuration)
@@ -744,7 +840,7 @@ function renderStudyCard(wineId) {
   const wine = findWine(wineId) || WINES[0];
   const idx = WINES.findIndex(w => w.id === wine.id);
 
-  header("Wine BTG");
+  header("By The Glass");
   app.appendChild(renderNavChips(wine.id, (id) => go("study-card", { wineId: id }, false)));
   app.appendChild(renderWineCardBody(wine));
 

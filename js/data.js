@@ -784,3 +784,7 @@ const CLASSIC_COCKTAILS = [
     bestFor: "A guest who likes the Last Word but wants something smokier and more agave-forward."
   }
 ];
+
+// Liquor / back bar list -- empty until real bottle data is provided.
+// Each item will follow: { id: "l1", name: "...", category: "Whiskey" | "Gin" | "Rum" | "Tequila" | "Vodka" | "Brandy/Cognac", ... }
+const LIQUOR = [];

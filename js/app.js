@@ -448,6 +448,8 @@ function renderDishList(headerTitle, searchPlaceholder, showAllergenFilter) {
   const listWrap = document.createElement("div");
   wrap.appendChild(listWrap);
 
+  const manualExpanded = new Set();
+
   function draw(filter) {
     listWrap.innerHTML = "";
     let filtered = DISHES.filter(d => d.name.toLowerCase().includes(filter.toLowerCase()));
@@ -457,14 +459,27 @@ function renderDishList(headerTitle, searchPlaceholder, showAllergenFilter) {
         return !excludedAllergens.some(a => has.includes(a));
       });
     }
+    const hasActiveFilter = excludedAllergens.length > 0 || filter.trim().length > 0;
     const groups = groupBySection(filtered);
     SECTION_ORDER.forEach(section => {
       const dishes = groups[section];
       if (!dishes.length) return;
-      const label = document.createElement("p");
-      label.className = "section-label";
-      label.textContent = section;
+
+      const isExpanded = hasActiveFilter || manualExpanded.has(section);
+
+      const label = document.createElement("button");
+      label.className = "section-label section-toggle";
+      label.innerHTML = `<span>${section}</span><span class="section-chevron">${isExpanded ? "\u25BE" : "\u25B8"}</span>`;
+      label.onclick = () => {
+        if (hasActiveFilter) return;
+        if (manualExpanded.has(section)) manualExpanded.delete(section);
+        else manualExpanded.add(section);
+        draw(input.value);
+      };
       listWrap.appendChild(label);
+
+      if (!isExpanded) return;
+
       dishes.forEach(d => {
         const row = document.createElement("div");
         row.className = "list-row";

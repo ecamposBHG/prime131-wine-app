@@ -194,11 +194,7 @@ function getFlavorIcon(tag) {
   return "\u{1F377}";
 }
 
-const SECTION_ICON_MAP = {
-  "Raw Bar": "\u{1F9AA}", "Starters": "\u{1F961}", "Soups & Salads": "\u{1F957}",
-  "Entr\u00E9es": "\u{1F37D}\uFE0F", "Sushi": "\u{1F363}", "Sushi Rolls": "\u{1F363}",
-  "Sides": "\u{1F35F}", "Steaks": "\u{1F969}", "Sauces": "\u{1F958}"
-};
+// SECTION_ICON_MAP now lives in config.js (per-restaurant configuration)
 function getSectionIcon(section) { return SECTION_ICON_MAP[section] || "\u{1F37D}\uFE0F"; }
 
 let activeTimer = null;
@@ -290,9 +286,9 @@ function renderHome() {
     <svg width="48" height="48" viewBox="0 0 56 56" class="home-stamp">
       <circle cx="28" cy="28" r="24" fill="none" stroke="var(--washi-300)" stroke-width="2"/>
       <circle cx="28" cy="28" r="24" fill="none" stroke="var(--bronze-500)" stroke-width="2.5"/>
-      <text x="28" y="34" text-anchor="middle" font-family="Shippori Mincho, serif" font-size="16" fill="var(--shoyu-700)">131</text>
+      <text x="28" y="34" text-anchor="middle" font-family="Shippori Mincho, serif" font-size="16" fill="var(--shoyu-700)">${BRAND.stampText}</text>
     </svg>
-    <p class="home-title">Prime 131 Wines</p>
+    <p class="home-title">${BRAND.fullName}</p>
   `;
   hero.querySelector(".theme-toggle").onclick = () => {
     setTheme(getTheme() === "dark" ? "light" : "dark");
@@ -525,11 +521,7 @@ function renderCocktailTypeChooser() {
   app.appendChild(options);
 }
 
-const SPIRIT_ORDER = ["Whiskey", "Gin", "Rum", "Tequila", "Vodka", "Brandy/Cognac"];
-const SPIRIT_ICON_MAP = {
-  "Whiskey": "\u{1F943}", "Gin": "\u{1F378}", "Rum": "\u{1F379}",
-  "Tequila": "\u{1FAD1}", "Vodka": "\u2744\uFE0F", "Brandy/Cognac": "\u{1F942}"
-};
+// SPIRIT_ORDER and SPIRIT_ICON_MAP now live in config.js (per-restaurant configuration)
 
 function renderClassicCocktailList() {
   header("Classic Cocktails");

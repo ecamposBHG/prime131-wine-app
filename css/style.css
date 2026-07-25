@@ -120,8 +120,8 @@ button, input {
 .home-card-play {
   background: var(--shoyu-700); border-color: var(--shoyu-700);
 }
-.home-card-play .home-card-title, .home-card-play .home-card-sub { color: var(--washi-100); }
-.home-card-play .home-card-sub { color: var(--washi-300); }
+.home-card-play .home-card-title { color: #F5F1E8; }
+.home-card-play .home-card-sub { color: #C9BEB2; }
 .home-card-tag {
   position: absolute; top: 12px; right: 12px;
   font-family: var(--font-mono); font-size: 10px; font-weight: 500;

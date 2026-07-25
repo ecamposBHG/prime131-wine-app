@@ -35,3 +35,10 @@ const SECTION_ICON_MAP = {
   "Entr\u00E9es": "\u{1F37D}\uFE0F", "Sushi": "\u{1F363}", "Sushi Rolls": "\u{1F363}",
   "Sides": "\u{1F35F}", "Steaks": "\u{1F969}", "Sauces": "\u{1F958}", "Desserts": "\u{1F370}"
 };
+
+// Dictionary categories, in display order, with their icon.
+const DICTIONARY_CATEGORY_ORDER = ["Wine & Tasting", "Bar & Cocktails", "Kitchen & Prep", "Sushi & Japanese Terms", "Service & Floor"];
+const DICTIONARY_CATEGORY_ICON_MAP = {
+  "Wine & Tasting": "\u{1F377}", "Bar & Cocktails": "\u{1F378}", "Kitchen & Prep": "\u{1F52A}",
+  "Sushi & Japanese Terms": "\u{1F363}", "Service & Floor": "\u{1F37D}\uFE0F"
+};

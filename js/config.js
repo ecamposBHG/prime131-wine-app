@@ -37,8 +37,9 @@ const SECTION_ICON_MAP = {
 };
 
 // Dictionary categories, in display order, with their icon.
-const DICTIONARY_CATEGORY_ORDER = ["Wine & Tasting", "Bar & Cocktails", "Kitchen & Prep", "Sushi & Japanese Terms", "Service & Floor"];
+const DICTIONARY_CATEGORY_ORDER = ["Japanese & Sushi Terms", "Specialty Ingredients & Sauces", "Kitchen & Prep Techniques", "Beef & Wagyu Grading", "Wine Production Terms", "Bar Technique Terms"];
 const DICTIONARY_CATEGORY_ICON_MAP = {
-  "Wine & Tasting": "\u{1F377}", "Bar & Cocktails": "\u{1F378}", "Kitchen & Prep": "\u{1F52A}",
-  "Sushi & Japanese Terms": "\u{1F363}", "Service & Floor": "\u{1F37D}\uFE0F"
+  "Japanese & Sushi Terms": "\u{1F363}", "Specialty Ingredients & Sauces": "\u{1F9C2}",
+  "Kitchen & Prep Techniques": "\u{1F52A}", "Beef & Wagyu Grading": "\u{1F969}",
+  "Wine Production Terms": "\u{1F377}", "Bar Technique Terms": "\u{1F378}"
 };

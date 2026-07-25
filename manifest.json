@@ -1,6 +1,6 @@
 {
-  "name": "Prime 131 Wines",
-  "short_name": "P131 Wines",
+  "name": "Optimus Prime 131",
+  "short_name": "Optimus 131",
   "description": "Wine education, cheat-sheet, and pairing tool for Prime 131 floor staff",
   "start_url": "./index.html",
   "scope": "./",

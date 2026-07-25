@@ -6,7 +6,7 @@
 // ============================================================
 
 const BRAND = {
-  fullName: "Prime 131 Wines",
+  fullName: "Optimus Prime 131",
   stampText: "131",
   storageKeyPrefix: "p131" // kept stable to avoid resetting any staff member's saved progress
 };

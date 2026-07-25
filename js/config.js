@@ -35,11 +35,3 @@ const SECTION_ICON_MAP = {
   "Entr\u00E9es": "\u{1F37D}\uFE0F", "Sushi": "\u{1F363}", "Sushi Rolls": "\u{1F363}",
   "Sides": "\u{1F35F}", "Steaks": "\u{1F969}", "Sauces": "\u{1F958}", "Desserts": "\u{1F370}"
 };
-
-// Dictionary categories, in display order, with their icon.
-const DICTIONARY_CATEGORY_ORDER = ["Japanese & Sushi Terms", "Specialty Ingredients & Sauces", "Kitchen & Prep Techniques", "Beef & Wagyu Grading", "Wine Production Terms", "Bar Technique Terms"];
-const DICTIONARY_CATEGORY_ICON_MAP = {
-  "Japanese & Sushi Terms": "\u{1F363}", "Specialty Ingredients & Sauces": "\u{1F9C2}",
-  "Kitchen & Prep Techniques": "\u{1F52A}", "Beef & Wagyu Grading": "\u{1F969}",
-  "Wine Production Terms": "\u{1F377}", "Bar Technique Terms": "\u{1F378}"
-};

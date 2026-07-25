@@ -231,8 +231,6 @@ function render() {
   else if (current.view === "wine-type") renderWineTypeChooser();
   else if (current.view === "wine-bottle-list") renderByTheBottleList();
   else if (current.view === "liquor-list") renderLiquorList();
-  else if (current.view === "dictionary-list") renderDictionaryList();
-  else if (current.view === "dictionary-detail") renderDictionaryDetail(current.params.termId);
   window.scrollTo(0, 0);
 }
 
@@ -337,16 +335,11 @@ function renderHome() {
       <div class="home-icon-circle">&#127918;</div>
       <div class="home-option-text"><p>Game Room</p><span>Micro-learning games: quiz, match, judgment calls</span></div>
     </div>
-    <div class="home-option" data-go="dictionary">
-      <div class="home-icon-circle">&#128218;</div>
-      <div class="home-option-text"><p>Dictionary</p><span>Terms every staff member should know cold</span></div>
-    </div>
   `;
   options.querySelector('[data-go="wine"]').onclick = () => go("wine-type");
   options.querySelector('[data-go="bar"]').onclick = () => go("cocktail-type");
   options.querySelector('[data-go="menu"]').onclick = () => go("menu-list");
   options.querySelector('[data-go="gameroom"]').onclick = () => go("game-room");
-  options.querySelector('[data-go="dictionary"]').onclick = () => go("dictionary-list");
   app.appendChild(options);
 }
 
@@ -563,106 +556,6 @@ function renderCocktailTypeChooser() {
   options.querySelector('[data-go="classic"]').onclick = () => go("classic-cocktail-list");
   options.querySelector('[data-go="liquor"]').onclick = () => go("liquor-list");
   app.appendChild(options);
-}
-
-function findDictTerm(id) { return DICTIONARY.find(t => t.id === id); }
-
-function renderDictionaryList() {
-  header("Dictionary");
-  const wrap = document.createElement("div");
-  const input = document.createElement("input");
-  input.className = "search-input";
-  input.placeholder = "Search terms";
-  wrap.appendChild(input);
-  const listWrap = document.createElement("div");
-  wrap.appendChild(listWrap);
-
-  const manualExpanded = new Set();
-
-  function draw(filter) {
-    listWrap.innerHTML = "";
-    const filterLower = filter.toLowerCase();
-    const hasActiveFilter = filterLower.trim().length > 0;
-
-    DICTIONARY_CATEGORY_ORDER.forEach(category => {
-      const terms = DICTIONARY.filter(t => t.category === category && t.term.toLowerCase().includes(filterLower));
-      if (!terms.length) return;
-
-      const isExpanded = hasActiveFilter || manualExpanded.has(category);
-
-      const label = document.createElement("button");
-      label.className = "section-label section-toggle";
-      label.innerHTML = `<span>${category}</span><span class="section-chevron">${isExpanded ? "\u25BE" : "\u25B8"}</span>`;
-      label.onclick = () => {
-        if (hasActiveFilter) return;
-        if (manualExpanded.has(category)) manualExpanded.delete(category);
-        else manualExpanded.add(category);
-        draw(input.value);
-      };
-      listWrap.appendChild(label);
-
-      if (!isExpanded) return;
-
-      terms.forEach(t => {
-        const row = document.createElement("div");
-        row.className = "list-row";
-        row.innerHTML = `<span class="list-row-main"><span class="dish-icon">${DICTIONARY_CATEGORY_ICON_MAP[category] || "\u{1F4D6}"}</span>${t.term}</span>`;
-        row.onclick = () => go("dictionary-detail", { termId: t.id });
-        listWrap.appendChild(row);
-      });
-    });
-    if (!DICTIONARY_CATEGORY_ORDER.some(c => DICTIONARY.some(t => t.category === c && t.term.toLowerCase().includes(filterLower)))) {
-      listWrap.innerHTML = `<p class="empty-note">No terms match that search.</p>`;
-    }
-  }
-  draw("");
-  input.oninput = () => draw(input.value);
-  app.appendChild(wrap);
-}
-
-function renderDictionaryDetail(termId) {
-  const t = findDictTerm(termId);
-  if (!t) { go("dictionary-list", {}, false); return; }
-  header(t.category);
-
-  const container = document.createElement("div");
-  const name = document.createElement("p");
-  name.className = "hero-name";
-  name.textContent = t.term;
-  container.appendChild(name);
-
-  const meansTitle = document.createElement("p");
-  meansTitle.className = "detail-h3";
-  meansTitle.innerHTML = `<span>&#128161;</span> What it means`;
-  container.appendChild(meansTitle);
-  const meansText = document.createElement("p");
-  meansText.className = "hero-meta";
-  meansText.style.cssText = "margin-bottom:16px; line-height:1.55; color:var(--shoyu-500);";
-  meansText.textContent = t.whatItMeans;
-  container.appendChild(meansText);
-
-  const whyTitle = document.createElement("p");
-  whyTitle.className = "detail-h3";
-  whyTitle.innerHTML = `<span>&#127919;</span> Why it matters on the floor`;
-  container.appendChild(whyTitle);
-  const whyText = document.createElement("p");
-  whyText.className = "hero-meta";
-  whyText.style.cssText = "margin-bottom:16px; line-height:1.55; color:var(--shoyu-500);";
-  whyText.textContent = t.whyItMatters;
-  container.appendChild(whyText);
-
-  if (t.sayItLikeThis) {
-    const sayTitle = document.createElement("p");
-    sayTitle.className = "detail-h3";
-    sayTitle.innerHTML = `<span>&#128172;</span> Say it like this`;
-    container.appendChild(sayTitle);
-    const sayBlock = document.createElement("div");
-    sayBlock.className = "arsenal-block";
-    sayBlock.innerHTML = `<p class="arsenal-text">${t.sayItLikeThis}</p>`;
-    container.appendChild(sayBlock);
-  }
-
-  app.appendChild(container);
 }
 
 function renderLiquorList() {

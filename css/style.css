@@ -14,13 +14,19 @@
   --bronze-500: #B1743A;
   --bronze-200: #E8D2B8;
   --wasabi-500: #5C6E4F;
+  --error-600: #8A3F2C;
+  --error-500: #A5533B;
 
   --flipcard-height: 460px;
 
   --font-display: 'Shippori Mincho', serif;
   --font-body: 'Inter', -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+
+  --press-duration: 120ms;
+  --focus-ring: 0 0 0 3px var(--bronze-200), 0 0 0 1px var(--bronze-500);
 }
+body.dark { --focus-ring: 0 0 0 3px var(--bronze-500), 0 0 0 1px var(--bronze-200); }
 
 * { box-sizing: border-box; }
 
@@ -92,6 +98,36 @@ button, input {
   width: 44px; height: 44px; border-radius: 50%; background: var(--bronze-200);
   display: flex; align-items: center; justify-content: center; font-size: 25px; flex-shrink: 0;
 }
+
+/* Top-level home screen — a distinctive 2x2 grid rather than the
+   reusable icon-circle list pattern (which is kept, unchanged, for
+   every sub-chooser screen: Wine type, Bar type, Game Room, etc). */
+.home-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+.home-card {
+  background: var(--washi-200); border: 1px solid var(--washi-300);
+  border-radius: 14px; padding: 18px 14px; cursor: pointer;
+  display: flex; flex-direction: column; gap: 4px; min-height: 118px;
+  position: relative;
+}
+.home-card-icon { font-size: 28px; line-height: 1; }
+.home-card-title {
+  font-family: var(--font-display); font-size: 18px; font-weight: 500;
+  color: var(--shoyu-700); margin: 4px 0 0;
+}
+.home-card-sub { font-size: 12px; color: var(--shoyu-300); line-height: 1.35; }
+.home-card-play {
+  background: var(--shoyu-700); border-color: var(--shoyu-700);
+}
+.home-card-play .home-card-title, .home-card-play .home-card-sub { color: var(--washi-100); }
+.home-card-play .home-card-sub { color: var(--washi-300); }
+.home-card-tag {
+  position: absolute; top: 12px; right: 12px;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+  color: var(--bronze-500); text-transform: uppercase; letter-spacing: 0.5px;
+}
+body.dark .home-card-play { background: var(--sumi-900); border-color: var(--bronze-600); }
 .home-option-text p {
   font-family: var(--font-body); font-size: 16px; font-weight: 500;
   color: var(--shoyu-700); margin: 0;
@@ -169,7 +205,7 @@ button, input {
 .flip-inner {
   width: 100%; height: 100%; border-radius: 14px; padding: 20px;
   overflow-y: auto; display: flex; flex-direction: column;
-  transition: transform 0.2s ease; transform: rotateY(0deg);
+  transition: transform 0.2s ease-in-out; transform: rotateY(0deg);
 }
 .flipcard.flipping .flip-inner { transform: rotateY(90deg); }
 .flip-inner.face-0 { background: var(--sumi-700); color: var(--washi-100); }
@@ -264,7 +300,7 @@ button, input {
 .dish-flip-inner {
   width: 100%; height: 100%; border-radius: 14px; padding: 18px;
   overflow-y: auto; display: flex; flex-direction: column;
-  background: var(--sumi-700); color: var(--washi-100); transition: transform 0.2s ease;
+  background: var(--sumi-700); color: var(--washi-100); transition: transform 0.2s ease-in-out;
 }
 .dish-flip-inner.chefprep { background: var(--shoyu-500); }
 .dish-flipcard.flipping .dish-flip-inner { transform: rotateY(90deg); }
@@ -398,7 +434,7 @@ body.dark .testme-answer-name { color: #F5F1E8; }
 
 /* This or That */
 .home-option.tot-correct { border-color: var(--wasabi-500); box-shadow: inset 0 0 0 2px var(--wasabi-500); }
-.home-option.tot-wrong { border-color: #A5533B; box-shadow: inset 0 0 0 2px #A5533B; }
+.home-option.tot-wrong { border-color: var(--error-500); box-shadow: inset 0 0 0 2px var(--error-500); }
 .tot-explain { margin-top: 16px; }
 .tot-contrast-label {
   font-family: var(--font-mono); font-size: 10px; color: var(--shoyu-300);
@@ -471,13 +507,13 @@ body.dark .testme-answer-name { color: #F5F1E8; }
 }
 .somm-statement { font-size: 18px; color: #F5F1E8; line-height: 1.55; text-align: center; margin: 0; font-weight: 500; }
 .somm-card.somm-flash-right { box-shadow: inset 0 0 0 4px var(--wasabi-500); }
-.somm-card.somm-flash-wrong { box-shadow: inset 0 0 0 4px #A5533B; }
+.somm-card.somm-flash-wrong { box-shadow: inset 0 0 0 4px var(--error-500); }
 .somm-btn-row { display: flex; gap: 10px; margin-top: 14px; }
 .somm-btn {
   flex: 1; padding: 20px; border-radius: 12px; font-size: 17px; font-weight: 600;
   font-family: var(--font-body); cursor: pointer; letter-spacing: 1px;
 }
-.somm-false { background: var(--washi-100); border: 2px solid #A5533B; color: #A5533B; }
+.somm-false { background: var(--washi-100); border: 2px solid var(--error-500); color: var(--error-500); }
 .somm-true { background: var(--wasabi-500); border: 2px solid var(--wasabi-500); color: var(--washi-100); }
 
 .somm-streak {
@@ -488,7 +524,7 @@ body.dark .testme-answer-name { color: #F5F1E8; }
   background: var(--washi-200); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;
 }
 .somm-review-shown {
-  font-size: 12px; color: var(--shoyu-500); margin: 0 0 4px; text-decoration: line-through; text-decoration-color: #A5533B;
+  font-size: 12px; color: var(--shoyu-500); margin: 0 0 4px; text-decoration: line-through; text-decoration-color: var(--error-500);
 }
 .somm-review-correct { font-size: 13px; color: var(--wasabi-500); font-weight: 500; margin: 0; }
 
@@ -497,4 +533,77 @@ body.dark .testme-answer-name { color: #F5F1E8; }
 .imposter-sub { font-size: 10px; font-weight: 400; color: var(--shoyu-300); }
 .imposter-tile.matched .imposter-sub { color: var(--washi-200); }
 .imposter-tile.revealed { cursor: default; }
-.imposter-tile.tot-wrong-tile { border-color: #A5533B; box-shadow: inset 0 0 0 2px #A5533B; }
+.imposter-tile.tot-wrong-tile { border-color: var(--error-500); box-shadow: inset 0 0 0 2px var(--error-500); }
+
+/* ============================================================
+   Press feedback — every tappable surface visibly acknowledges
+   a touch. Subtle scale, not exaggerated (Emil: pressable controls).
+   ============================================================ */
+.home-option, .home-card, .list-row, .pill, .nav-chip, .footer-btn, .speed-toggle,
+.wotd-strip, .wotd-main, .wotd-shuffle, .theme-toggle, .back-btn, .section-toggle,
+.match-tile, .allergen-filter-chip, .testme-reset, .predict-btn, .somm-btn,
+.flipcard, .dish-flipcard, .testme-card, .imposter-tile {
+  transition: transform var(--press-duration) ease, background var(--press-duration) ease, box-shadow var(--press-duration) ease;
+}
+.home-option:active, .home-card:active, .list-row:active, .pill:active, .nav-chip:active,
+.footer-btn:not(:disabled):active, .speed-toggle:active, .wotd-strip:active,
+.wotd-main:active, .wotd-shuffle:active, .theme-toggle:active, .back-btn:active, .section-toggle:active,
+.match-tile:not(.matched):not(.picked):active, .allergen-filter-chip:active,
+.testme-reset:active, .predict-btn:active, .somm-btn:active,
+.flipcard:active, .dish-flipcard:active, .testme-card:active,
+.imposter-tile:not(.revealed):active {
+  transform: scale(0.97);
+}
+
+/* ============================================================
+   Focus visibility — keyboard/screen-reader users get a clear ring.
+   Uses :focus-visible so mouse/touch taps don't show a ring, only
+   real keyboard focus does.
+   ============================================================ */
+.home-option:focus-visible, .home-card:focus-visible, .list-row:focus-visible, .pill:focus-visible,
+.nav-chip:focus-visible, .footer-btn:focus-visible, .speed-toggle:focus-visible,
+.wotd-strip:focus-visible, .wotd-main:focus-visible, .wotd-shuffle:focus-visible, .theme-toggle:focus-visible,
+.back-btn:focus-visible, .section-toggle:focus-visible, .match-tile:focus-visible,
+.allergen-filter-chip:focus-visible, .predict-btn:focus-visible, .somm-btn:focus-visible,
+.flipcard:focus-visible, .dish-flipcard:focus-visible, .testme-card:focus-visible,
+.imposter-tile:focus-visible, .search-input:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+.wotd-main { border-radius: 8px; }
+
+/* ============================================================
+   Reduced motion — keep state/color feedback, drop movement.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .flip-inner, .dish-flip-inner, .confetti, .match-tile, .calibration-toast,
+  .home-option, .home-card, .list-row, .pill, .nav-chip, .footer-btn, .speed-toggle,
+  .wotd-strip, .wotd-shuffle, .theme-toggle, .back-btn, .section-toggle,
+  .allergen-filter-chip, .testme-reset, .predict-btn, .somm-btn,
+  .flipcard, .dish-flipcard, .testme-card, .imposter-tile {
+    animation: none !important;
+    transition: background var(--press-duration) ease, box-shadow var(--press-duration) ease !important;
+    transform: none !important;
+  }
+  .flipcard.flipping .flip-inner, .dish-flipcard.flipping .dish-flip-inner { transform: none !important; }
+}
+
+/* Unify typographic voice: section/header titles use the display serif
+   on high-frequency screens, matching wine/dish hero names. */
+.header-title { font-family: var(--font-display); font-weight: 600; }
+
+/* Deliberate wide-viewport treatment: the app is designed mobile-first
+   on purpose (staff phones, quick use during shifts). Rather than an
+   accidental blank margin on wider screens, give the surrounding area
+   a quiet surface so the phone-width column reads as an intentional
+   frame, not a broken layout. */
+@media (min-width: 560px) {
+  html, body { background: var(--washi-200); }
+  #app {
+    background: var(--washi-100);
+    box-shadow: 0 0 0 1px var(--washi-300);
+    min-height: auto;
+    margin: 24px auto;
+    border-radius: 16px;
+  }
+}

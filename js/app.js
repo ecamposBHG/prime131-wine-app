@@ -28,6 +28,29 @@ window.addEventListener("popstate", (e) => {
 
 history.replaceState({ view: "home", params: {} }, "", "");
 
+// Accessibility: several interactive surfaces are <div>s (not native
+// <button>s) because they carry richer internal markup (icon + title +
+// subtitle, flip-card faces, etc). Give them button semantics and
+// keyboard support once per render rather than repeating this in every
+// render function.
+const KEYBOARD_TAPPABLE_SELECTOR = ".home-option, .home-card, .list-row, .speed-toggle, .wotd-main, .flipcard, .dish-flipcard, .testme-card";
+
+function makeDivsKeyboardAccessible() {
+  app.querySelectorAll(KEYBOARD_TAPPABLE_SELECTOR).forEach((el) => {
+    if (el.hasAttribute("tabindex")) return;
+    el.setAttribute("role", "button");
+    el.setAttribute("tabindex", "0");
+  });
+}
+
+app.addEventListener("keydown", (e) => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  const el = e.target.closest(KEYBOARD_TAPPABLE_SELECTOR);
+  if (!el) return;
+  e.preventDefault();
+  el.click();
+});
+
 function findWine(id) { return WINES.find(w => w.id === id); }
 function findDish(id) { return DISHES.find(d => d.id === id); }
 
@@ -231,6 +254,7 @@ function render() {
   else if (current.view === "wine-type") renderWineTypeChooser();
   else if (current.view === "wine-bottle-list") renderByTheBottleList();
   else if (current.view === "liquor-list") renderLiquorList();
+  makeDivsKeyboardAccessible();
   window.scrollTo(0, 0);
 }
 
@@ -317,23 +341,28 @@ function renderHome() {
   app.appendChild(wotdStrip);
 
   const options = document.createElement("div");
-  options.className = "home-options";
+  options.className = "home-grid";
   options.innerHTML = `
-    <div class="home-option" data-go="menu">
-      <div class="home-icon-circle">&#128220;</div>
-      <div class="home-option-text"><p>Food</p><span>Browse the full food menu</span></div>
+    <div class="home-card" data-go="menu">
+      <span class="home-card-icon">&#128220;</span>
+      <p class="home-card-title">Food</p>
+      <span class="home-card-sub">Full menu</span>
     </div>
-    <div class="home-option" data-go="wine">
-      <div class="home-icon-circle">&#127863;</div>
-      <div class="home-option-text"><p>Wine</p><span>By the glass, by the bottle, and pairing tools</span></div>
+    <div class="home-card" data-go="wine">
+      <span class="home-card-icon">&#127863;</span>
+      <p class="home-card-title">Wine</p>
+      <span class="home-card-sub">Glass, bottle &amp; pairing</span>
     </div>
-    <div class="home-option" data-go="bar">
-      <div class="home-icon-circle">&#127864;</div>
-      <div class="home-option-text"><p>Bar</p><span>Cocktails and the back bar</span></div>
+    <div class="home-card" data-go="bar">
+      <span class="home-card-icon">&#127864;</span>
+      <p class="home-card-title">Bar</p>
+      <span class="home-card-sub">Cocktails &amp; back bar</span>
     </div>
-    <div class="home-option" data-go="gameroom">
-      <div class="home-icon-circle">&#127918;</div>
-      <div class="home-option-text"><p>Game Room</p><span>Micro-learning games: quiz, match, judgment calls</span></div>
+    <div class="home-card home-card-play" data-go="gameroom">
+      <span class="home-card-tag">Play</span>
+      <span class="home-card-icon">&#127918;</span>
+      <p class="home-card-title">Game Room</p>
+      <span class="home-card-sub">Quiz, match, judgment calls</span>
     </div>
   `;
   options.querySelector('[data-go="wine"]').onclick = () => go("wine-type");

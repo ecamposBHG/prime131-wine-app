@@ -294,35 +294,34 @@ function resetProgress() {
   try { localStorage.removeItem(PROGRESS_KEY); } catch (e) {}
 }
 
-const REVIEW_STREAK_KEY = "p131-review-streak";
-const REVIEW_STREAK_SEED_START = "2026-04-16T00:00:00"; // last known 1-star review
-let streakJustReset = false;
+const REVIEW_STREAK_SEEN_KEY = "p131-review-streak-seen";
+let reviewStreakPendingAnimation = null; // set once at load if this device hasn't seen the latest reset yet
 
-function getReviewStreak() {
-  let data;
-  try { data = JSON.parse(localStorage.getItem(REVIEW_STREAK_KEY)); } catch (e) { data = null; }
-  if (!data || !data.start) {
-    const seedDays = Math.max(0, Math.floor((new Date() - new Date(REVIEW_STREAK_SEED_START)) / 86400000));
-    data = { start: REVIEW_STREAK_SEED_START, best: seedDays };
-    try { localStorage.setItem(REVIEW_STREAK_KEY, JSON.stringify(data)); } catch (e) {}
-  }
-  return data;
-}
-
-function reviewStreakDays(data) {
-  const start = new Date(data.start);
+function reviewStreakDays(startStr) {
+  const start = new Date(startStr);
   const now = new Date();
   return Math.max(0, Math.floor((now - start) / 86400000));
 }
 
-function logOneStarReview() {
-  const data = getReviewStreak();
-  const current = reviewStreakDays(data);
-  const best = Math.max(data.best || 0, current);
-  const updated = { start: new Date().toISOString(), best };
-  try { localStorage.setItem(REVIEW_STREAK_KEY, JSON.stringify(updated)); } catch (e) {}
-  return updated;
-}
+// Runs once when the script loads. Compares this device's last-seen streak
+// start against the deployed record. If they differ, a reset happened since
+// this device last checked in, so it queues the extinguish animation for the
+// next home render. There is no in-app way to change REVIEW_STREAK_RECORD.start
+// yourself — it only changes when the owner asks Claude to update it.
+(function checkReviewStreakReset() {
+  let seenStart;
+  try { seenStart = localStorage.getItem(REVIEW_STREAK_SEEN_KEY); } catch (e) { seenStart = null; }
+  if (seenStart === null) {
+    try { localStorage.setItem(REVIEW_STREAK_SEEN_KEY, REVIEW_STREAK_RECORD.start); } catch (e) {}
+    return;
+  }
+  if (seenStart !== REVIEW_STREAK_RECORD.start) {
+    reviewStreakPendingAnimation = {
+      endedDays: typeof REVIEW_STREAK_RECORD.lastEndedDays === "number" ? REVIEW_STREAK_RECORD.lastEndedDays : null
+    };
+    try { localStorage.setItem(REVIEW_STREAK_SEEN_KEY, REVIEW_STREAK_RECORD.start); } catch (e) {}
+  }
+})();
 
 function playStreakExtinguish(stripEl, onDone) {
   stripEl.style.position = "relative";
@@ -331,8 +330,6 @@ function playStreakExtinguish(stripEl, onDone) {
   const main = stripEl.querySelector(".streak-main");
   const numEl = stripEl.querySelector(".streak-num");
   const labelEl = stripEl.querySelector(".streak-label");
-  const btn = stripEl.querySelector(".streak-log-btn");
-  if (btn) btn.disabled = true;
 
   stripEl.classList.add("shaking");
   if (flame) {
@@ -394,37 +391,41 @@ function renderHome() {
   };
   app.appendChild(hero);
 
-  const streakData = getReviewStreak();
-  const streakDays = reviewStreakDays(streakData);
+  const currentDays = reviewStreakDays(REVIEW_STREAK_RECORD.start);
+  const bestDisplay = Math.max(REVIEW_STREAK_RECORD.best || 0, currentDays);
+  const pending = reviewStreakPendingAnimation;
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const showAnimation = pending && pending.endedDays !== null && !reduceMotion;
+  const initialDays = showAnimation ? pending.endedDays : currentDays;
+
   const streakStrip = document.createElement("div");
   streakStrip.className = "streak-strip";
   streakStrip.innerHTML = `
-    <span class="streak-flame-icon${streakJustReset ? " reborn" : ""}" aria-hidden="true">&#128293;</span>
+    <span class="streak-flame-icon" aria-hidden="true">&#128293;</span>
     <div class="streak-main">
-      <p class="streak-num">${streakDays} day${streakDays === 1 ? "" : "s"}</p>
+      <p class="streak-num">${initialDays} day${initialDays === 1 ? "" : "s"}</p>
       <p class="streak-label">Since last 1-star review</p>
     </div>
-    <button class="streak-log-btn" aria-label="Log a new 1-star review">Best: ${streakData.best || 0}</button>
+    <span class="streak-best-pill">Best: ${bestDisplay}</span>
   `;
-  streakJustReset = false;
-  streakStrip.querySelector(".streak-log-btn").onclick = (e) => {
-    e.stopPropagation();
-    const ok = window.confirm("Log a new 1-star review? This resets the streak to 0 and can't be undone.");
-    if (!ok) return;
-    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduceMotion) {
-      logOneStarReview();
-      streakJustReset = true;
-      render();
-      return;
-    }
-    playStreakExtinguish(streakStrip, () => {
-      logOneStarReview();
-      streakJustReset = true;
-      render();
-    });
-  };
   app.appendChild(streakStrip);
+
+  if (pending) reviewStreakPendingAnimation = null; // only ever plays once
+
+  if (showAnimation) {
+    setTimeout(() => {
+      playStreakExtinguish(streakStrip, () => {
+        const flame = streakStrip.querySelector(".streak-flame-icon");
+        const numEl = streakStrip.querySelector(".streak-num");
+        const labelEl = streakStrip.querySelector(".streak-label");
+        if (flame) { flame.textContent = "\u{1F525}"; flame.classList.remove("dying"); flame.classList.add("reborn"); }
+        if (numEl) numEl.textContent = `${currentDays} day${currentDays === 1 ? "" : "s"}`;
+        if (labelEl) labelEl.textContent = "Since last 1-star review";
+        streakStrip.classList.remove("shaking");
+        streakStrip.querySelectorAll(".streak-smoke-puff").forEach(el => el.remove());
+      });
+    }, 500);
+  }
 
   const wotd = wineOfTheDay();
   const wotdStrip = document.createElement("div");

@@ -35,3 +35,21 @@ const SECTION_ICON_MAP = {
   "Entr\u00E9es": "\u{1F37D}\uFE0F", "Sushi": "\u{1F363}", "Sushi Rolls": "\u{1F363}",
   "Sides": "\u{1F35F}", "Steaks": "\u{1F969}", "Sauces": "\u{1F958}", "Desserts": "\u{1F370}"
 };
+
+// Zero-star review streak — source of truth for the home screen counter.
+// There is deliberately no in-app control for this. It only ever changes
+// when the owner asks Claude to update it after a real 1-star review, so
+// every device shows the same numbers instead of drifting per-phone.
+//
+// start:         ISO date the CURRENT streak began (day count is derived from this).
+// best:          longest streak ever recorded, in days. Update this when a
+//                streak that just ended beat the previous record.
+// lastEndedDays: the day count of the streak that just ended, set only at
+//                the moment of a reset so each device can play the
+//                "Streak Extinguished" animation once, then it's cleared
+//                back to null until the next reset.
+const REVIEW_STREAK_RECORD = {
+  start: "2026-04-16T00:00:00",
+  best: 100,
+  lastEndedDays: null
+};

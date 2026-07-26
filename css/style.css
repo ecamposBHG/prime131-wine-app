@@ -372,12 +372,11 @@ body.dark .arsenal-block p, body.dark .arsenal-label, body.dark .arsenal-text { 
 .streak-main { flex: 1; }
 .streak-num { font-family: var(--font-display); font-size: 22px; color: #F5F1E8; line-height: 1; margin: 0; }
 .streak-label { font-family: var(--font-mono); font-size: 10px; color: #C9BEB2; text-transform: uppercase; letter-spacing: 0.4px; margin: 3px 0 0; }
-.streak-log-btn {
+.streak-best-pill {
   font-family: var(--font-mono); font-size: 10px; color: var(--sumi-900);
-  background: var(--bronze-500); border: none; padding: 6px 10px; border-radius: 20px;
-  font-weight: 600; letter-spacing: 0.3px; cursor: pointer;
+  background: var(--bronze-500); padding: 6px 10px; border-radius: 20px;
+  font-weight: 600; letter-spacing: 0.3px;
 }
-.streak-log-btn:disabled { opacity: 0.35; cursor: default; }
 body.dark .streak-strip { background: linear-gradient(135deg, var(--sumi-900), var(--sumi-700)); }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -603,7 +602,7 @@ body.dark .testme-answer-name { color: #F5F1E8; }
 .home-option, .home-card, .list-row, .pill, .nav-chip, .footer-btn, .speed-toggle,
 .wotd-strip, .wotd-main, .wotd-shuffle, .theme-toggle, .back-btn, .section-toggle,
 .match-tile, .allergen-filter-chip, .testme-reset, .predict-btn, .somm-btn,
-.flipcard, .dish-flipcard, .testme-card, .imposter-tile, .streak-log-btn {
+.flipcard, .dish-flipcard, .testme-card, .imposter-tile {
   transition: transform var(--press-duration) ease, background var(--press-duration) ease, box-shadow var(--press-duration) ease;
 }
 .home-option:active, .home-card:active, .list-row:active, .pill:active, .nav-chip:active,
@@ -612,7 +611,7 @@ body.dark .testme-answer-name { color: #F5F1E8; }
 .match-tile:not(.matched):not(.picked):active, .allergen-filter-chip:active,
 .testme-reset:active, .predict-btn:active, .somm-btn:active,
 .flipcard:active, .dish-flipcard:active, .testme-card:active,
-.imposter-tile:not(.revealed):active, .streak-log-btn:active {
+.imposter-tile:not(.revealed):active {
   transform: scale(0.97);
 }
 
@@ -627,7 +626,7 @@ body.dark .testme-answer-name { color: #F5F1E8; }
 .back-btn:focus-visible, .section-toggle:focus-visible, .match-tile:focus-visible,
 .allergen-filter-chip:focus-visible, .predict-btn:focus-visible, .somm-btn:focus-visible,
 .flipcard:focus-visible, .dish-flipcard:focus-visible, .testme-card:focus-visible,
-.imposter-tile:focus-visible, .search-input:focus-visible, .streak-log-btn:focus-visible {
+.imposter-tile:focus-visible, .search-input:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
 }

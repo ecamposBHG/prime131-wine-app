@@ -296,6 +296,7 @@ function resetProgress() {
 
 const REVIEW_STREAK_KEY = "p131-review-streak";
 const REVIEW_STREAK_SEED_START = "2026-04-16T00:00:00"; // last known 1-star review
+let streakJustReset = false;
 
 function getReviewStreak() {
   let data;
@@ -321,6 +322,47 @@ function logOneStarReview() {
   const updated = { start: new Date().toISOString(), best };
   try { localStorage.setItem(REVIEW_STREAK_KEY, JSON.stringify(updated)); } catch (e) {}
   return updated;
+}
+
+function playStreakExtinguish(stripEl, onDone) {
+  stripEl.style.position = "relative";
+  stripEl.style.overflow = "visible";
+  const flame = stripEl.querySelector(".streak-flame-icon");
+  const main = stripEl.querySelector(".streak-main");
+  const numEl = stripEl.querySelector(".streak-num");
+  const labelEl = stripEl.querySelector(".streak-label");
+  const btn = stripEl.querySelector(".streak-log-btn");
+  if (btn) btn.disabled = true;
+
+  stripEl.classList.add("shaking");
+  if (flame) {
+    flame.classList.add("dying");
+    const flameRect = flame.getBoundingClientRect();
+    const stripRect = stripEl.getBoundingClientRect();
+    const baseLeft = flameRect.left - stripRect.left + flameRect.width / 2;
+    const baseTop = flameRect.top - stripRect.top;
+    for (let i = 0; i < 5; i++) {
+      const puff = document.createElement("span");
+      puff.className = "streak-smoke-puff";
+      puff.setAttribute("aria-hidden", "true");
+      puff.textContent = "\u{1F4A8}";
+      puff.style.left = (baseLeft + (i - 2) * 5) + "px";
+      puff.style.top = baseTop + "px";
+      puff.style.animationDelay = (i * 90) + "ms";
+      stripEl.appendChild(puff);
+    }
+  }
+
+  setTimeout(() => {
+    if (main) main.classList.add("ashen-out");
+    setTimeout(() => {
+      if (flame) flame.textContent = "\u{1FAA6}";
+      if (numEl) numEl.textContent = "Extinguished";
+      if (labelEl) labelEl.textContent = "Streak reset \u2014 back to zero";
+      if (main) main.classList.remove("ashen-out");
+      setTimeout(onDone, 650);
+    }, 150);
+  }, 650);
 }
 
 function wineOfTheDay() {
@@ -357,20 +399,30 @@ function renderHome() {
   const streakStrip = document.createElement("div");
   streakStrip.className = "streak-strip";
   streakStrip.innerHTML = `
-    <span class="streak-flame-icon" aria-hidden="true">&#128293;</span>
+    <span class="streak-flame-icon${streakJustReset ? " reborn" : ""}" aria-hidden="true">&#128293;</span>
     <div class="streak-main">
       <p class="streak-num">${streakDays} day${streakDays === 1 ? "" : "s"}</p>
       <p class="streak-label">Since last 1-star review</p>
     </div>
     <button class="streak-log-btn" aria-label="Log a new 1-star review">Best: ${streakData.best || 0}</button>
   `;
+  streakJustReset = false;
   streakStrip.querySelector(".streak-log-btn").onclick = (e) => {
     e.stopPropagation();
     const ok = window.confirm("Log a new 1-star review? This resets the streak to 0 and can't be undone.");
-    if (ok) {
+    if (!ok) return;
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
       logOneStarReview();
+      streakJustReset = true;
       render();
+      return;
     }
+    playStreakExtinguish(streakStrip, () => {
+      logOneStarReview();
+      streakJustReset = true;
+      render();
+    });
   };
   app.appendChild(streakStrip);
 

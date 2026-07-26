@@ -377,7 +377,43 @@ body.dark .arsenal-block p, body.dark .arsenal-label, body.dark .arsenal-text { 
   background: var(--bronze-500); border: none; padding: 6px 10px; border-radius: 20px;
   font-weight: 600; letter-spacing: 0.3px; cursor: pointer;
 }
+.streak-log-btn:disabled { opacity: 0.35; cursor: default; }
 body.dark .streak-strip { background: linear-gradient(135deg, var(--sumi-900), var(--sumi-700)); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .streak-strip.shaking { animation: streak-shake 0.5s ease-in-out; }
+  .streak-flame-icon.dying { animation: streak-flame-die 0.6s ease-in forwards; display: inline-block; }
+  .streak-flame-icon.reborn { animation: streak-flame-spark 0.5s ease-out; display: inline-block; }
+  .streak-main.ashen-out { transition: opacity 150ms ease; opacity: 0; }
+  .streak-smoke-puff {
+    position: absolute;
+    font-size: 13px;
+    opacity: 0.85;
+    pointer-events: none;
+    animation: streak-smoke-rise 0.9s ease-out forwards;
+  }
+}
+@keyframes streak-shake {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  20% { transform: translateX(-4px) rotate(-1deg); }
+  40% { transform: translateX(4px) rotate(1deg); }
+  60% { transform: translateX(-3px) rotate(-1deg); }
+  80% { transform: translateX(3px) rotate(1deg); }
+}
+@keyframes streak-flame-die {
+  0% { transform: scale(1) rotate(0deg); opacity: 1; }
+  30% { transform: scale(1.3) rotate(-6deg); opacity: 1; }
+  100% { transform: scale(0.2) rotate(10deg); opacity: 0; }
+}
+@keyframes streak-flame-spark {
+  0% { transform: scale(0.3) rotate(-8deg); opacity: 0; }
+  60% { transform: scale(1.15) rotate(4deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+@keyframes streak-smoke-rise {
+  0% { transform: translateY(0) scale(0.6); opacity: 0.8; }
+  100% { transform: translateY(-32px) scale(1.5); opacity: 0; }
+}
 
 .wotd-strip {
   display: flex; align-items: center; gap: 10px;

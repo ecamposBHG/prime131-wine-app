@@ -370,8 +370,8 @@ body.dark .arsenal-block p, body.dark .arsenal-label, body.dark .arsenal-text { 
   50% { transform: scale(1.06) rotate(-2deg); }
 }
 .streak-main { flex: 1; }
-.streak-num { font-family: var(--font-display); font-size: 22px; color: var(--washi-100); line-height: 1; margin: 0; }
-.streak-label { font-family: var(--font-mono); font-size: 10px; color: var(--bronze-200); text-transform: uppercase; letter-spacing: 0.4px; margin: 3px 0 0; }
+.streak-num { font-family: var(--font-display); font-size: 22px; color: #F5F1E8; line-height: 1; margin: 0; }
+.streak-label { font-family: var(--font-mono); font-size: 10px; color: #C9BEB2; text-transform: uppercase; letter-spacing: 0.4px; margin: 3px 0 0; }
 .streak-log-btn {
   font-family: var(--font-mono); font-size: 10px; color: var(--sumi-900);
   background: var(--bronze-500); border: none; padding: 6px 10px; border-radius: 20px;

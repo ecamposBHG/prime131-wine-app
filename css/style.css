@@ -354,6 +354,31 @@ body.dark .arsenal-block p, body.dark .arsenal-label, body.dark .arsenal-text { 
 }
 
 /* Wine of the day strip */
+.streak-strip {
+  display: flex; align-items: center; gap: 12px;
+  background: linear-gradient(135deg, var(--shoyu-700), var(--sumi-700));
+  border-radius: 12px;
+  padding: 14px 14px;
+  margin-bottom: 12px;
+}
+.streak-flame-icon { font-size: 24px; }
+@media (prefers-reduced-motion: no-preference) {
+  .streak-flame-icon { animation: streak-flicker 2.4s ease-in-out infinite; }
+}
+@keyframes streak-flicker {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.06) rotate(-2deg); }
+}
+.streak-main { flex: 1; }
+.streak-num { font-family: var(--font-display); font-size: 22px; color: var(--washi-100); line-height: 1; margin: 0; }
+.streak-label { font-family: var(--font-mono); font-size: 10px; color: var(--bronze-200); text-transform: uppercase; letter-spacing: 0.4px; margin: 3px 0 0; }
+.streak-log-btn {
+  font-family: var(--font-mono); font-size: 10px; color: var(--sumi-900);
+  background: var(--bronze-500); border: none; padding: 6px 10px; border-radius: 20px;
+  font-weight: 600; letter-spacing: 0.3px; cursor: pointer;
+}
+body.dark .streak-strip { background: linear-gradient(135deg, var(--sumi-900), var(--sumi-700)); }
+
 .wotd-strip {
   display: flex; align-items: center; gap: 10px;
   background: var(--bronze-200); border: 1px solid var(--bronze-500);
@@ -542,7 +567,7 @@ body.dark .testme-answer-name { color: #F5F1E8; }
 .home-option, .home-card, .list-row, .pill, .nav-chip, .footer-btn, .speed-toggle,
 .wotd-strip, .wotd-main, .wotd-shuffle, .theme-toggle, .back-btn, .section-toggle,
 .match-tile, .allergen-filter-chip, .testme-reset, .predict-btn, .somm-btn,
-.flipcard, .dish-flipcard, .testme-card, .imposter-tile {
+.flipcard, .dish-flipcard, .testme-card, .imposter-tile, .streak-log-btn {
   transition: transform var(--press-duration) ease, background var(--press-duration) ease, box-shadow var(--press-duration) ease;
 }
 .home-option:active, .home-card:active, .list-row:active, .pill:active, .nav-chip:active,
@@ -551,7 +576,7 @@ body.dark .testme-answer-name { color: #F5F1E8; }
 .match-tile:not(.matched):not(.picked):active, .allergen-filter-chip:active,
 .testme-reset:active, .predict-btn:active, .somm-btn:active,
 .flipcard:active, .dish-flipcard:active, .testme-card:active,
-.imposter-tile:not(.revealed):active {
+.imposter-tile:not(.revealed):active, .streak-log-btn:active {
   transform: scale(0.97);
 }
 
@@ -566,7 +591,7 @@ body.dark .testme-answer-name { color: #F5F1E8; }
 .back-btn:focus-visible, .section-toggle:focus-visible, .match-tile:focus-visible,
 .allergen-filter-chip:focus-visible, .predict-btn:focus-visible, .somm-btn:focus-visible,
 .flipcard:focus-visible, .dish-flipcard:focus-visible, .testme-card:focus-visible,
-.imposter-tile:focus-visible, .search-input:focus-visible {
+.imposter-tile:focus-visible, .search-input:focus-visible, .streak-log-btn:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
 }

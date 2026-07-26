@@ -294,6 +294,35 @@ function resetProgress() {
   try { localStorage.removeItem(PROGRESS_KEY); } catch (e) {}
 }
 
+const REVIEW_STREAK_KEY = "p131-review-streak";
+const REVIEW_STREAK_SEED_START = "2026-04-16T00:00:00"; // last known 1-star review
+
+function getReviewStreak() {
+  let data;
+  try { data = JSON.parse(localStorage.getItem(REVIEW_STREAK_KEY)); } catch (e) { data = null; }
+  if (!data || !data.start) {
+    const seedDays = Math.max(0, Math.floor((new Date() - new Date(REVIEW_STREAK_SEED_START)) / 86400000));
+    data = { start: REVIEW_STREAK_SEED_START, best: seedDays };
+    try { localStorage.setItem(REVIEW_STREAK_KEY, JSON.stringify(data)); } catch (e) {}
+  }
+  return data;
+}
+
+function reviewStreakDays(data) {
+  const start = new Date(data.start);
+  const now = new Date();
+  return Math.max(0, Math.floor((now - start) / 86400000));
+}
+
+function logOneStarReview() {
+  const data = getReviewStreak();
+  const current = reviewStreakDays(data);
+  const best = Math.max(data.best || 0, current);
+  const updated = { start: new Date().toISOString(), best };
+  try { localStorage.setItem(REVIEW_STREAK_KEY, JSON.stringify(updated)); } catch (e) {}
+  return updated;
+}
+
 function wineOfTheDay() {
   const now = new Date();
   const start = new Date(now.getFullYear(), 0, 0);
@@ -322,6 +351,28 @@ function renderHome() {
     render();
   };
   app.appendChild(hero);
+
+  const streakData = getReviewStreak();
+  const streakDays = reviewStreakDays(streakData);
+  const streakStrip = document.createElement("div");
+  streakStrip.className = "streak-strip";
+  streakStrip.innerHTML = `
+    <span class="streak-flame-icon" aria-hidden="true">&#128293;</span>
+    <div class="streak-main">
+      <p class="streak-num">${streakDays} day${streakDays === 1 ? "" : "s"}</p>
+      <p class="streak-label">Since last 1-star review</p>
+    </div>
+    <button class="streak-log-btn" aria-label="Log a new 1-star review">Best: ${streakData.best || 0}</button>
+  `;
+  streakStrip.querySelector(".streak-log-btn").onclick = (e) => {
+    e.stopPropagation();
+    const ok = window.confirm("Log a new 1-star review? This resets the streak to 0 and can't be undone.");
+    if (ok) {
+      logOneStarReview();
+      render();
+    }
+  };
+  app.appendChild(streakStrip);
 
   const wotd = wineOfTheDay();
   const wotdStrip = document.createElement("div");

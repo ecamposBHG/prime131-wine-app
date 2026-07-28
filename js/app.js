@@ -377,13 +377,13 @@ function renderHome() {
   const hero = document.createElement("div");
   hero.className = "home-hero";
   hero.innerHTML = `
-    <button class="theme-toggle" aria-label="Toggle dark mode">${getTheme() === "dark" ? "\u2600\uFE0F" : "\u{1F319}"}</button>
-    <svg width="48" height="48" viewBox="0 0 56 56" class="home-stamp">
-      <circle cx="28" cy="28" r="24" fill="none" stroke="var(--washi-300)" stroke-width="2"/>
-      <circle cx="28" cy="28" r="24" fill="none" stroke="var(--bronze-500)" stroke-width="2.5"/>
-      <text x="28" y="34" text-anchor="middle" font-family="Shippori Mincho, serif" font-size="16" fill="var(--shoyu-700)">${BRAND.stampText}</text>
-    </svg>
-    <p class="home-title">${BRAND.fullName}</p>
+    <div class="home-hero-plate">
+      <div>
+        <p class="home-title">${BRAND.fullName}</p>
+        <p class="home-title-sub">Staff training</p>
+      </div>
+      <button class="theme-toggle" aria-label="Toggle dark mode">${getTheme() === "dark" ? "\u2600\uFE0F" : "\u{1F319}"}</button>
+    </div>
   `;
   hero.querySelector(".theme-toggle").onclick = () => {
     setTheme(getTheme() === "dark" ? "light" : "dark");
@@ -402,8 +402,11 @@ function renderHome() {
   streakStrip.className = "streak-strip";
   streakStrip.innerHTML = `
     <span class="streak-flame-icon" aria-hidden="true">&#128293;</span>
+    <div class="streak-num-block">
+      <p class="streak-num">${initialDays}</p>
+      <p class="streak-num-lbl">${initialDays === 1 ? "Day" : "Days"}</p>
+    </div>
     <div class="streak-main">
-      <p class="streak-num">${initialDays} day${initialDays === 1 ? "" : "s"}</p>
       <p class="streak-label">Since last 1-star review</p>
     </div>
     <span class="streak-best-pill">Best: ${bestDisplay}</span>
@@ -417,9 +420,11 @@ function renderHome() {
       playStreakExtinguish(streakStrip, () => {
         const flame = streakStrip.querySelector(".streak-flame-icon");
         const numEl = streakStrip.querySelector(".streak-num");
+        const numLblEl = streakStrip.querySelector(".streak-num-lbl");
         const labelEl = streakStrip.querySelector(".streak-label");
         if (flame) { flame.textContent = "\u{1F525}"; flame.classList.remove("dying"); flame.classList.add("reborn"); }
-        if (numEl) numEl.textContent = `${currentDays} day${currentDays === 1 ? "" : "s"}`;
+        if (numEl) numEl.textContent = `${currentDays}`;
+        if (numLblEl) numLblEl.textContent = currentDays === 1 ? "Day" : "Days";
         if (labelEl) labelEl.textContent = "Since last 1-star review";
         streakStrip.classList.remove("shaking");
         streakStrip.querySelectorAll(".streak-smoke-puff").forEach(el => el.remove());
@@ -448,21 +453,25 @@ function renderHome() {
   options.className = "home-grid";
   options.innerHTML = `
     <div class="home-card" data-go="menu">
+      <span class="nav-idx">01</span>
       <span class="home-card-icon">&#128220;</span>
       <p class="home-card-title">Food</p>
       <span class="home-card-sub">Full menu</span>
     </div>
     <div class="home-card" data-go="wine">
+      <span class="nav-idx">02</span>
       <span class="home-card-icon">&#127863;</span>
       <p class="home-card-title">Wine</p>
       <span class="home-card-sub">Glass, bottle &amp; pairing</span>
     </div>
     <div class="home-card" data-go="bar">
+      <span class="nav-idx">03</span>
       <span class="home-card-icon">&#127864;</span>
       <p class="home-card-title">Bar</p>
       <span class="home-card-sub">Cocktails &amp; back bar</span>
     </div>
     <div class="home-card home-card-play" data-go="gameroom">
+      <span class="nav-idx">04</span>
       <span class="home-card-tag">Play</span>
       <span class="home-card-icon">&#127918;</span>
       <p class="home-card-title">Game Room</p>

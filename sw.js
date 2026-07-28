@@ -1,4 +1,4 @@
-const CACHE_NAME = "prime131-wines-v54";
+const CACHE_NAME = "prime131-wines-v55";
 const ASSETS = [
   "./",
   "./index.html",
@@ -8,7 +8,17 @@ const ASSETS = [
   "./js/app.js",
   "./manifest.json",
   "./icons/icon-192.png",
-  "./icons/icon-512.png"
+  "./icons/icon-512.png",
+  "./fonts/oswald-latin-500-normal.woff2",
+  "./fonts/oswald-latin-600-normal.woff2",
+  "./fonts/oswald-latin-700-normal.woff2",
+  "./fonts/inter-latin-400-normal.woff2",
+  "./fonts/inter-latin-500-normal.woff2",
+  "./fonts/inter-latin-600-normal.woff2",
+  "./fonts/inter-latin-700-normal.woff2",
+  "./fonts/jetbrains-mono-latin-400-normal.woff2",
+  "./fonts/jetbrains-mono-latin-500-normal.woff2",
+  "./fonts/jetbrains-mono-latin-700-normal.woff2"
 ];
 
 self.addEventListener("install", (event) => {

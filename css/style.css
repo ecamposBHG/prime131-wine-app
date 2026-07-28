@@ -144,6 +144,11 @@ button, input {
   align-content: start;
   margin: 0 -16px;
 }
+.build-stamp {
+  font-family: var(--font-mono); font-size: 9px; color: var(--shoyu-200);
+  text-align: center; margin: 14px -16px 0; padding-bottom: 4px;
+  letter-spacing: 0.4px;
+}
 .home-card {
   background: var(--washi-200); border: none;
   border-right: 2px solid var(--washi-300); border-bottom: 2px solid var(--washi-300);

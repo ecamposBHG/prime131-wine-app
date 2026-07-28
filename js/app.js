@@ -483,6 +483,11 @@ function renderHome() {
   options.querySelector('[data-go="menu"]').onclick = () => go("menu-list");
   options.querySelector('[data-go="gameroom"]').onclick = () => go("game-room");
   app.appendChild(options);
+
+  const versionStamp = document.createElement("p");
+  versionStamp.className = "build-stamp";
+  versionStamp.textContent = "build " + APP_VERSION;
+  app.appendChild(versionStamp);
 }
 
 function renderSearchableWineList(onSelect, placeholder) {

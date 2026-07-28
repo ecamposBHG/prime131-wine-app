@@ -11,6 +11,12 @@ const BRAND = {
   storageKeyPrefix: "p131" // kept stable to avoid resetting any staff member's saved progress
 };
 
+// Bumped alongside sw.js's CACHE_NAME on every deploy. Shown as a tiny
+// stamp on the home screen so we can confirm, at a glance, whether a
+// given device is actually serving the latest build -- useful while
+// GitHub Pages' CDN edge cache may lag behind the reported build status.
+const APP_VERSION = "v59";
+
 // Which home cards this restaurant's deployment shows, and in what order.
 // (Currently informational — app.js still renders all five directly.
 // A future pass can make the home screen read this list instead.)

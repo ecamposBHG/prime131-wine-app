@@ -167,7 +167,8 @@ button, input {
   font-family: var(--font-mono); font-size: 9px; color: var(--shoyu-200);
 }
 .home-card-play .nav-idx { color: var(--ink-on-rust-soft); }
-.home-card-icon { font-size: 22px; line-height: 1; margin-bottom: 2px; margin-top: 14px; }
+.home-card-icon { margin-bottom: 2px; margin-top: 14px; color: var(--shoyu-700); display: flex; }
+.home-card-play .home-card-icon { color: var(--ink-on-rust); }
 .home-card-title {
   font-family: var(--font-display); font-size: 15px; font-weight: 600;
   color: var(--shoyu-700); margin: 2px 0 0; text-transform: uppercase; letter-spacing: 0.4px;
@@ -404,7 +405,7 @@ button, input {
 /* Theme toggle */
 .theme-toggle {
   position: absolute; top: 0; right: 0; background: var(--sumi-700); border: 2px solid var(--washi-300);
-  width: 38px; height: 38px; font-size: 16px; cursor: pointer;
+  width: 38px; height: 38px; cursor: pointer; color: var(--shoyu-700);
   display: flex; align-items: center; justify-content: center;
 }
 
@@ -414,7 +415,7 @@ button, input {
   background: var(--washi-200); border: none; border-bottom: 2px solid var(--washi-300); border-left: 4px solid var(--neon);
   padding: 14px 16px; margin: 0 -16px;
 }
-.streak-flame-icon { font-size: 22px; align-self: center; margin-right: 12px; }
+.streak-flame-icon { color: var(--bronze-500); align-self: center; margin-right: 12px; display: flex; }
 .streak-num-block {
   border-right: 2px solid var(--washi-300); padding-right: 14px; margin-right: 14px;
   display: flex; flex-direction: column; justify-content: center; align-self: stretch;
@@ -484,11 +485,15 @@ button, input {
 .wotd-label {
   font-family: var(--font-mono); font-size: 9.5px; color: var(--bronze-200);
   text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 3px;
+  display: flex; align-items: center; gap: 5px;
 }
+.wotd-label-icon { display: flex; }
+.wotd-label-icon svg { width: 12px; height: 12px; }
 .wotd-name { font-family: var(--font-display); font-size: 17px; font-weight: 600; color: var(--shoyu-700); margin: 0; }
 .wotd-shuffle {
   background: var(--sumi-700); border: 2px solid var(--washi-300);
-  width: 42px; height: 42px; font-size: 18px; cursor: pointer; flex-shrink: 0;
+  width: 42px; height: 42px; cursor: pointer; flex-shrink: 0; color: var(--shoyu-700);
+  display: flex; align-items: center; justify-content: center;
 }
 
 /* Test Me */

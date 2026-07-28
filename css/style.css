@@ -76,8 +76,16 @@ html, body {
 #app.home-view {
   max-width: none;
   width: 100vw;
+  /* vh is the LARGEST possible mobile viewport (address bar hidden);
+     the real visible area shrinks whenever the address bar is showing,
+     which happens intermittently as the bar auto-hides/reappears --
+     that mismatch is what caused the scroll to appear only sometimes.
+     dvh tracks the actual visible viewport; vh stays as a fallback
+     for older browsers without dvh support. */
   height: 100vh;
+  height: 100dvh;
   min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
   padding: 0;
   overflow: hidden;

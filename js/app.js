@@ -398,13 +398,8 @@ function renderHome() {
         <p class="home-title">${BRAND.fullName}</p>
         <p class="home-title-sub">Staff training</p>
       </div>
-      <button class="theme-toggle" aria-label="Toggle dark mode">${getTheme() === "dark" ? ICONS.sun : ICONS.moon}</button>
     </div>
   `;
-  hero.querySelector(".theme-toggle").onclick = () => {
-    setTheme(getTheme() === "dark" ? "light" : "dark");
-    render();
-  };
   app.appendChild(hero);
 
   const currentDays = reviewStreakDays(REVIEW_STREAK_RECORD.start);

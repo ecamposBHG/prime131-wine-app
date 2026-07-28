@@ -138,10 +138,13 @@ button, input {
 }
 .home-icon-circle { display: none; }
 
-/* Top-level home grid: bordered nav cells, solid accent on the primary/play cell only */
+/* Top-level home grid: bordered nav cells, solid accent on the primary/play cell only.
+   flex: 1 lets it consume whatever room is left in #app's min-height:100vh
+   on mobile; the desktop breakpoint sets #app's min-height back to auto,
+   so this naturally becomes a no-op there instead of stretching absurdly. */
 .home-grid {
-  display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: min-content;
-  align-content: start;
+  display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr;
+  flex: 1;
   margin: 0 -16px;
 }
 .build-stamp {
@@ -153,8 +156,8 @@ button, input {
   background: var(--washi-200); border: none;
   border-right: 2px solid var(--washi-300); border-bottom: 2px solid var(--washi-300);
   padding: 18px 14px; cursor: pointer;
-  display: flex; flex-direction: column; gap: 4px;
-  align-items: flex-start; align-self: start;
+  display: flex; flex-direction: column; gap: 4px; min-height: 110px;
+  align-items: flex-start; justify-content: flex-end;
   position: relative;
 }
 .home-card:nth-child(2n) { border-right: none; }

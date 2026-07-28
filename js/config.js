@@ -15,7 +15,7 @@ const BRAND = {
 // stamp on the home screen so we can confirm, at a glance, whether a
 // given device is actually serving the latest build -- useful while
 // GitHub Pages' CDN edge cache may lag behind the reported build status.
-const APP_VERSION = "v59";
+const APP_VERSION = "v60";
 
 // Which home cards this restaurant's deployment shows, and in what order.
 // (Currently informational — app.js still renders all five directly.

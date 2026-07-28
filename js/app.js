@@ -1,6 +1,7 @@
 // Prime 131 Wine App — logic
 
 const app = document.getElementById("app");
+document.documentElement.setAttribute("data-build", typeof APP_VERSION !== "undefined" ? APP_VERSION : "unknown");
 let current = { view: "home", params: {} };
 
 function go(view, params = {}, pushHistory = true) {
@@ -225,6 +226,7 @@ let activeTimer = null;
 function render() {
   if (activeTimer) { clearInterval(activeTimer); activeTimer = null; }
   app.innerHTML = "";
+  app.classList.toggle("home-view", current.view === "home");
   if (current.view === "home") renderHome();
   else if (current.view === "study-list") renderStudyList();
   else if (current.view === "study-card") renderStudyCard(current.params.wineId);
@@ -326,34 +328,15 @@ function reviewStreakDays(startStr) {
 function playStreakExtinguish(stripEl, onDone) {
   stripEl.style.position = "relative";
   stripEl.style.overflow = "visible";
-  const flame = stripEl.querySelector(".streak-flame-icon");
   const main = stripEl.querySelector(".streak-main");
   const numEl = stripEl.querySelector(".streak-num");
   const labelEl = stripEl.querySelector(".streak-label");
 
   stripEl.classList.add("shaking");
-  if (flame) {
-    flame.classList.add("dying");
-    const flameRect = flame.getBoundingClientRect();
-    const stripRect = stripEl.getBoundingClientRect();
-    const baseLeft = flameRect.left - stripRect.left + flameRect.width / 2;
-    const baseTop = flameRect.top - stripRect.top;
-    for (let i = 0; i < 5; i++) {
-      const puff = document.createElement("span");
-      puff.className = "streak-smoke-puff";
-      puff.setAttribute("aria-hidden", "true");
-      puff.textContent = "\u{1F4A8}";
-      puff.style.left = (baseLeft + (i - 2) * 5) + "px";
-      puff.style.top = baseTop + "px";
-      puff.style.animationDelay = (i * 90) + "ms";
-      stripEl.appendChild(puff);
-    }
-  }
 
   setTimeout(() => {
     if (main) main.classList.add("ashen-out");
     setTimeout(() => {
-      if (flame) flame.textContent = "\u{1FAA6}";
       if (numEl) numEl.textContent = "Extinguished";
       if (labelEl) labelEl.textContent = "Streak reset \u2014 back to zero";
       if (main) main.classList.remove("ashen-out");
@@ -373,21 +356,6 @@ function randomWine() {
   return WINES[Math.floor(Math.random() * WINES.length)];
 }
 
-// Minimal mono-line icon set (2px stroke, square terminals, no rounded
-// corners) replacing emoji per the design system. currentColor means each
-// icon automatically follows whatever text color its container already
-// uses (including the rust-fill "play" card's dark ink), so no per-icon
-// color rules are needed.
-const ICONS = {
-  food: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"><rect x="3" y="2.5" width="14" height="15"/><line x1="6" y1="7" x2="14" y2="7"/><line x1="6" y1="10.5" x2="14" y2="10.5"/><line x1="6" y1="14" x2="11" y2="14"/></svg>',
-  wine: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"><path d="M6 2.5 H14 L12.5 9 C12.5 11 7.5 11 7.5 9 Z"/><line x1="10" y1="11" x2="10" y2="16"/><line x1="6.5" y1="17.2" x2="13.5" y2="17.2"/></svg>',
-  bar: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"><path d="M4 3 H16 L10 10 Z"/><line x1="10" y1="10" x2="10" y2="16"/><line x1="6.5" y1="17.2" x2="13.5" y2="17.2"/></svg>',
-  game: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"><rect x="2.5" y="6" width="15" height="8"/><line x1="6" y1="8.5" x2="6" y2="11.5"/><line x1="4.5" y1="10" x2="7.5" y2="10"/><circle cx="14" cy="9" r="0.9" fill="currentColor" stroke="none"/><circle cx="14" cy="11.5" r="0.9" fill="currentColor" stroke="none"/></svg>',
-  sun: '<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"><circle cx="10" cy="10" r="4"/><line x1="10" y1="1.5" x2="10" y2="3.5"/><line x1="10" y1="16.5" x2="10" y2="18.5"/><line x1="1.5" y1="10" x2="3.5" y2="10"/><line x1="16.5" y1="10" x2="18.5" y2="10"/><line x1="4" y1="4" x2="5.4" y2="5.4"/><line x1="14.6" y1="14.6" x2="16" y2="16"/><line x1="4" y1="16" x2="5.4" y2="14.6"/><line x1="14.6" y1="5.4" x2="16" y2="4"/></svg>',
-  moon: '<svg width="18" height="18" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" fill="currentColor"/><circle cx="13.5" cy="7.5" r="6" fill="var(--sumi-700)"/></svg>',
-  flame: '<svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1 C10 5 6 6 6 11 C6 15 8.5 17 10 17 C11.5 17 14 15 14 11 C14 9 12.5 8 12.5 6 C12.5 8 11 9 11 11 C11 12.5 10 13 9.5 13 C9 13 8 12 8 10.5 C8 7 10 5 10 1 Z"/></svg>',
-  shuffle: '<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"><path d="M2 5 H13 L10.5 2.5 M13 5 L10.5 7.5"/><path d="M2 15 H13 L10.5 12.5 M13 15 L10.5 17.5"/></svg>'
-};
 
 function renderHome() {
   const hero = document.createElement("div");
@@ -412,7 +380,6 @@ function renderHome() {
   const streakStrip = document.createElement("div");
   streakStrip.className = "streak-strip";
   streakStrip.innerHTML = `
-    <span class="streak-flame-icon" aria-hidden="true">${ICONS.flame}</span>
     <div class="streak-num-block">
       <p class="streak-num">${initialDays}</p>
       <p class="streak-num-lbl">${initialDays === 1 ? "Day" : "Days"}</p>
@@ -429,16 +396,13 @@ function renderHome() {
   if (showAnimation) {
     setTimeout(() => {
       playStreakExtinguish(streakStrip, () => {
-        const flame = streakStrip.querySelector(".streak-flame-icon");
         const numEl = streakStrip.querySelector(".streak-num");
         const numLblEl = streakStrip.querySelector(".streak-num-lbl");
         const labelEl = streakStrip.querySelector(".streak-label");
-        if (flame) { flame.innerHTML = ICONS.flame; flame.classList.remove("dying"); flame.classList.add("reborn"); }
         if (numEl) numEl.textContent = `${currentDays}`;
         if (numLblEl) numLblEl.textContent = currentDays === 1 ? "Day" : "Days";
         if (labelEl) labelEl.textContent = "Since last 1-star review";
         streakStrip.classList.remove("shaking");
-        streakStrip.querySelectorAll(".streak-smoke-puff").forEach(el => el.remove());
       });
     }, 500);
   }
@@ -448,10 +412,10 @@ function renderHome() {
   wotdStrip.className = "wotd-strip";
   wotdStrip.innerHTML = `
     <div class="wotd-main">
-      <p class="wotd-label"><span class="wotd-label-icon" aria-hidden="true">${ICONS.wine}</span>Wine of the day</p>
+      <p class="wotd-label">Wine of the day</p>
       <p class="wotd-name">${wotd.name}</p>
     </div>
-    <button class="wotd-shuffle" aria-label="Surprise me with a random wine">${ICONS.shuffle}</button>
+    <button class="wotd-shuffle" aria-label="Surprise me with a random wine">Shuffle</button>
   `;
   wotdStrip.querySelector(".wotd-main").onclick = () => go("study-card", { wineId: wotd.id });
   wotdStrip.querySelector(".wotd-shuffle").onclick = (e) => {
@@ -465,26 +429,22 @@ function renderHome() {
   options.innerHTML = `
     <div class="home-card" data-go="menu">
       <span class="nav-idx">01</span>
-      <span class="home-card-icon">${ICONS.food}</span>
       <p class="home-card-title">Food</p>
       <span class="home-card-sub">Full menu</span>
     </div>
     <div class="home-card" data-go="wine">
       <span class="nav-idx">02</span>
-      <span class="home-card-icon">${ICONS.wine}</span>
       <p class="home-card-title">Wine</p>
       <span class="home-card-sub">Glass, bottle &amp; pairing</span>
     </div>
     <div class="home-card" data-go="bar">
       <span class="nav-idx">03</span>
-      <span class="home-card-icon">${ICONS.bar}</span>
       <p class="home-card-title">Bar</p>
       <span class="home-card-sub">Cocktails &amp; back bar</span>
     </div>
     <div class="home-card home-card-play" data-go="gameroom">
       <span class="nav-idx">04</span>
       <span class="home-card-tag">Play</span>
-      <span class="home-card-icon">${ICONS.game}</span>
       <p class="home-card-title">Game Room</p>
       <span class="home-card-sub">Quiz, match, judgment calls</span>
     </div>
@@ -494,11 +454,6 @@ function renderHome() {
   options.querySelector('[data-go="menu"]').onclick = () => go("menu-list");
   options.querySelector('[data-go="gameroom"]').onclick = () => go("game-room");
   app.appendChild(options);
-
-  const versionStamp = document.createElement("p");
-  versionStamp.className = "build-stamp";
-  versionStamp.textContent = "build " + APP_VERSION;
-  app.appendChild(versionStamp);
 }
 
 function renderSearchableWineList(onSelect, placeholder) {

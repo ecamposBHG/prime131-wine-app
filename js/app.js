@@ -34,7 +34,7 @@ history.replaceState({ view: "home", params: {} }, "", "");
 // subtitle, flip-card faces, etc). Give them button semantics and
 // keyboard support once per render rather than repeating this in every
 // render function.
-const KEYBOARD_TAPPABLE_SELECTOR = ".home-option, .home-card, .list-row, .speed-toggle, .wotd-main, .flipcard, .dish-flipcard, .testme-card";
+const KEYBOARD_TAPPABLE_SELECTOR = ".home-option, .home-card, .list-row, .speed-toggle, .wotd-main, .flipcard, .dish-flipcard, .testme-card, .video-frame";
 
 function makeDivsKeyboardAccessible() {
   app.querySelectorAll(KEYBOARD_TAPPABLE_SELECTOR).forEach((el) => {
@@ -256,6 +256,10 @@ function render() {
   else if (current.view === "wine-type") renderWineTypeChooser();
   else if (current.view === "wine-bottle-list") renderByTheBottleList();
   else if (current.view === "liquor-list") renderLiquorList();
+  else if (current.view === "learning-hub") renderLearningHub();
+  else if (current.view === "learning-intro") renderLearningIntro(current.params.moduleId);
+  else if (current.view === "learning-slide") renderLearningSlide(current.params.moduleId, current.params.index);
+  else if (current.view === "learning-complete") renderLearningComplete(current.params.moduleId);
   makeDivsKeyboardAccessible();
   window.scrollTo(0, 0);
 }
@@ -295,6 +299,46 @@ function setWineProgress(wineId, status) {
 function resetProgress() {
   try { localStorage.removeItem(PROGRESS_KEY); } catch (e) {}
 }
+
+/* Learning modules: dedicated progress store, keyed by module id.
+   Shape: { [moduleId]: { furthest: <index reached>, completed: <bool> } }
+   This is the layer that will eventually get backed by the database
+   instead of localStorage -- the render functions below only ever call
+   these four helpers, so swapping the storage later shouldn't require
+   touching the views. */
+const LEARNING_PROGRESS_KEY = "p131-learning-progress";
+function getLearningProgress() {
+  try { return JSON.parse(localStorage.getItem(LEARNING_PROGRESS_KEY)) || {}; } catch (e) { return {}; }
+}
+function setLearningFurthest(moduleId, sectionIndex) {
+  const p = getLearningProgress();
+  const cur = p[moduleId] || { furthest: -1, completed: false };
+  cur.furthest = Math.max(cur.furthest, sectionIndex);
+  p[moduleId] = cur;
+  try { localStorage.setItem(LEARNING_PROGRESS_KEY, JSON.stringify(p)); } catch (e) {}
+}
+function markLearningComplete(moduleId) {
+  const p = getLearningProgress();
+  const cur = p[moduleId] || { furthest: -1, completed: false };
+  const alreadyDone = cur.completed;
+  cur.completed = true;
+  p[moduleId] = cur;
+  try { localStorage.setItem(LEARNING_PROGRESS_KEY, JSON.stringify(p)); } catch (e) {}
+  return !alreadyDone; // true the first time this module is finished
+}
+function isModuleUnlocked(mod) {
+  if (!mod.unlockAfter) return true;
+  const p = getLearningProgress();
+  return !!(p[mod.unlockAfter] && p[mod.unlockAfter].completed);
+}
+function moduleStatus(mod) {
+  if (!isModuleUnlocked(mod)) return "locked";
+  const p = getLearningProgress()[mod.id];
+  if (p && p.completed) return "completed";
+  if (p && p.furthest > -1) return "in-progress";
+  return "not-started";
+}
+function findLearningModule(id) { return LEARNING_MODULES.find(m => m.id === id); }
 
 const REVIEW_STREAK_SEEN_KEY = "p131-review-streak-seen";
 let reviewStreakPendingAnimation = null; // set once at load if this device hasn't seen the latest reset yet
@@ -454,6 +498,17 @@ function renderHome() {
   options.querySelector('[data-go="menu"]').onclick = () => go("menu-list");
   options.querySelector('[data-go="gameroom"]').onclick = () => go("game-room");
   app.appendChild(options);
+
+  const learningCard = document.createElement("div");
+  learningCard.className = "home-card learning-card";
+  learningCard.innerHTML = `
+    <span class="nav-idx">05</span>
+    <span class="home-card-tag">New</span>
+    <p class="home-card-title">Learning</p>
+    <span class="home-card-sub">Modules &amp; courses</span>
+  `;
+  learningCard.onclick = () => go("learning-hub");
+  app.appendChild(learningCard);
 }
 
 function renderSearchableWineList(onSelect, placeholder) {
@@ -1881,6 +1936,237 @@ function renderGameRoom() {
   options.querySelector('[data-go="imposter"]').onclick = () => go("imposter");
   options.querySelector('[data-go="sommsays"]').onclick = () => go("somm-says");
   app.appendChild(options);
+}
+
+/* ---------- Learning: modules/courses, same engine for every restaurant ---------- */
+
+function learningRowHTML(mod) {
+  const status = moduleStatus(mod);
+  const locked = status === "locked";
+  const dotClass = status === "completed" ? "done" : (locked ? "locked" : "");
+  let metaText;
+  if (status === "completed") metaText = "Completed \u00b7 100%";
+  else if (status === "in-progress") {
+    const p = getLearningProgress()[mod.id];
+    const pct = Math.round(((p.furthest + 1) / mod.sections.length) * 100);
+    metaText = `${p.furthest + 1} of ${mod.sections.length} sections \u00b7 ${pct}%`;
+  } else if (locked) {
+    const req = findLearningModule(mod.unlockAfter);
+    metaText = `Unlocks after ${req ? req.title : "a previous module"}`;
+  } else {
+    metaText = `${mod.sections.length} sections`;
+  }
+  const pct = status === "completed" ? 100
+    : status === "in-progress" ? Math.round(((getLearningProgress()[mod.id].furthest + 1) / mod.sections.length) * 100)
+    : 0;
+  const rightHTML = status === "completed"
+    ? `<span class="chev">&#10003;</span>`
+    : locked
+      ? `<span class="lock-ic">&#128274;</span>`
+      : `<div class="mini-track"><div class="mini-fill" style="width:${pct}%"></div></div>`;
+  return `
+    <div class="list-row ${locked ? "locked" : ""}" data-module="${mod.id}" ${locked ? 'tabindex="-1" aria-disabled="true"' : ""}>
+      <div class="list-row-main">
+        <span class="mod-dot ${dotClass}"></span>
+        <div class="list-row-text">
+          <p>${mod.title}</p>
+          <span>${metaText}</span>
+        </div>
+      </div>
+      ${rightHTML}
+    </div>
+  `;
+}
+
+function renderLearningHub() {
+  header("Learning");
+
+  const groups = { "in-progress": [], "not-started": [], "locked": [], "completed": [] };
+  LEARNING_MODULES.forEach(m => groups[moduleStatus(m)].push(m));
+
+  const wrap = document.createElement("div");
+  let html = "";
+  if (groups["in-progress"].length) {
+    html += `<p class="section-label">In Progress</p>` + groups["in-progress"].map(learningRowHTML).join("");
+  }
+  if (groups["not-started"].length || groups["locked"].length) {
+    html += `<p class="section-label">Not Started</p>` + groups["not-started"].concat(groups["locked"]).map(learningRowHTML).join("");
+  }
+  if (groups["completed"].length) {
+    html += `<p class="section-label">Completed</p>` + groups["completed"].map(learningRowHTML).join("");
+  }
+  wrap.innerHTML = html;
+  wrap.querySelectorAll(".list-row").forEach(row => {
+    if (row.classList.contains("locked")) return;
+    row.onclick = () => go("learning-intro", { moduleId: row.dataset.module });
+  });
+  app.appendChild(wrap);
+}
+
+function renderLearningIntro(moduleId) {
+  header("Learning");
+  const mod = findLearningModule(moduleId);
+  if (!mod) { go("learning-hub"); return; }
+
+  const status = moduleStatus(mod);
+  const p = getLearningProgress()[mod.id];
+  const pct = status === "completed" ? 100 : status === "in-progress" ? Math.round(((p.furthest + 1) / mod.sections.length) * 100) : 0;
+  const minutes = Math.max(1, Math.round(mod.sections.length * 1.5));
+  const startLabel = status === "completed" ? "Review Module" : status === "in-progress" ? "Resume Module" : "Start Module";
+  const startIndex = status === "completed" ? 0 : (p ? Math.min(p.furthest + 1, mod.sections.length - 1) : 0);
+
+  const wrap = document.createElement("div");
+  wrap.className = "intro-wrap";
+  wrap.innerHTML = `
+    <p class="intro-eyebrow">${mod.category} \u00b7 Module</p>
+    <h1 class="intro-title">${mod.title}</h1>
+    <div class="intro-meta-row">
+      <div class="intro-meta"><b>${mod.sections.length}</b><span>Sections</span></div>
+      <div class="intro-meta"><b>~${minutes}</b><span>Minutes</span></div>
+      <div class="intro-meta"><b>${pct}%</b><span>Complete</span></div>
+    </div>
+    <button class="btn-start">${startLabel}</button>
+  `;
+  wrap.querySelector(".btn-start").onclick = () => go("learning-slide", { moduleId, index: startIndex });
+  app.appendChild(wrap);
+}
+
+function renderLearningSlide(moduleId, index) {
+  header("Learning");
+  const mod = findLearningModule(moduleId);
+  if (!mod) { go("learning-hub"); return; }
+  index = Math.max(0, Math.min(index, mod.sections.length - 1));
+  const section = mod.sections[index];
+
+  const dots = document.createElement("div");
+  dots.className = "dots-row";
+  dots.innerHTML = mod.sections.map((_, i) => `<div class="dot-seg ${i <= index ? "filled" : ""}"></div>`).join("");
+  app.appendChild(dots);
+
+  const body = document.createElement("div");
+  body.className = "slide-body";
+  const kicker = `Section ${index + 1} of ${mod.sections.length}`;
+
+  if (section.type === "text") {
+    body.innerHTML = `
+      <p class="slide-kicker">${kicker}</p>
+      <h2 class="slide-title">${section.title}</h2>
+      <p class="slide-text">${section.body}</p>
+      ${section.note ? `<div class="fact-block"><b>Why it matters</b><p>${section.note}</p></div>` : ""}
+    `;
+  } else if (section.type === "image") {
+    body.innerHTML = `
+      <p class="slide-kicker">${kicker}</p>
+      <h2 class="slide-title">${section.title}</h2>
+      <div class="illo-frame">
+        ${section.imageUrl
+          ? `<img src="${section.imageUrl}" alt="${section.title}" style="width:100%; display:block;">`
+          : `<p class="empty-note">Image not yet added.</p>`}
+      </div>
+      ${section.caption ? `<p class="slide-text">${section.caption}</p>` : ""}
+    `;
+  } else if (section.type === "video") {
+    body.innerHTML = `
+      <p class="slide-kicker">${kicker}</p>
+      <h2 class="slide-title">${section.title}</h2>
+      <div class="video-frame" data-role="video-slot">
+        ${section.videoUrl
+          ? `<div class="play-btn"></div><span class="video-caption">${section.title}</span>`
+          : `<p class="empty-note">Video not yet added.</p>`}
+      </div>
+      ${section.duration ? `<p class="video-time">${section.duration}</p>` : ""}
+    `;
+    const slot = body.querySelector('[data-role="video-slot"]');
+    if (section.videoUrl) {
+      slot.onclick = () => {
+        slot.innerHTML = `<iframe src="${section.videoUrl}" style="width:100%; height:100%; border:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+        slot.onclick = null;
+      };
+    }
+  } else if (section.type === "quiz") {
+    body.innerHTML = `
+      <p class="slide-kicker">${kicker} \u00b7 Knowledge check</p>
+      <h2 class="slide-title">${section.question}</h2>
+      <div data-role="quiz-opts"></div>
+      <p class="quiz-feedback" data-role="quiz-feedback" style="display:none"></p>
+    `;
+    const optsWrap = body.querySelector('[data-role="quiz-opts"]');
+    section.options.forEach((opt, i) => {
+      const btn = document.createElement("button");
+      btn.className = "quiz-opt";
+      btn.textContent = opt;
+      btn.onclick = () => {
+        const feedback = body.querySelector('[data-role="quiz-feedback"]');
+        optsWrap.querySelectorAll(".quiz-opt").forEach((b, bi) => {
+          b.onclick = null;
+          if (bi === section.correctIndex) b.classList.add("correct");
+          else if (bi === i) b.classList.add("picked-wrong");
+        });
+        feedback.textContent = i === section.correctIndex ? "Correct" : "Not quite \u2014 correct answer highlighted above";
+        feedback.style.display = "block";
+      };
+      optsWrap.appendChild(btn);
+    });
+  }
+  app.appendChild(body);
+
+  setLearningFurthest(moduleId, index);
+
+  const isLast = index === mod.sections.length - 1;
+  const nav = document.createElement("div");
+  nav.className = "card-footer-nav";
+  const prevBtn = document.createElement("button");
+  prevBtn.className = "footer-btn";
+  prevBtn.textContent = "\u2039 Previous";
+  if (index === 0) { prevBtn.disabled = true; }
+  else prevBtn.onclick = () => go("learning-slide", { moduleId, index: index - 1 });
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "footer-btn footer-btn-home";
+  nextBtn.textContent = isLast ? "Finish \u203a" : "Next \u203a";
+  nextBtn.onclick = () => {
+    if (isLast) go("learning-complete", { moduleId });
+    else go("learning-slide", { moduleId, index: index + 1 });
+  };
+  nav.appendChild(prevBtn);
+  nav.appendChild(nextBtn);
+  app.appendChild(nav);
+}
+
+function renderLearningComplete(moduleId) {
+  header("Learning");
+  const mod = findLearningModule(moduleId);
+  if (!mod) { go("learning-hub"); return; }
+
+  const firstTime = markLearningComplete(moduleId);
+  if (firstTime) celebrate();
+
+  const unlocked = LEARNING_MODULES.find(m => m.unlockAfter === moduleId && isModuleUnlocked(m));
+
+  const wrap = document.createElement("div");
+  wrap.className = "complete-wrap";
+  wrap.innerHTML = `
+    <div class="complete-badge">&#10003;</div>
+    <h2 class="complete-title">Module Complete</h2>
+    <p class="complete-sub">You finished ${mod.title}.</p>
+    ${unlocked ? `<div class="milestone-strip"><p class="milestone-line">${unlocked.title} unlocked</p></div>` : ""}
+  `;
+  app.appendChild(wrap);
+
+  const nav = document.createElement("div");
+  nav.className = "card-footer-nav";
+  const hubBtn = document.createElement("button");
+  hubBtn.className = "footer-btn";
+  hubBtn.textContent = "Learning Hub";
+  hubBtn.onclick = () => go("learning-hub");
+  nav.appendChild(hubBtn);
+  if (unlocked) {
+    const nextBtn = document.createElement("button");
+    nextBtn.className = "footer-btn footer-btn-home";
+    nextBtn.textContent = "Next Module \u203a";
+    nextBtn.onclick = () => go("learning-intro", { moduleId: unlocked.id });
+    nav.appendChild(nextBtn);
+  }
+  app.appendChild(nav);
 }
 
 /* ---------- This or That: judgment calls from real pairings ---------- */

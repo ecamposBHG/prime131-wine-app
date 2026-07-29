@@ -789,3 +789,66 @@ const CLASSIC_COCKTAILS = [
 // Each item will follow: { id: "l1", name: "...", category: "Whiskey" | "Gin" | "Rum" | "Tequila" | "Vodka" | "Brandy/Cognac", ... }
 const LIQUOR = [];
 
+// ============================================================
+// LEARNING MODULES -- standard schema, same shape for every
+// restaurant clone. app.js's Learning views read only this shape:
+// { id, title, category, unlockAfter (module id or null), sections: [
+//     { type: "text",  title, body, note? }
+//     { type: "image", title, imageUrl?, caption }
+//     { type: "video", title, videoUrl?, duration }
+//     { type: "quiz",  question, options: [...], correctIndex }
+//   ]
+// }
+// PLACEHOLDER CONTENT: the modules below are sample/demo content only,
+// used to verify the Learning engine end-to-end. Replace with real,
+// owner-provided material before treating this as live training copy.
+// ============================================================
+const LEARNING_MODULES = [
+  {
+    id: "wine-service-101",
+    title: "Tableside Wine Service",
+    category: "Wine",
+    unlockAfter: null,
+    sections: [
+      {
+        type: "text",
+        title: "Presenting the Bottle",
+        body: "Before anything is opened, the bottle is presented label-up to the host who ordered it — never poured first, never opened out of view. State the producer, the vintage, and confirm it's the bottle they selected.",
+        note: "A bottle opened before confirmation can't be sent back in good faith — the presentation step protects the guest and the house."
+      },
+      {
+        type: "image",
+        title: "Reading the Label Angle",
+        imageUrl: "",
+        caption: "Hold the bottle so the label faces the host throughout presentation and pouring — not yourself."
+      },
+      {
+        type: "video",
+        title: "Watch: The Pour",
+        videoUrl: "",
+        duration: "1:48"
+      },
+      {
+        type: "quiz",
+        question: "Who confirms the bottle first?",
+        options: ["The guest who ordered it", "Whoever is closest to the table", "The sommelier only"],
+        correctIndex: 0
+      }
+    ]
+  },
+  {
+    id: "steak-doneness-guide",
+    title: "Steak Doneness Guide",
+    category: "Food",
+    unlockAfter: "wine-service-101",
+    sections: [
+      {
+        type: "text",
+        title: "Placeholder Module",
+        body: "This module exists to demonstrate the unlock system (it stays locked until Tableside Wine Service is completed). Replace this section with real steak-doneness content before launch.",
+        note: "Placeholder — not real training content yet."
+      }
+    ]
+  }
+];
+

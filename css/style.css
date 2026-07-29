@@ -654,12 +654,72 @@ button, input {
 .imposter-tile.tot-wrong-tile { border-color: var(--error-500); border-width: 3px; }
 
 /* ============================================================
+   Learning modules — same schema/engine for every restaurant clone.
+   ============================================================ */
+.learning-card {
+  width: 100%; margin-top: 2px; border: 2px solid var(--washi-300); border-left: 4px solid var(--bronze-500);
+  padding: 14px; min-height: 64px; display: flex; flex-direction: column; justify-content: center;
+  gap: 4px; cursor: pointer; position: relative; background: var(--washi-200);
+}
+
+.list-row-text p { margin: 0; font-size: 14px; font-weight: 600; color: var(--shoyu-700); }
+.list-row.locked .list-row-text p { color: var(--shoyu-300); }
+.list-row-text span { display: block; font-family: var(--font-mono); font-size: 10px; color: var(--shoyu-300); text-transform: uppercase; letter-spacing: 0.3px; margin-top: 3px; }
+.mod-dot { width: 8px; height: 8px; flex-shrink: 0; background: var(--bronze-500); }
+.mod-dot.done { background: var(--wasabi-500); }
+.mod-dot.locked { background: var(--shoyu-200); }
+.lock-ic, .chev { color: var(--shoyu-200); font-size: 13px; flex-shrink: 0; }
+.chev { color: var(--bronze-200); }
+.list-row.locked { cursor: default; }
+
+/* Module cover screen */
+.intro-wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 16px; }
+.intro-eyebrow { font-family: var(--font-mono); font-size: 10px; color: var(--bronze-200); text-transform: uppercase; letter-spacing: 0.6px; }
+.intro-title { font-family: var(--font-display); font-size: 26px; font-weight: 700; color: var(--shoyu-700); margin: 0; line-height: 1.15; }
+.intro-meta-row { display: flex; gap: 0; border: 2px solid var(--washi-300); }
+.intro-meta { flex: 1; padding: 10px 12px; border-right: 1px solid var(--washi-300-soft); }
+.intro-meta:last-child { border-right: none; }
+.intro-meta b { display: block; font-family: var(--font-display); font-size: 17px; color: var(--shoyu-700); }
+.intro-meta span { font-family: var(--font-mono); font-size: 9.5px; color: var(--shoyu-300); text-transform: uppercase; letter-spacing: 0.4px; }
+.btn-start { background: var(--bronze-500); border: none; color: var(--ink-on-rust); font-family: var(--font-mono); font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; padding: 15px; cursor: pointer; margin-top: 4px; }
+
+/* Slide viewer */
+.dots-row { display: flex; gap: 5px; margin-bottom: 16px; }
+.dot-seg { flex: 1; height: 3px; background: var(--washi-300); }
+.dot-seg.filled { background: var(--bronze-500); }
+.slide-body { flex: 1; display: flex; flex-direction: column; }
+.slide-kicker { font-family: var(--font-mono); font-size: 10px; color: var(--bronze-200); text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px; }
+.slide-title { font-family: var(--font-display); font-size: 21px; font-weight: 700; color: var(--shoyu-700); margin: 0 0 12px; line-height: 1.2; }
+.slide-text { font-size: 14.5px; color: var(--shoyu-500); line-height: 1.65; margin: 0 0 10px; }
+.illo-frame { border: 2px solid var(--washi-300); background: var(--sumi-700); padding: 14px; margin-bottom: 14px; min-height: 100px; display: flex; align-items: center; justify-content: center; }
+
+/* Video slide */
+.video-frame { border: 2px solid var(--washi-300); background: var(--sumi-900); aspect-ratio: 16/9; position: relative; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; cursor: pointer; overflow: hidden; }
+.play-btn { width: 52px; height: 52px; background: var(--bronze-500); display: flex; align-items: center; justify-content: center; }
+.play-btn::after { content: ""; width: 0; height: 0; border-top: 9px solid transparent; border-bottom: 9px solid transparent; border-left: 15px solid var(--ink-on-rust); margin-left: 4px; }
+.video-caption { position: absolute; bottom: 10px; left: 12px; font-family: var(--font-mono); font-size: 10px; color: var(--shoyu-300); }
+.video-time { font-family: var(--font-mono); font-size: 11px; color: var(--shoyu-300); text-align: right; margin: 0 0 14px; }
+
+/* Quiz slide — same interaction language as the other quiz games */
+.quiz-opt { display: block; width: 100%; text-align: left; background: var(--washi-200); border: 2px solid var(--washi-300); color: var(--shoyu-700); font-size: 14px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer; font-family: var(--font-body); }
+.quiz-opt.correct { border-color: var(--wasabi-500); }
+.quiz-opt.picked-wrong { border-color: var(--error-500); }
+.quiz-feedback { font-family: var(--font-mono); font-size: 11px; color: var(--wasabi-500); text-transform: uppercase; letter-spacing: 0.4px; margin-top: 6px; }
+
+/* Completion screen — reuses .milestone-strip for the celebration line */
+.complete-wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 14px; }
+.complete-badge { width: 64px; height: 64px; border: 2px solid var(--bronze-500); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 26px; color: var(--bronze-200); }
+.complete-title { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--shoyu-700); margin: 0; }
+.complete-sub { font-size: 13.5px; color: var(--shoyu-500); margin: 0; max-width: 260px; }
+
+/* ============================================================
    Press feedback — mechanical, not glossy: steep ease-out, short.
    ============================================================ */
 .home-option, .home-card, .list-row, .pill, .nav-chip, .footer-btn, .speed-toggle,
 .wotd-strip, .wotd-main, .wotd-shuffle, .theme-toggle, .back-btn, .section-toggle,
 .match-tile, .allergen-filter-chip, .testme-reset, .predict-btn, .somm-btn,
-.flipcard, .dish-flipcard, .testme-card, .imposter-tile {
+.flipcard, .dish-flipcard, .testme-card, .imposter-tile,
+.learning-card, .quiz-opt, .btn-start, .video-frame {
   transition: transform var(--press-duration) ease-out, background var(--press-duration) ease-out, border-color var(--press-duration) ease-out;
 }
 .home-option:active, .home-card:active, .list-row:active, .pill:active, .nav-chip:active,
@@ -668,7 +728,8 @@ button, input {
 .match-tile:not(.matched):not(.picked):active, .allergen-filter-chip:active,
 .testme-reset:active, .predict-btn:active, .somm-btn:active,
 .flipcard:active, .dish-flipcard:active, .testme-card:active,
-.imposter-tile:not(.revealed):active {
+.imposter-tile:not(.revealed):active,
+.learning-card:active, .quiz-opt:active, .btn-start:active, .video-frame:active {
   transform: scale(0.97);
 }
 
@@ -681,7 +742,8 @@ button, input {
 .back-btn:focus-visible, .section-toggle:focus-visible, .match-tile:focus-visible,
 .allergen-filter-chip:focus-visible, .predict-btn:focus-visible, .somm-btn:focus-visible,
 .flipcard:focus-visible, .dish-flipcard:focus-visible, .testme-card:focus-visible,
-.imposter-tile:focus-visible, .search-input:focus-visible {
+.imposter-tile:focus-visible, .search-input:focus-visible,
+.learning-card:focus-visible, .quiz-opt:focus-visible, .btn-start:focus-visible, .video-frame:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
 }
@@ -694,7 +756,8 @@ button, input {
   .home-option, .home-card, .list-row, .pill, .nav-chip, .footer-btn, .speed-toggle,
   .wotd-strip, .wotd-shuffle, .theme-toggle, .back-btn, .section-toggle,
   .allergen-filter-chip, .testme-reset, .predict-btn, .somm-btn,
-  .flipcard, .dish-flipcard, .testme-card, .imposter-tile {
+  .flipcard, .dish-flipcard, .testme-card, .imposter-tile,
+  .learning-card, .quiz-opt, .btn-start, .video-frame {
     animation: none !important;
     transition: background var(--press-duration) ease-out, border-color var(--press-duration) ease-out !important;
     transform: none !important;

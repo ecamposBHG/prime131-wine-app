@@ -407,6 +407,18 @@ button, input {
   margin-bottom: 10px; padding-left: 16px; position: relative;
 }
 .ingredient-list li::before { content: "\2013"; position: absolute; left: 0; color: var(--bronze-200); }
+.ingredient-list li.ingredient-group { padding-left: 0; margin-bottom: 14px; }
+.ingredient-list li.ingredient-group::before { content: none; }
+.ingredient-group-label {
+  display: block; font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.6px; color: var(--bronze-200); margin-bottom: 6px;
+}
+.ingredient-sublist { margin: 0; padding: 0; list-style: none; }
+.ingredient-sublist li {
+  font-size: 14px; color: var(--shoyu-500); line-height: 1.5;
+  margin-bottom: 6px; padding-left: 16px; position: relative;
+}
+.ingredient-sublist li::before { content: "\2013"; position: absolute; left: 0; color: var(--bronze-200); }
 .chefprep-text { font-size: 14px; color: var(--shoyu-500); line-height: 1.65; margin: 0 0 10px; }
 
 /* Cocktail follow-up questions */

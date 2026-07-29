@@ -1134,10 +1134,50 @@ function renderWineDetailWithPairing(wineId) {
   app.appendChild(container);
 }
 
+function splitTopLevel(str, delim) {
+  const result = [];
+  let depth = 0, current = "";
+  for (const ch of str) {
+    if (ch === "(") depth++;
+    if (ch === ")") depth--;
+    if (ch === delim && depth === 0) {
+      result.push(current);
+      current = "";
+    } else {
+      current += ch;
+    }
+  }
+  if (current.trim().length) result.push(current);
+  return result;
+}
+
 function splitIngredients(text) {
   if (!text) return [];
-  const parts = text.split(" | ").flatMap(p => p.split(/\.\s+(?=[A-Z])/));
-  return parts.map(p => p.trim().replace(/\.$/, "")).filter(p => p.length > 0);
+  const components = text.split(" | ").flatMap(p => p.split(/\.\s+(?=[A-Z])/));
+  const groups = [];
+  components.forEach(raw => {
+    const comp = raw.trim().replace(/\.$/, "");
+    if (!comp) return;
+    const dashMatch = comp.match(/^(.{2,60}?)\s*-\s*(.+)$/);
+    let label = null, rest = comp;
+    if (dashMatch && dashMatch[2].trim().length) {
+      label = dashMatch[1].trim();
+      rest = dashMatch[2];
+    }
+    const items = splitTopLevel(rest, ",").map(s => s.trim()).filter(Boolean);
+    if (items.length) groups.push({ label, items });
+  });
+  return groups;
+}
+
+function renderIngredientGroups(groups) {
+  return groups.map(g => {
+    const itemsHtml = g.items.map(i => `<li>${i}</li>`).join("");
+    if (g.label) {
+      return `<li class="ingredient-group"><span class="ingredient-group-label">${g.label}</span><ul class="ingredient-sublist">${itemsHtml}</ul></li>`;
+    }
+    return itemsHtml;
+  }).join("");
 }
 
 function renderDishFlipCard(dish) {
@@ -1152,7 +1192,7 @@ function renderDishFlipCard(dish) {
       return `
         <p class="dish-flip-tag">1/2 &middot; tap to flip</p>
         <p class="dish-flip-title">&#129367; Ingredients</p>
-        <ul class="ingredient-list">${ingredientItems.map(i => `<li>${i}</li>`).join("")}</ul>
+        <ul class="ingredient-list">${renderIngredientGroups(ingredientItems)}</ul>
       `;
     }
     return `

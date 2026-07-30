@@ -792,13 +792,24 @@ const LIQUOR = [];
 // ============================================================
 // LEARNING MODULES -- standard schema, same shape for every
 // restaurant clone. app.js's Learning views read only this shape:
-// { id, title, category, unlockAfter (module id or null), sections: [
-//     { type: "text",  title, body, note? }
-//     { type: "image", title, imageUrl?, caption }
-//     { type: "video", title, videoUrl?, duration }
-//     { type: "quiz",  question, options: [...], correctIndex }
+// { id, title, category, unlockAfter (module id or null),
+//   chapters: [
+//     { title, sections: [
+//         { type: "text",  title, body, note? }
+//         { type: "image", title, imageUrl?, caption }
+//         { type: "video", title, videoUrl?, duration }
+//       ]
+//     },
+//     ... one or more chapters/blocks of content ...
+//   ],
+//   test: [
+//     { question, options: [...], correctIndex },
+//     ... trailing knowledge-check questions, may be an empty array ...
 //   ]
 // }
+// Every module always finishes a chapter, then (if test.length) goes
+// through the same "Ready for the Test?" screen before completion —
+// a one-chapter module and a multi-chapter module both end the same way.
 // PLACEHOLDER CONTENT: the modules below are sample/demo content only,
 // used to verify the Learning engine end-to-end. Replace with real,
 // owner-provided material before treating this as live training copy.
@@ -809,27 +820,33 @@ const LEARNING_MODULES = [
     title: "Tableside Wine Service",
     category: "Wine",
     unlockAfter: null,
-    sections: [
+    chapters: [
       {
-        type: "text",
-        title: "Presenting the Bottle",
-        body: "Before anything is opened, the bottle is presented label-up to the host who ordered it — never poured first, never opened out of view. State the producer, the vintage, and confirm it's the bottle they selected.",
-        note: "A bottle opened before confirmation can't be sent back in good faith — the presentation step protects the guest and the house."
-      },
+        title: "Tableside Wine Service",
+        sections: [
+          {
+            type: "text",
+            title: "Presenting the Bottle",
+            body: "Before anything is opened, the bottle is presented label-up to the host who ordered it — never poured first, never opened out of view. State the producer, the vintage, and confirm it's the bottle they selected.",
+            note: "A bottle opened before confirmation can't be sent back in good faith — the presentation step protects the guest and the house."
+          },
+          {
+            type: "image",
+            title: "Reading the Label Angle",
+            imageUrl: "",
+            caption: "Hold the bottle so the label faces the host throughout presentation and pouring — not yourself."
+          },
+          {
+            type: "video",
+            title: "Watch: The Pour",
+            videoUrl: "",
+            duration: "1:48"
+          }
+        ]
+      }
+    ],
+    test: [
       {
-        type: "image",
-        title: "Reading the Label Angle",
-        imageUrl: "",
-        caption: "Hold the bottle so the label faces the host throughout presentation and pouring — not yourself."
-      },
-      {
-        type: "video",
-        title: "Watch: The Pour",
-        videoUrl: "",
-        duration: "1:48"
-      },
-      {
-        type: "quiz",
         question: "Who confirms the bottle first?",
         options: ["The guest who ordered it", "Whoever is closest to the table", "The sommelier only"],
         correctIndex: 0
@@ -841,89 +858,99 @@ const LEARNING_MODULES = [
     title: "Steak Doneness Guide",
     category: "Food",
     unlockAfter: "wine-service-101",
-    sections: [
+    chapters: [
       {
-        type: "text",
         title: "Placeholder Module",
-        body: "This module exists to demonstrate the unlock system (it stays locked until Tableside Wine Service is completed). Replace this section with real steak-doneness content before launch.",
-        note: "Placeholder — not real training content yet."
+        sections: [
+          {
+            type: "text",
+            title: "Placeholder Module",
+            body: "This module exists to demonstrate the unlock system (it stays locked until Tableside Wine Service is completed). Replace this section with real steak-doneness content before launch.",
+            note: "Placeholder — not real training content yet."
+          }
+        ]
       }
-    ]
+    ],
+    test: []
   },
   {
     id: "olive-wagyu-service",
     title: "Olive Wagyu: Selling the Rarest Steak",
     category: "Food",
     unlockAfter: null,
-    sections: [
+    chapters: [
       {
-        type: "text",
-        title: "The Rarest Steak You'll Sell",
-        body: "Olive Wagyu isn't just another premium cut — it's a genuine rarity, and it deserves to be sold like one. This module covers where it comes from, why it eats differently than any other Wagyu, and exactly what to say and do when it hits your table.",
-        note: "Fewer than 2,200 of these cattle exist globally, and only a small fraction are harvested each month."
-      },
+        title: "Selling the Rarest Steak",
+        sections: [
+          {
+            type: "text",
+            title: "The Rarest Steak You'll Sell",
+            body: "Olive Wagyu isn't just another premium cut — it's a genuine rarity, and it deserves to be sold like one. This module covers where it comes from, why it eats differently than any other Wagyu, and exactly what to say and do when it hits your table.",
+            note: "Fewer than 2,200 of these cattle exist globally, and only a small fraction are harvested each month."
+          },
+          {
+            type: "text",
+            title: "The Story: Once-in-a-Lifetime",
+            body: "Olive Wagyu comes from Shodoshima Island, the heart of Japan's Seto Inland Sea, which produces 99% of Japan's domestic olive oil. In 2006, farmer Masaki Ishii began toasting the discarded olive pulp left over from oil production to remove its bitterness and caramelize its natural sugars — then fed it to the cattle. The result is a Wagyu unlike any other on the market.",
+            note: "That feed innovation, not just the breed, is what makes Olive Wagyu genuinely different from standard A5."
+          },
+          {
+            type: "image",
+            title: "The Science of the Melt",
+            imageUrl: "images/learning/wagyu-melt.jpg",
+            caption: "Olive Wagyu runs 62–68% oleic acid (a heart-healthy monounsaturated fat), compared to roughly 50% in standard A5. That's why it melts at about 72°F (22°C) versus 77°F (25°C) — the fat literally begins to soften at room temperature."
+          },
+          {
+            type: "text",
+            title: "Why This Changes Service",
+            body: "The low melting point isn't just a talking point — it changes how the kitchen and the table both need to move. Because the fat renders so fast, the chef cooks it fast and precise, and it needs to reach the guest immediately to preserve that velvet texture.",
+            note: "Stating this proactively — \"due to the extremely low melting point, the chef cooks this fast and precise\" — elegantly deflects medium-well requests before they happen."
+          },
+          {
+            type: "image",
+            title: "Words to Use at the Table",
+            imageUrl: "images/learning/wagyu-plate.jpg",
+            caption: "Velvety — a liquid-silk sensation where the fat dissolves instantly on contact. Weightless — an impossibly clean finish, without the heavy, lingering richness that causes palate fatigue. Buttery — a nutty, sweet umami profile driven by the olive diet."
+          },
+          {
+            type: "image",
+            title: "Know the Tier: Olive vs. the Menu",
+            imageUrl: "images/learning/wagyu-marbling.jpg",
+            caption: "American/Aussie Wagyu is the excellent baseline — beefy and approachable. Standard A5 Wagyu is the luxury standard — deep umami, intensely rich, pure white fat. Olive Wagyu is the pinnacle — sweeter, cleaner, impossibly light, with ivory-tinted fat, at extreme rarity."
+          },
+          {
+            type: "text",
+            title: "The Pitch & Objection Handling",
+            body: "\"Is it really worth the price?\" and \"That's too expensive/rich for me\" are the two objections you'll hear most. Contrast, don't defend: frame the existing Wagyu on your menu as an excellent choice, and position Olive Wagyu as the rare step above it — not a knock on what they'd otherwise order. Sell the share: a 4oz cut works well as a split starter for the table, for up to four guests, which dramatically lowers the per-person buy-in.",
+            note: "Frame it as an event, not a menu item."
+          },
+          {
+            type: "image",
+            title: "At the Table",
+            imageUrl: "images/learning/wagyu-table.jpg",
+            caption: "The Raw Reveal: if presenting tableside, highlight the BMS 8-12 marbling and the subtle golden/ivory tint of the fat — build anticipation before it hits the pan. Set the Rules: proactively explain the fast, precise cook. The Delivery: serve immediately, since the fat renders rapidly and timing is everything for the texture."
+          },
+          {
+            type: "text",
+            title: "What to Pour",
+            body: "A high-acid red — a Barolo or a high-elevation Cabernet — cuts through the rich fat and cleanses the palate between bites. A premium, clean sake, like a Junmai Daiginjo, mirrors and elevates the meat's pure umami profile instead of cutting against it.",
+            note: "Pick one of each to memorize before your shift, so you can recommend with total confidence."
+          }
+        ]
+      }
+    ],
+    test: [
       {
-        type: "text",
-        title: "The Story: Once-in-a-Lifetime",
-        body: "Olive Wagyu comes from Shodoshima Island, the heart of Japan's Seto Inland Sea, which produces 99% of Japan's domestic olive oil. In 2006, farmer Masaki Ishii began toasting the discarded olive pulp left over from oil production to remove its bitterness and caramelize its natural sugars — then fed it to the cattle. The result is a Wagyu unlike any other on the market.",
-        note: "That feed innovation, not just the breed, is what makes Olive Wagyu genuinely different from standard A5."
-      },
-      {
-        type: "image",
-        title: "The Science of the Melt",
-        imageUrl: "images/learning/wagyu-melt.jpg",
-        caption: "Olive Wagyu runs 62–68% oleic acid (a heart-healthy monounsaturated fat), compared to roughly 50% in standard A5. That's why it melts at about 72°F (22°C) versus 77°F (25°C) — the fat literally begins to soften at room temperature."
-      },
-      {
-        type: "text",
-        title: "Why This Changes Service",
-        body: "The low melting point isn't just a talking point — it changes how the kitchen and the table both need to move. Because the fat renders so fast, the chef cooks it fast and precise, and it needs to reach the guest immediately to preserve that velvet texture.",
-        note: "Stating this proactively — \"due to the extremely low melting point, the chef cooks this fast and precise\" — elegantly deflects medium-well requests before they happen."
-      },
-      {
-        type: "image",
-        title: "Words to Use at the Table",
-        imageUrl: "images/learning/wagyu-plate.jpg",
-        caption: "Velvety — a liquid-silk sensation where the fat dissolves instantly on contact. Weightless — an impossibly clean finish, without the heavy, lingering richness that causes palate fatigue. Buttery — a nutty, sweet umami profile driven by the olive diet."
-      },
-      {
-        type: "image",
-        title: "Know the Tier: Olive vs. the Menu",
-        imageUrl: "images/learning/wagyu-marbling.jpg",
-        caption: "American/Aussie Wagyu is the excellent baseline — beefy and approachable. Standard A5 Wagyu is the luxury standard — deep umami, intensely rich, pure white fat. Olive Wagyu is the pinnacle — sweeter, cleaner, impossibly light, with ivory-tinted fat, at extreme rarity."
-      },
-      {
-        type: "text",
-        title: "The Pitch & Objection Handling",
-        body: "\"Is it really worth the price?\" and \"That's too expensive/rich for me\" are the two objections you'll hear most. Contrast, don't defend: frame the existing Wagyu on your menu as an excellent choice, and position Olive Wagyu as the rare step above it — not a knock on what they'd otherwise order. Sell the share: a 4oz cut works well as a split starter for the table, for up to four guests, which dramatically lowers the per-person buy-in.",
-        note: "Frame it as an event, not a menu item."
-      },
-      {
-        type: "image",
-        title: "At the Table",
-        imageUrl: "images/learning/wagyu-table.jpg",
-        caption: "The Raw Reveal: if presenting tableside, highlight the BMS 8-12 marbling and the subtle golden/ivory tint of the fat — build anticipation before it hits the pan. Set the Rules: proactively explain the fast, precise cook. The Delivery: serve immediately, since the fat renders rapidly and timing is everything for the texture."
-      },
-      {
-        type: "text",
-        title: "What to Pour",
-        body: "A high-acid red — a Barolo or a high-elevation Cabernet — cuts through the rich fat and cleanses the palate between bites. A premium, clean sake, like a Junmai Daiginjo, mirrors and elevates the meat's pure umami profile instead of cutting against it.",
-        note: "Pick one of each to memorize before your shift, so you can recommend with total confidence."
-      },
-      {
-        type: "quiz",
         question: "What actually causes Olive Wagyu's lower melting point?",
         options: ["A higher percentage of oleic acid from the olive-pulp diet", "The cattle are younger than standard A5 cattle", "It's aged longer than standard Wagyu"],
         correctIndex: 0
       },
       {
-        type: "quiz",
         question: "A guest says the steak is too expensive for them. What's the recommended move?",
         options: ["Offer a discount to close the sale", "Sell the share — a 4oz cut as a split starter for the table", "Steer them away from Wagyu entirely"],
         correctIndex: 1
       },
       {
-        type: "quiz",
         question: "What should you proactively tell the table before it's cooked?",
         options: ["There's no wrong way to prepare it", "Well-done brings out the best flavor", "Due to the extremely low melting point, the chef cooks it fast and precise"],
         correctIndex: 2

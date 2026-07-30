@@ -684,6 +684,7 @@ button, input {
 .btn-start { background: var(--bronze-500); border: none; color: var(--ink-on-rust); font-family: var(--font-mono); font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; padding: 15px; cursor: pointer; margin-top: 4px; }
 
 /* Slide viewer */
+.chapter-kicker { font-family: var(--font-mono); font-size: 10px; color: var(--bronze-200); text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 8px; }
 .dots-row { display: flex; gap: 5px; margin-bottom: 16px; }
 .dot-seg { flex: 1; height: 3px; background: var(--washi-300); }
 .dot-seg.filled { background: var(--bronze-500); }

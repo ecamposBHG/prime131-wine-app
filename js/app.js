@@ -258,7 +258,9 @@ function render() {
   else if (current.view === "liquor-list") renderLiquorList();
   else if (current.view === "learning-hub") renderLearningHub();
   else if (current.view === "learning-intro") renderLearningIntro(current.params.moduleId);
-  else if (current.view === "learning-slide") renderLearningSlide(current.params.moduleId, current.params.index);
+  else if (current.view === "learning-chapter") renderLearningChapter(current.params.moduleId, current.params.chapterIndex, current.params.sectionIndex);
+  else if (current.view === "learning-test-intro") renderLearningTestIntro(current.params.moduleId);
+  else if (current.view === "learning-test") renderLearningTest(current.params.moduleId, current.params.index);
   else if (current.view === "learning-complete") renderLearningComplete(current.params.moduleId);
   makeDivsKeyboardAccessible();
   window.scrollTo(0, 0);
@@ -301,25 +303,37 @@ function resetProgress() {
 }
 
 /* Learning modules: dedicated progress store, keyed by module id.
-   Shape: { [moduleId]: { furthest: <index reached>, completed: <bool> } }
+   Shape: { [moduleId]: { furthest: <flat content index reached>, completed: <bool>, testFurthest: <index reached in the test> }
    This is the layer that will eventually get backed by the database
    instead of localStorage -- the render functions below only ever call
-   these four helpers, so swapping the storage later shouldn't require
-   touching the views. */
+   these helpers, so swapping the storage later shouldn't require
+   touching the views.
+
+   Modules are organized as chapters (blocks of text/image/video content)
+   followed by a single trailing test (quiz questions). "furthest" tracks
+   position across the flattened chapter content only; the test has its
+   own counter so leaving mid-test resumes there instead of at chapter 1. */
 const LEARNING_PROGRESS_KEY = "p131-learning-progress";
 function getLearningProgress() {
   try { return JSON.parse(localStorage.getItem(LEARNING_PROGRESS_KEY)) || {}; } catch (e) { return {}; }
 }
 function setLearningFurthest(moduleId, sectionIndex) {
   const p = getLearningProgress();
-  const cur = p[moduleId] || { furthest: -1, completed: false };
+  const cur = p[moduleId] || { furthest: -1, completed: false, testFurthest: -1 };
   cur.furthest = Math.max(cur.furthest, sectionIndex);
+  p[moduleId] = cur;
+  try { localStorage.setItem(LEARNING_PROGRESS_KEY, JSON.stringify(p)); } catch (e) {}
+}
+function setTestFurthest(moduleId, questionIndex) {
+  const p = getLearningProgress();
+  const cur = p[moduleId] || { furthest: -1, completed: false, testFurthest: -1 };
+  cur.testFurthest = Math.max(cur.testFurthest ?? -1, questionIndex);
   p[moduleId] = cur;
   try { localStorage.setItem(LEARNING_PROGRESS_KEY, JSON.stringify(p)); } catch (e) {}
 }
 function markLearningComplete(moduleId) {
   const p = getLearningProgress();
-  const cur = p[moduleId] || { furthest: -1, completed: false };
+  const cur = p[moduleId] || { furthest: -1, completed: false, testFurthest: -1 };
   const alreadyDone = cur.completed;
   cur.completed = true;
   p[moduleId] = cur;
@@ -339,6 +353,27 @@ function moduleStatus(mod) {
   return "not-started";
 }
 function findLearningModule(id) { return LEARNING_MODULES.find(m => m.id === id); }
+
+/* Chapter/block helpers: a module's content lives in mod.chapters (each a
+   block with its own sections), always followed by a single trailing
+   mod.test (may be empty). These helpers flatten chapters for progress
+   math without the views needing to know chapter boundaries directly. */
+function moduleChapters(mod) { return mod.chapters || []; }
+function flattenModuleContent(mod) {
+  const flat = [];
+  moduleChapters(mod).forEach((ch, ci) => {
+    ch.sections.forEach((s, si) => flat.push({ chapterIndex: ci, sectionIndex: si }));
+  });
+  return flat;
+}
+function moduleTotalContent(mod) { return flattenModuleContent(mod).length; }
+function resumeChapterPosition(mod) {
+  const flat = flattenModuleContent(mod);
+  if (!flat.length) return { chapterIndex: 0, sectionIndex: 0 };
+  const p = getLearningProgress()[mod.id];
+  const flatIndex = p ? Math.min(p.furthest + 1, flat.length - 1) : 0;
+  return flat[Math.max(0, flatIndex)];
+}
 
 const REVIEW_STREAK_SEEN_KEY = "p131-review-streak-seen";
 let reviewStreakPendingAnimation = null; // set once at load if this device hasn't seen the latest reset yet
@@ -1944,20 +1979,22 @@ function learningRowHTML(mod) {
   const status = moduleStatus(mod);
   const locked = status === "locked";
   const dotClass = status === "completed" ? "done" : (locked ? "locked" : "");
+  const totalContent = moduleTotalContent(mod);
+  const hasTest = mod.test && mod.test.length > 0;
   let metaText;
   if (status === "completed") metaText = "Completed \u00b7 100%";
   else if (status === "in-progress") {
     const p = getLearningProgress()[mod.id];
-    const pct = Math.round(((p.furthest + 1) / mod.sections.length) * 100);
-    metaText = `${p.furthest + 1} of ${mod.sections.length} sections \u00b7 ${pct}%`;
+    const pct = Math.round(((p.furthest + 1) / totalContent) * 100);
+    metaText = `${p.furthest + 1} of ${totalContent} sections \u00b7 ${pct}%`;
   } else if (locked) {
     const req = findLearningModule(mod.unlockAfter);
     metaText = `Unlocks after ${req ? req.title : "a previous module"}`;
   } else {
-    metaText = `${mod.sections.length} sections`;
+    metaText = `${totalContent} sections${hasTest ? " + test" : ""}`;
   }
   const pct = status === "completed" ? 100
-    : status === "in-progress" ? Math.round(((getLearningProgress()[mod.id].furthest + 1) / mod.sections.length) * 100)
+    : status === "in-progress" ? Math.round(((getLearningProgress()[mod.id].furthest + 1) / totalContent) * 100)
     : 0;
   const rightHTML = status === "completed"
     ? `<span class="chev">&#10003;</span>`
@@ -2010,10 +2047,11 @@ function renderLearningIntro(moduleId) {
 
   const status = moduleStatus(mod);
   const p = getLearningProgress()[mod.id];
-  const pct = status === "completed" ? 100 : status === "in-progress" ? Math.round(((p.furthest + 1) / mod.sections.length) * 100) : 0;
-  const minutes = Math.max(1, Math.round(mod.sections.length * 1.5));
+  const totalContent = moduleTotalContent(mod);
+  const hasTest = mod.test && mod.test.length > 0;
+  const pct = status === "completed" ? 100 : status === "in-progress" ? Math.round(((p.furthest + 1) / totalContent) * 100) : 0;
+  const minutes = Math.max(1, Math.round((totalContent + (hasTest ? mod.test.length : 0)) * 1.5));
   const startLabel = status === "completed" ? "Review Module" : status === "in-progress" ? "Resume Module" : "Start Module";
-  const startIndex = status === "completed" ? 0 : (p ? Math.min(p.furthest + 1, mod.sections.length - 1) : 0);
 
   const wrap = document.createElement("div");
   wrap.className = "intro-wrap";
@@ -2021,31 +2059,46 @@ function renderLearningIntro(moduleId) {
     <p class="intro-eyebrow">${mod.category} \u00b7 Module</p>
     <h1 class="intro-title">${mod.title}</h1>
     <div class="intro-meta-row">
-      <div class="intro-meta"><b>${mod.sections.length}</b><span>Sections</span></div>
+      <div class="intro-meta"><b>${totalContent}</b><span>Sections</span></div>
+      ${hasTest ? `<div class="intro-meta"><b>${mod.test.length}</b><span>Test Qs</span></div>` : ""}
       <div class="intro-meta"><b>~${minutes}</b><span>Minutes</span></div>
       <div class="intro-meta"><b>${pct}%</b><span>Complete</span></div>
     </div>
     <button class="btn-start">${startLabel}</button>
   `;
-  wrap.querySelector(".btn-start").onclick = () => go("learning-slide", { moduleId, index: startIndex });
+  wrap.querySelector(".btn-start").onclick = () => {
+    const pos = status === "completed" ? { chapterIndex: 0, sectionIndex: 0 } : resumeChapterPosition(mod);
+    go("learning-chapter", { moduleId, chapterIndex: pos.chapterIndex, sectionIndex: pos.sectionIndex });
+  };
   app.appendChild(wrap);
 }
 
-function renderLearningSlide(moduleId, index) {
+function renderLearningChapter(moduleId, chapterIndex, sectionIndex) {
   header("Learning");
   const mod = findLearningModule(moduleId);
   if (!mod) { go("learning-hub"); return; }
-  index = Math.max(0, Math.min(index, mod.sections.length - 1));
-  const section = mod.sections[index];
+  const chapters = moduleChapters(mod);
+  if (!chapters.length) { go("learning-hub"); return; }
+  chapterIndex = Math.max(0, Math.min(chapterIndex, chapters.length - 1));
+  const chapter = chapters[chapterIndex];
+  sectionIndex = Math.max(0, Math.min(sectionIndex, chapter.sections.length - 1));
+  const section = chapter.sections[sectionIndex];
+
+  if (chapters.length > 1) {
+    const chapterKicker = document.createElement("p");
+    chapterKicker.className = "chapter-kicker";
+    chapterKicker.textContent = `Chapter ${chapterIndex + 1} of ${chapters.length} \u00b7 ${chapter.title}`;
+    app.appendChild(chapterKicker);
+  }
 
   const dots = document.createElement("div");
   dots.className = "dots-row";
-  dots.innerHTML = mod.sections.map((_, i) => `<div class="dot-seg ${i <= index ? "filled" : ""}"></div>`).join("");
+  dots.innerHTML = chapter.sections.map((_, i) => `<div class="dot-seg ${i <= sectionIndex ? "filled" : ""}"></div>`).join("");
   app.appendChild(dots);
 
   const body = document.createElement("div");
   body.className = "slide-body";
-  const kicker = `Section ${index + 1} of ${mod.sections.length}`;
+  const kicker = `Section ${sectionIndex + 1} of ${chapter.sections.length}`;
 
   if (section.type === "text") {
     body.innerHTML = `
@@ -2083,49 +2136,140 @@ function renderLearningSlide(moduleId, index) {
         slot.onclick = null;
       };
     }
-  } else if (section.type === "quiz") {
-    body.innerHTML = `
-      <p class="slide-kicker">${kicker} \u00b7 Knowledge check</p>
-      <h2 class="slide-title">${section.question}</h2>
-      <div data-role="quiz-opts"></div>
-      <p class="quiz-feedback" data-role="quiz-feedback" style="display:none"></p>
-    `;
-    const optsWrap = body.querySelector('[data-role="quiz-opts"]');
-    section.options.forEach((opt, i) => {
-      const btn = document.createElement("button");
-      btn.className = "quiz-opt";
-      btn.textContent = opt;
-      btn.onclick = () => {
-        const feedback = body.querySelector('[data-role="quiz-feedback"]');
-        optsWrap.querySelectorAll(".quiz-opt").forEach((b, bi) => {
-          b.onclick = null;
-          if (bi === section.correctIndex) b.classList.add("correct");
-          else if (bi === i) b.classList.add("picked-wrong");
-        });
-        feedback.textContent = i === section.correctIndex ? "Correct" : "Not quite \u2014 correct answer highlighted above";
-        feedback.style.display = "block";
-      };
-      optsWrap.appendChild(btn);
-    });
   }
   app.appendChild(body);
 
-  setLearningFurthest(moduleId, index);
+  const flat = flattenModuleContent(mod);
+  const flatIdx = flat.findIndex(f => f.chapterIndex === chapterIndex && f.sectionIndex === sectionIndex);
+  setLearningFurthest(moduleId, flatIdx);
 
-  const isLast = index === mod.sections.length - 1;
+  const isFirstOverall = chapterIndex === 0 && sectionIndex === 0;
+  const isLastSectionInChapter = sectionIndex === chapter.sections.length - 1;
+  const isLastChapter = chapterIndex === chapters.length - 1;
+  const isVeryLast = isLastSectionInChapter && isLastChapter;
+  const hasTest = mod.test && mod.test.length > 0;
+
+  const nav = document.createElement("div");
+  nav.className = "card-footer-nav";
+  const prevBtn = document.createElement("button");
+  prevBtn.className = "footer-btn";
+  prevBtn.textContent = "\u2039 Previous";
+  if (isFirstOverall) {
+    prevBtn.disabled = true;
+  } else if (sectionIndex === 0) {
+    const prevChapter = chapters[chapterIndex - 1];
+    prevBtn.onclick = () => go("learning-chapter", { moduleId, chapterIndex: chapterIndex - 1, sectionIndex: prevChapter.sections.length - 1 });
+  } else {
+    prevBtn.onclick = () => go("learning-chapter", { moduleId, chapterIndex, sectionIndex: sectionIndex - 1 });
+  }
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "footer-btn footer-btn-home";
+  nextBtn.textContent = isVeryLast ? "Finish \u203a" : "Next \u203a";
+  nextBtn.onclick = () => {
+    if (!isLastSectionInChapter) {
+      go("learning-chapter", { moduleId, chapterIndex, sectionIndex: sectionIndex + 1 });
+    } else if (!isLastChapter) {
+      go("learning-chapter", { moduleId, chapterIndex: chapterIndex + 1, sectionIndex: 0 });
+    } else if (hasTest) {
+      go("learning-test-intro", { moduleId });
+    } else {
+      go("learning-complete", { moduleId });
+    }
+  };
+  nav.appendChild(prevBtn);
+  nav.appendChild(nextBtn);
+  app.appendChild(nav);
+}
+
+function renderLearningTestIntro(moduleId) {
+  header("Learning");
+  const mod = findLearningModule(moduleId);
+  if (!mod) { go("learning-hub"); return; }
+  const test = mod.test || [];
+  if (!test.length) { go("learning-complete", { moduleId }); return; }
+
+  const p = getLearningProgress()[mod.id];
+  const testStarted = p && p.testFurthest > -1;
+
+  const wrap = document.createElement("div");
+  wrap.className = "intro-wrap";
+  wrap.innerHTML = `
+    <p class="intro-eyebrow">${mod.category} \u00b7 Knowledge Check</p>
+    <h1 class="intro-title">Ready for the Test?</h1>
+    <p class="slide-text">You've finished every chapter of ${mod.title}. Answer ${test.length} question${test.length === 1 ? "" : "s"} to complete the module.</p>
+    <div class="intro-meta-row">
+      <div class="intro-meta"><b>${test.length}</b><span>Questions</span></div>
+    </div>
+    <button class="btn-start">${testStarted ? "Resume Test" : "Start Test"}</button>
+  `;
+  const startIndex = testStarted ? Math.min(p.testFurthest + 1, test.length - 1) : 0;
+  wrap.querySelector(".btn-start").onclick = () => go("learning-test", { moduleId, index: startIndex });
+  app.appendChild(wrap);
+}
+
+function renderLearningTest(moduleId, index) {
+  header("Learning");
+  const mod = findLearningModule(moduleId);
+  if (!mod) { go("learning-hub"); return; }
+  const test = mod.test || [];
+  if (!test.length) { go("learning-complete", { moduleId }); return; }
+  index = Math.max(0, Math.min(index, test.length - 1));
+  const q = test[index];
+
+  const testKicker = document.createElement("p");
+  testKicker.className = "chapter-kicker";
+  testKicker.textContent = "Knowledge Check";
+  app.appendChild(testKicker);
+
+  const dots = document.createElement("div");
+  dots.className = "dots-row";
+  dots.innerHTML = test.map((_, i) => `<div class="dot-seg ${i <= index ? "filled" : ""}"></div>`).join("");
+  app.appendChild(dots);
+
+  const body = document.createElement("div");
+  body.className = "slide-body";
+  const kicker = `Question ${index + 1} of ${test.length}`;
+  body.innerHTML = `
+    <p class="slide-kicker">${kicker}</p>
+    <h2 class="slide-title">${q.question}</h2>
+    <div data-role="quiz-opts"></div>
+    <p class="quiz-feedback" data-role="quiz-feedback" style="display:none"></p>
+  `;
+  const optsWrap = body.querySelector('[data-role="quiz-opts"]');
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.className = "quiz-opt";
+    btn.textContent = opt;
+    btn.onclick = () => {
+      const feedback = body.querySelector('[data-role="quiz-feedback"]');
+      optsWrap.querySelectorAll(".quiz-opt").forEach((b, bi) => {
+        b.onclick = null;
+        if (bi === q.correctIndex) b.classList.add("correct");
+        else if (bi === i) b.classList.add("picked-wrong");
+      });
+      feedback.textContent = i === q.correctIndex ? "Correct" : "Not quite \u2014 correct answer highlighted above";
+      feedback.style.display = "block";
+    };
+    optsWrap.appendChild(btn);
+  });
+  app.appendChild(body);
+
+  setTestFurthest(moduleId, index);
+
+  const isLast = index === test.length - 1;
   const nav = document.createElement("div");
   nav.className = "card-footer-nav";
   const prevBtn = document.createElement("button");
   prevBtn.className = "footer-btn";
   prevBtn.textContent = "\u2039 Previous";
   if (index === 0) { prevBtn.disabled = true; }
-  else prevBtn.onclick = () => go("learning-slide", { moduleId, index: index - 1 });
+  else prevBtn.onclick = () => go("learning-test", { moduleId, index: index - 1 });
   const nextBtn = document.createElement("button");
   nextBtn.className = "footer-btn footer-btn-home";
   nextBtn.textContent = isLast ? "Finish \u203a" : "Next \u203a";
   nextBtn.onclick = () => {
     if (isLast) go("learning-complete", { moduleId });
-    else go("learning-slide", { moduleId, index: index + 1 });
+    else go("learning-test", { moduleId, index: index + 1 });
   };
   nav.appendChild(prevBtn);
   nav.appendChild(nextBtn);

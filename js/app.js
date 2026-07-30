@@ -2068,7 +2068,7 @@ function renderLearningIntro(moduleId) {
   `;
   wrap.querySelector(".btn-start").onclick = () => {
     const pos = status === "completed" ? { chapterIndex: 0, sectionIndex: 0 } : resumeChapterPosition(mod);
-    go("learning-chapter", { moduleId, chapterIndex: pos.chapterIndex, sectionIndex: pos.sectionIndex });
+    go("learning-chapter", { moduleId, chapterIndex: pos.chapterIndex, sectionIndex: pos.sectionIndex }, false);
   };
   app.appendChild(wrap);
 }
@@ -2158,22 +2158,22 @@ function renderLearningChapter(moduleId, chapterIndex, sectionIndex) {
     prevBtn.disabled = true;
   } else if (sectionIndex === 0) {
     const prevChapter = chapters[chapterIndex - 1];
-    prevBtn.onclick = () => go("learning-chapter", { moduleId, chapterIndex: chapterIndex - 1, sectionIndex: prevChapter.sections.length - 1 });
+    prevBtn.onclick = () => go("learning-chapter", { moduleId, chapterIndex: chapterIndex - 1, sectionIndex: prevChapter.sections.length - 1 }, false);
   } else {
-    prevBtn.onclick = () => go("learning-chapter", { moduleId, chapterIndex, sectionIndex: sectionIndex - 1 });
+    prevBtn.onclick = () => go("learning-chapter", { moduleId, chapterIndex, sectionIndex: sectionIndex - 1 }, false);
   }
   const nextBtn = document.createElement("button");
   nextBtn.className = "footer-btn footer-btn-home";
   nextBtn.textContent = isVeryLast ? "Finish \u203a" : "Next \u203a";
   nextBtn.onclick = () => {
     if (!isLastSectionInChapter) {
-      go("learning-chapter", { moduleId, chapterIndex, sectionIndex: sectionIndex + 1 });
+      go("learning-chapter", { moduleId, chapterIndex, sectionIndex: sectionIndex + 1 }, false);
     } else if (!isLastChapter) {
-      go("learning-chapter", { moduleId, chapterIndex: chapterIndex + 1, sectionIndex: 0 });
+      go("learning-chapter", { moduleId, chapterIndex: chapterIndex + 1, sectionIndex: 0 }, false);
     } else if (hasTest) {
-      go("learning-test-intro", { moduleId });
+      go("learning-test-intro", { moduleId }, false);
     } else {
-      go("learning-complete", { moduleId });
+      go("learning-complete", { moduleId }, false);
     }
   };
   nav.appendChild(prevBtn);
@@ -2186,7 +2186,7 @@ function renderLearningTestIntro(moduleId) {
   const mod = findLearningModule(moduleId);
   if (!mod) { go("learning-hub"); return; }
   const test = mod.test || [];
-  if (!test.length) { go("learning-complete", { moduleId }); return; }
+  if (!test.length) { go("learning-complete", { moduleId }, false); return; }
 
   const p = getLearningProgress()[mod.id];
   const testStarted = p && p.testFurthest > -1;
@@ -2203,7 +2203,7 @@ function renderLearningTestIntro(moduleId) {
     <button class="btn-start">${testStarted ? "Resume Test" : "Start Test"}</button>
   `;
   const startIndex = testStarted ? Math.min(p.testFurthest + 1, test.length - 1) : 0;
-  wrap.querySelector(".btn-start").onclick = () => go("learning-test", { moduleId, index: startIndex });
+  wrap.querySelector(".btn-start").onclick = () => go("learning-test", { moduleId, index: startIndex }, false);
   app.appendChild(wrap);
 }
 
@@ -2212,7 +2212,7 @@ function renderLearningTest(moduleId, index) {
   const mod = findLearningModule(moduleId);
   if (!mod) { go("learning-hub"); return; }
   const test = mod.test || [];
-  if (!test.length) { go("learning-complete", { moduleId }); return; }
+  if (!test.length) { go("learning-complete", { moduleId }, false); return; }
   index = Math.max(0, Math.min(index, test.length - 1));
   const q = test[index];
 
@@ -2263,13 +2263,13 @@ function renderLearningTest(moduleId, index) {
   prevBtn.className = "footer-btn";
   prevBtn.textContent = "\u2039 Previous";
   if (index === 0) { prevBtn.disabled = true; }
-  else prevBtn.onclick = () => go("learning-test", { moduleId, index: index - 1 });
+  else prevBtn.onclick = () => go("learning-test", { moduleId, index: index - 1 }, false);
   const nextBtn = document.createElement("button");
   nextBtn.className = "footer-btn footer-btn-home";
   nextBtn.textContent = isLast ? "Finish \u203a" : "Next \u203a";
   nextBtn.onclick = () => {
-    if (isLast) go("learning-complete", { moduleId });
-    else go("learning-test", { moduleId, index: index + 1 });
+    if (isLast) go("learning-complete", { moduleId }, false);
+    else go("learning-test", { moduleId, index: index + 1 }, false);
   };
   nav.appendChild(prevBtn);
   nav.appendChild(nextBtn);

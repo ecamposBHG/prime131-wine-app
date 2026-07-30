@@ -816,64 +816,6 @@ const LIQUOR = [];
 // ============================================================
 const LEARNING_MODULES = [
   {
-    id: "wine-service-101",
-    title: "Tableside Wine Service",
-    category: "Wine",
-    unlockAfter: null,
-    chapters: [
-      {
-        title: "Tableside Wine Service",
-        sections: [
-          {
-            type: "text",
-            title: "Presenting the Bottle",
-            body: "Before anything is opened, the bottle is presented label-up to the host who ordered it — never poured first, never opened out of view. State the producer, the vintage, and confirm it's the bottle they selected.",
-            note: "A bottle opened before confirmation can't be sent back in good faith — the presentation step protects the guest and the house."
-          },
-          {
-            type: "image",
-            title: "Reading the Label Angle",
-            imageUrl: "",
-            caption: "Hold the bottle so the label faces the host throughout presentation and pouring — not yourself."
-          },
-          {
-            type: "video",
-            title: "Watch: The Pour",
-            videoUrl: "",
-            duration: "1:48"
-          }
-        ]
-      }
-    ],
-    test: [
-      {
-        question: "Who confirms the bottle first?",
-        options: ["The guest who ordered it", "Whoever is closest to the table", "The sommelier only"],
-        correctIndex: 0
-      }
-    ]
-  },
-  {
-    id: "steak-doneness-guide",
-    title: "Steak Doneness Guide",
-    category: "Food",
-    unlockAfter: "wine-service-101",
-    chapters: [
-      {
-        title: "Placeholder Module",
-        sections: [
-          {
-            type: "text",
-            title: "Placeholder Module",
-            body: "This module exists to demonstrate the unlock system (it stays locked until Tableside Wine Service is completed). Replace this section with real steak-doneness content before launch.",
-            note: "Placeholder — not real training content yet."
-          }
-        ]
-      }
-    ],
-    test: []
-  },
-  {
     id: "olive-wagyu-service",
     title: "Olive Wagyu: Selling the Rarest Steak",
     category: "Food",

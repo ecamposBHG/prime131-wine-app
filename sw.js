@@ -1,4 +1,4 @@
-const CACHE_NAME = "prime131-wines-v68";
+const CACHE_NAME = "prime131-wines-v69";
 const ASSETS = [
   "./",
   "./index.html",
@@ -9,6 +9,10 @@ const ASSETS = [
   "./manifest.json",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
+  "./images/learning/wagyu-melt.jpg",
+  "./images/learning/wagyu-marbling.jpg",
+  "./images/learning/wagyu-table.jpg",
+  "./images/learning/wagyu-plate.jpg",
   "./fonts/oswald-latin-500-normal.woff2",
   "./fonts/oswald-latin-600-normal.woff2",
   "./fonts/oswald-latin-700-normal.woff2",

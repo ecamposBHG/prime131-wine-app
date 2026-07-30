@@ -898,6 +898,76 @@ const LEARNING_MODULES = [
         correctIndex: 2
       }
     ]
+  },
+  {
+    id: "restaurant-week-floor-management",
+    title: "Restaurant Week: Managing the Floor at Peak Volume",
+    category: "Service",
+    unlockAfter: null,
+    chapters: [
+      {
+        title: "Turnover Without the Guest Ever Feeling It",
+        sections: [
+          {
+            type: "text",
+            title: "The Balance We're Managing",
+            body: "During Restaurant Week, our focus is managing the dining room efficiently at peak volume — without ever making a guest feel rushed or compromised on service. Every technique in this module exists to protect both sides of that balance: high turnover and exceptional hospitality, at the same time.",
+            note: "If a technique speeds up the floor but makes the guest feel it, it's not the right technique."
+          },
+          {
+            type: "text",
+            title: "Rule 1: Complete Parties Only",
+            body: "Do not host or seat any party until all guests have arrived. Seating an incomplete group that's holding a table for late arrivals bogs down table pacing, delays the first round of drink orders, and directly reduces our seating capacity during our highest-demand hours.",
+            note: "A held table isn't neutral — it's actively costing us capacity every minute it sits partially full."
+          },
+          {
+            type: "text",
+            title: "Rule 2: Strategic Check Drops",
+            body: "Anticipate the end of the meal. Pre-clear dessert plates promptly and drop the check before the guest has to ask for it. The key is framing: pair the check drop with warm, reassuring language so it reads as attentive service, not a push out the door.",
+            note: "Try: \"I'll leave this right here for your convenience — there's absolutely no rush, please take your time,\" or \"I want to make sure you have everything you need to wrap up today. Can I offer any coffee or digestifs, or may I process this whenever you're ready?\""
+          },
+          {
+            type: "text",
+            title: "Rule 3: \"Liquid Hospitality\" — The Bar Transition",
+            body: "If a table is lingering and needs to be cleared for an incoming reservation, transition them to the bar with a generous offer. Inviting guests to finish their evening at the bar — often paired with a quick post-dinner pour or espresso — turns a tight operational turnaround into a warm, VIP experience instead of a squeeze.",
+            note: "This is the move for a table that's genuinely happy but just needs to move — never a substitute for rushing them at the table itself."
+          },
+          {
+            type: "text",
+            title: "Rule 4: Professional Language & Non-Verbal Cues",
+            body: "Never ask a guest \"Are you done?\" or \"Are you still working on that?\" Instead, use non-verbal hospitality cues to signal the meal's natural transition: clear unused glassware, remove empty bread baskets, and offer dessert or coffee menus. When you do need to check on plates, reframe it as \"May I clear this space for you?\"",
+            note: "The cue should read as attentiveness, not a hint that we need the table back."
+          }
+        ]
+      }
+    ],
+    test: [
+      {
+        question: "A four-top has two guests seated and two guests running late. What's the rule?",
+        options: ["Seat them now to hold the table and lock in the reservation", "Do not host or seat the party until everyone has arrived", "Seat them but delay taking any drink orders"],
+        correctIndex: 1
+      },
+      {
+        question: "Why does seating incomplete parties hurt Restaurant Week service specifically?",
+        options: ["It's against health code", "It confuses the kitchen's ticket order", "It bogs down table pacing, delays drink orders, and reduces seating capacity during peak hours"],
+        correctIndex: 2
+      },
+      {
+        question: "Which check-drop line fits the \"proactive, never pushy\" standard?",
+        options: ["\"I'll leave this right here for your convenience — there's no rush at all, please take your time.\"", "\"I'll go ahead and drop this since we need the table back.\"", "\"Whenever you get a chance, we'll need this closed out.\""],
+        correctIndex: 0
+      },
+      {
+        question: "A happy table is lingering and a reservation is about to arrive. What's the recommended move?",
+        options: ["Ask them directly to wrap up", "Invite them to finish the evening at the bar with a generous offer, like a post-dinner pour or espresso", "Quietly seat the new reservation at a nearby table and let both parties share the space"],
+        correctIndex: 1
+      },
+      {
+        question: "Which phrase should never be used when checking on a table's plates?",
+        options: ["\"May I clear this space for you?\"", "\"Are you still working on that?\"", "\"Can I offer any coffee or digestifs?\""],
+        correctIndex: 1
+      }
+    ]
   }
 ];
 

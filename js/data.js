@@ -922,19 +922,19 @@ const LEARNING_MODULES = [
           },
           {
             type: "text",
-            title: "Rule 4: Professional Language & Non-Verbal Cues",
+            title: "Rule 2: Professional Language & Non-Verbal Cues",
             body: "Never ask a guest \"Are you done?\" or \"Are you still working on that?\" Instead, use non-verbal hospitality cues to signal the meal's natural transition: clear unused glassware, remove empty bread baskets, and offer dessert or coffee menus. When you do need to check on plates, reframe it as \"May I clear this space for you?\"",
             note: "The cue should read as attentiveness, not a hint that we need the table back."
           },
           {
             type: "text",
-            title: "Rule 2: Strategic Check Drops",
+            title: "Rule 3: Strategic Check Drops",
             body: "Anticipate the end of the meal. Pre-clear dessert plates promptly and drop the check before the guest has to ask for it. The key is framing: pair the check drop with warm, reassuring language so it reads as attentive service, not a push out the door.",
             note: "Try: \"I'll leave this right here for your convenience — there's absolutely no rush, please take your time,\" or \"I want to make sure you have everything you need to wrap up today. Can I offer any coffee or digestifs, or may I process this whenever you're ready?\""
           },
           {
             type: "text",
-            title: "Rule 3: \"Liquid Hospitality\" — The Bar Transition",
+            title: "Rule 4: \"Liquid Hospitality\" — The Bar Transition",
             body: "If a table is lingering and needs to be cleared for an incoming reservation, transition them to the bar with a generous offer. Inviting guests to finish their evening at the bar — often paired with a quick post-dinner pour or espresso — turns a tight operational turnaround into a warm, VIP experience instead of a squeeze.",
             note: "This is the move for a table that's genuinely happy but just needs to move — never a substitute for rushing them at the table itself."
           }

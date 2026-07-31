@@ -968,6 +968,110 @@ const LEARNING_MODULES = [
         correctIndex: 1
       }
     ]
+  },
+  {
+    id: "hrw-service-excellence",
+    title: "Houston Restaurant Weeks: Volume & Hospitality",
+    category: "Service",
+    unlockAfter: null,
+    chapters: [
+      {
+        title: "Unconditional Hospitality at Volume",
+        sections: [
+          {
+            type: "text",
+            title: "Why HRW Is Different",
+            body: "Houston Restaurant Weeks brings immense volume, elevated energy, and a significant influx of first-time guests. Menu prices dip during HRW, but our standard of service never does.",
+            note: "Every HRW table is a first impression for someone who has never eaten here before."
+          },
+          {
+            type: "text",
+            title: "Unconditional Hospitality",
+            body: "Unconditional hospitality means treating every guest with warmth, respect, and attentive generosity — regardless of check size, dining speed, or whether they're ordering strictly from the promotional menu. Approach HRW diners with the exact same prestige and presence as a high-roller regular. Every table is an opportunity to create a lifelong regular.",
+            note: "Neutralize bias: check size during HRW says nothing about who that guest becomes as a regular."
+          },
+          {
+            type: "text",
+            title: "Micro-Dosing Touchpoints",
+            body: "Small, intentional moments of care make guests feel truly valued amid high-volume hustle: a sincere welcome, eye contact, prompt water refills, and clean table clears. Frame the HRW menu itself as a celebration and guided tour of our culinary philosophy, not a discount menu.",
+            note: "These are fast to do — they don't cost you pace, they cost you attention."
+          }
+        ]
+      },
+      {
+        title: "Course Timing & Open-Fire Expectations",
+        sections: [
+          {
+            type: "text",
+            title: "The Fire-on-Drop Standard",
+            body: "To keep kitchen tick times structured and prevent bottlenecks, fire the next course in the POS as soon as the current course drops at the table — or immediately after verifying the guest is enjoying it. Do not wait for plates to be cleared before sending the next ticket to the open-fire line.",
+            note: "Fire-on-drop is the operational benchmark — the default you fire to unless the table tells you otherwise."
+          },
+          {
+            type: "text",
+            title: "Critical Rule: One Size Does Not Fit All",
+            body: "Read your table's unique tempo. Is the table dining fast before a show, or celebrating an anniversary over relaxed conversation? If a guest is pacing slowly, adjust your firing interval accordingly. Firing on drop is the benchmark, but guest comfort always dictates the final tempo.",
+            note: "Efficiency must never compromise individual guest comfort — pacing is diagnostic, not fixed."
+          },
+          {
+            type: "text",
+            title: "Setting Expectations: Open-Fire, Open-Kitchen",
+            body: "Our culinary program centers on live open-fire cooking over raw wood embers — precise sear, temperature control, and coursing require deliberate time over heat. During peak HRW volume, timing between courses may naturally extend. Set this expectation upfront with warmth and enthusiasm, framing wait times as part of the authentic live-fire dining experience.",
+            note: "Try: \"Tonight you'll be experiencing our open-fire kitchen, where everything is prepared live over natural wood embers. Because cooking over live fire is an artisanal, temperature-sensitive process, courses are paced thoughtfully so every dish comes off the hearth at its peak. Lean back, enjoy the ambiance, and we'll bring out each course as it reaches perfection!\""
+          }
+        ]
+      },
+      {
+        title: "Pairings & Enhancements, Light Touch",
+        sections: [
+          {
+            type: "text",
+            title: "Keep It Organic and Low-Pressure",
+            body: "Keep beverage and enhancement offerings organic, natural, and low-pressure. Rather than pushy upselling, offer thoughtful additions that elevate the multi-course experience.",
+            note: "The tone is guide, not salesperson."
+          },
+          {
+            type: "text",
+            title: "Targeted Glass Pairings",
+            body: "Suggest a single, specific glass pairing during the initial order consult — for example: \"If you're selecting the short rib, our bold wood-aged Cabernet pairs exceptionally well with that live-fire char.\"",
+            note: "One specific, confident suggestion beats a list of options."
+          },
+          {
+            type: "text",
+            title: "Subtle Enhancements",
+            body: "Mention signature additions or side enhancements casually while walking through the HRW menu options. Keep it informative, helpful, and brief.",
+            note: null
+          }
+        ]
+      }
+    ],
+    test: [
+      {
+        question: "A guest is ordering only from the HRW promotional menu. How should they be treated?",
+        options: ["With the same prestige and presence as a high-roller regular", "Efficiently, but with less tableside attention than full-menu guests", "The same, but table clears can wait until they leave"],
+        correctIndex: 0
+      },
+      {
+        question: "What is the \"Fire-on-Drop\" standard?",
+        options: ["Fire the next course only after plates are fully cleared", "Fire the next course as soon as the current course drops, without waiting for clearing", "Fire all courses at once at the start of the meal"],
+        correctIndex: 1
+      },
+      {
+        question: "A table is celebrating an anniversary and dining slowly. What should you do?",
+        options: ["Fire on drop regardless, since that's the benchmark", "Adjust your firing interval to match their slower tempo", "Suggest they move to the bar to free the table faster"],
+        correctIndex: 1
+      },
+      {
+        question: "Why do courses sometimes take longer during peak HRW volume?",
+        options: ["The kitchen is understaffed during HRW", "Live open-fire cooking over wood embers requires deliberate, temperature-sensitive time", "HRW tickets are deprioritized behind full-price tickets"],
+        correctIndex: 1
+      },
+      {
+        question: "What's the recommended approach to beverage pairings during HRW?",
+        options: ["Offer a full list of pairing options for every course", "Suggest one specific, targeted glass pairing during the initial order consult", "Avoid mentioning pairings unless the guest asks first"],
+        correctIndex: 1
+      }
+    ]
   }
 ];
 

@@ -385,12 +385,12 @@ const HRW_WINES = [
     shortStory: "A family-owned Sancerre estate best known for Sauvignon Blanc, Domaine de la Ch\u00e9zatte also direct-presses a small amount of Pinot Noir into this pale, precise ros\u00e9 \u2014 sustainably farmed on the region's flint and limestone slopes."
   },
   {
-    id: "hrw3", name: "Neal Family \"Rutherford Dust Vineyard\" White", style: "white",
-    grape: "Likely Vermentino \u2014 confirm exact varietal against the bottle label before service", producer: "Neal Family Vineyards", region: "Rutherford, Napa Valley, California",
+    id: "hrw3", name: "Neal Family \"Rutherford Dust Vineyards\" White Wine Blend 2025", style: "white",
+    grape: "White wine blend (exact varietal composition not listed on the label)", producer: "Neal Family Vineyards", region: "Rutherford Dust Vineyards, Napa Valley, California",
     winemaker: "Mark Neal & family",
     flavorTags: ["Lemon Flower", "Tangerine Rind", "Bay Leaf", "Lychee"],
     structure: { sweetness: 1, acidity: 5, tannin: 0, alcohol: 4, body: 3 },
-    guestDescription: "A Napa white off the Rutherford Dust vineyard \u2014 lemon flower, tangerine rind, a little lychee and fresh herb, partly aged in French oak.",
+    guestDescription: "A Napa white blend off the Rutherford Dust vineyard \u2014 lemon flower, tangerine rind, a little lychee and fresh herb, partly aged in French oak.",
     sellingPoints: ["A genuine Napa white curiosity \u2014 most guests only know this vineyard for Cabernet", "From a 54-year organic Napa grower, now certified biodynamic on this site", "Good pitch for 'only drink red' guests who still want something local"],
     winemakingNote: "Partly aged in a mix of new and neutral French oak, and grown using Mark Neal's own 'stacked' vine-training system \u2014 white grapes trained low to catch reflected heat while red grapes shield them from above.",
     moment: "A red-only drinker who wants something local and interesting to start the meal.",

@@ -3382,4 +3382,8 @@ function renderSommEnd(seconds, params) {
 }
 
 initTheme();
-render();
+if (getStoredAuth()) {
+  render();
+} else {
+  renderAuthScreen(render);
+}

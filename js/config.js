@@ -11,11 +11,22 @@ const BRAND = {
   storageKeyPrefix: "p131" // kept stable to avoid resetting any staff member's saved progress
 };
 
+// Supabase project + Edge Functions used for staff login/register.
+// The anon key is safe to ship here -- it has no table access on its own;
+// RLS on every table denies everything by default, and the only way in
+// is through the staff-login / staff-register Edge Functions below,
+// which run with elevated (service_role) rights server-side only.
+const AUTH_CONFIG = {
+  supabaseUrl: "https://axbdapzgfzsenvejmsax.supabase.co",
+  anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4YmRhcHpnZnpzZW52ZWptc2F4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0NzYyNTIsImV4cCI6MjEwMTA1MjI1Mn0.TvJx8_HqftIaqe_SbfTFtICJ8qwVtvTfqVKJpXH6GDQ",
+  restaurantSlug: "prime131"
+};
+
 // Bumped alongside sw.js's CACHE_NAME on every deploy. Shown as a tiny
 // stamp on the home screen so we can confirm, at a glance, whether a
 // given device is actually serving the latest build -- useful while
 // GitHub Pages' CDN edge cache may lag behind the reported build status.
-const APP_VERSION = "v66";
+const APP_VERSION = "v78";
 
 // Which home cards this restaurant's deployment shows, and in what order.
 // (Currently informational — app.js still renders all five directly.

@@ -1,10 +1,11 @@
-const CACHE_NAME = "prime131-wines-v77";
+const CACHE_NAME = "prime131-wines-v78";
 const ASSETS = [
   "./",
   "./index.html",
   "./css/style.css",
   "./js/data.js",
   "./js/config.js",
+  "./js/auth.js",
   "./js/app.js",
   "./manifest.json",
   "./icons/icon-192.png",

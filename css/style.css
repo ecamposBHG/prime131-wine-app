@@ -776,3 +776,64 @@ button, input {
     margin: 24px auto;
   }
 }
+
+/* Staff auth screen (login / register) */
+.auth-screen {
+  display: flex; flex-direction: column; padding-top: 8px;
+}
+.auth-brand {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 22px;
+}
+.auth-stamp {
+  width: 40px; height: 40px; flex-shrink: 0;
+  background: var(--bronze-500); color: var(--ink-on-rust);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 700; font-size: 12px;
+  letter-spacing: 0.3px;
+}
+.auth-brand-name {
+  font-family: var(--font-display); font-size: 16px; font-weight: 600;
+  color: var(--shoyu-700); margin: 0; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.auth-brand-sub { font-size: 12px; color: var(--shoyu-300); margin: 2px 0 0; }
+
+.auth-tabs {
+  display: flex; border-bottom: 2px solid var(--washi-300); margin-bottom: 20px;
+}
+.auth-tab {
+  flex: 1; background: none; border: none; cursor: pointer;
+  padding: 10px 0; margin-bottom: -2px;
+  font-family: var(--font-display); font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  color: var(--shoyu-300); border-bottom: 2px solid transparent;
+}
+.auth-tab.active { color: var(--shoyu-700); border-bottom-color: var(--bronze-500); }
+
+.auth-panel { display: flex; flex-direction: column; }
+.auth-label {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+  color: var(--bronze-200); text-transform: uppercase; letter-spacing: 0.5px;
+  margin: 0 0 6px;
+}
+.auth-input {
+  width: 100%; background: var(--sumi-700); border: 2px solid var(--washi-300);
+  padding: 11px 12px; font-size: 15px; color: var(--shoyu-700);
+  margin-bottom: 16px; box-sizing: border-box;
+}
+.auth-input::placeholder { color: var(--shoyu-300); }
+.auth-input:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.auth-input.auth-pin { letter-spacing: 8px; font-size: 18px; }
+
+.auth-error {
+  background: var(--error-600); color: var(--shoyu-700);
+  font-size: 12px; padding: 9px 11px; margin: -4px 0 14px;
+  border-left: 4px solid var(--error-500);
+}
+
+.auth-submit {
+  background: var(--bronze-500); border: none; color: var(--ink-on-rust);
+  padding: 13px; font-family: var(--font-display); font-size: 13px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;
+}
+.auth-submit:active { transform: scale(0.98); }
+.auth-submit:disabled { opacity: 0.6; cursor: default; }

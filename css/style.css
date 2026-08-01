@@ -44,13 +44,6 @@
   --press-duration: 120ms;
   --focus-ring: 0 0 0 2px var(--sumi-900), 0 0 0 4px var(--neon);
 }
-body.dark {
-  --sumi-900: #050403; --sumi-700: #0F0C09; --sumi-500: #1A130C;
-  --washi-100: #050403; --washi-200: #0F0C09; --washi-300: #211A13; --washi-300-soft: #16110D;
-  --shoyu-700: #E8DFD0; --shoyu-500: #A89C89; --shoyu-300: #6E6558; --shoyu-200: #4A4338;
-  --focus-ring: 0 0 0 2px var(--sumi-900), 0 0 0 4px var(--bronze-200);
-}
-
 * { box-sizing: border-box; border-radius: 0; }
 
 html, body {
@@ -798,7 +791,7 @@ button, input {
 .auth-brand-sub { font-size: 12px; color: var(--shoyu-300); margin: 2px 0 0; }
 
 .auth-tabs {
-  display: flex; border-bottom: 2px solid var(--washi-300); margin-bottom: 20px;
+  display: flex; position: relative; border-bottom: 2px solid var(--washi-300); margin-bottom: 20px;
 }
 .auth-tab {
   flex: 1; background: none; border: none; cursor: pointer;
@@ -806,11 +799,20 @@ button, input {
   font-family: var(--font-display); font-size: 12px; font-weight: 600;
   text-transform: uppercase; letter-spacing: 0.5px;
   color: var(--shoyu-300); border-bottom: 2px solid transparent;
+  transition: color 160ms ease;
 }
-.auth-tab.active { color: var(--shoyu-700); border-bottom-color: var(--bronze-500); }
+.auth-tab.active { color: var(--shoyu-700); }
+.auth-tab:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.auth-tab-indicator {
+  position: absolute; bottom: -2px; left: 0; height: 2px;
+  background: var(--bronze-500);
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), width 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
 
-.auth-panel { display: flex; flex-direction: column; }
+.auth-panels { position: relative; }
+.auth-panel { display: flex; flex-direction: column; opacity: 1; transition: opacity 160ms ease; }
 .auth-panel[hidden] { display: none; }
+.auth-panel.auth-panel-leaving { opacity: 0; }
 .auth-label {
   font-family: var(--font-mono); font-size: 10px; font-weight: 500;
   color: var(--bronze-200); text-transform: uppercase; letter-spacing: 0.5px;
@@ -820,10 +822,22 @@ button, input {
   width: 100%; background: var(--sumi-700); border: 2px solid var(--washi-300);
   padding: 11px 12px; font-size: 15px; color: var(--shoyu-700);
   margin-bottom: 16px; box-sizing: border-box;
+  transition: box-shadow 120ms ease;
 }
 .auth-input::placeholder { color: var(--shoyu-300); }
 .auth-input:focus-visible { outline: none; box-shadow: var(--focus-ring); }
-.auth-input.auth-pin { letter-spacing: 8px; font-size: 18px; }
+.auth-input.auth-pin { letter-spacing: 8px; font-size: 18px; margin-bottom: 0; }
+
+.auth-pin-row { display: flex; align-items: stretch; gap: 8px; margin-bottom: 16px; }
+.auth-pin-row .auth-input.auth-pin { margin-bottom: 0; flex: 1; }
+.auth-pin-toggle {
+  flex-shrink: 0; background: none; border: 2px solid var(--washi-300); cursor: pointer;
+  padding: 0 12px; font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.5px; color: var(--shoyu-300);
+  transition: color 120ms ease, border-color 120ms ease;
+}
+.auth-pin-toggle:hover { color: var(--shoyu-700); border-color: var(--shoyu-300); }
+.auth-pin-toggle:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 
 .auth-error {
   background: var(--error-600); color: var(--shoyu-700);
@@ -832,9 +846,25 @@ button, input {
 }
 
 .auth-submit {
+  position: relative;
   background: var(--bronze-500); border: none; color: var(--ink-on-rust);
   padding: 13px; font-family: var(--font-display); font-size: 13px; font-weight: 600;
   text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;
+  transition: transform var(--press-duration) ease, opacity 120ms ease;
 }
 .auth-submit:active { transform: scale(0.98); }
-.auth-submit:disabled { opacity: 0.6; cursor: default; }
+.auth-submit:disabled { opacity: 0.85; cursor: default; }
+.auth-submit:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.auth-submit-label { display: inline-block; }
+.auth-submit.is-loading::after {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: 14px; height: 14px; margin: -7px 0 0 -7px;
+  border: 2px solid var(--ink-on-rust-soft); border-top-color: var(--ink-on-rust);
+  border-radius: 50%;
+  animation: auth-spin 650ms linear infinite;
+}
+@keyframes auth-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .auth-tab-indicator, .auth-panel, .auth-input, .auth-submit { transition: none; }
+  .auth-submit.is-loading::after { animation-duration: 1200ms; }
+}

@@ -278,17 +278,7 @@ function header(title, showBack = true) {
 }
 
 /* Device-local storage helpers (per-device, no accounts) */
-const THEME_KEY = "p131-theme";
 const PROGRESS_KEY = "p131-progress";
-
-function getTheme() {
-  try { return localStorage.getItem(THEME_KEY) || "light"; } catch (e) { return "light"; }
-}
-function setTheme(theme) {
-  try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
-  document.body.classList.toggle("dark", theme === "dark");
-}
-function initTheme() { setTheme(getTheme()); }
 
 function getProgress() {
   try { return JSON.parse(localStorage.getItem(PROGRESS_KEY)) || {}; } catch (e) { return {}; }
@@ -3381,7 +3371,6 @@ function renderSommEnd(seconds, params) {
   app.appendChild(btnRow);
 }
 
-initTheme();
 if (getStoredAuth()) {
   render();
 } else {

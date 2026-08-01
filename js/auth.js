@@ -75,38 +75,79 @@ function renderAuthScreen(onSuccess) {
     <div class="auth-tabs">
       <button type="button" class="auth-tab active" data-tab="login">Log in</button>
       <button type="button" class="auth-tab" data-tab="register">New here?</button>
+      <span class="auth-tab-indicator"></span>
     </div>
-    <form class="auth-panel" id="auth-panel-login" novalidate>
-      <label class="auth-label">Your name</label>
-      <input class="auth-input" name="name" placeholder="First and last name" autocomplete="name" required>
-      <label class="auth-label">4-digit PIN</label>
-      <input class="auth-input auth-pin" name="pin" type="password" placeholder="••••" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="current-password" required>
-      <p class="auth-error" hidden></p>
-      <button type="submit" class="auth-submit">Log in</button>
-    </form>
-    <form class="auth-panel" id="auth-panel-register" novalidate hidden>
-      <label class="auth-label">Join code</label>
-      <input class="auth-input" name="join_code" placeholder="Ask your manager" autocomplete="off" required>
-      <label class="auth-label">Your name</label>
-      <input class="auth-input" name="name" placeholder="First and last name" autocomplete="name" required>
-      <label class="auth-label">Choose a 4-digit PIN</label>
-      <input class="auth-input auth-pin" name="pin" type="password" placeholder="••••" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="new-password" required>
-      <p class="auth-error" hidden></p>
-      <button type="submit" class="auth-submit">Create account</button>
-    </form>
+    <div class="auth-panels">
+      <form class="auth-panel" id="auth-panel-login" novalidate>
+        <label class="auth-label">Your name</label>
+        <input class="auth-input" name="name" placeholder="First and last name" autocomplete="name" required>
+        <label class="auth-label">4-digit PIN</label>
+        <div class="auth-pin-row">
+          <input class="auth-input auth-pin" name="pin" type="password" placeholder="••••" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="current-password" required>
+          <button type="button" class="auth-pin-toggle" aria-label="Show PIN">Show</button>
+        </div>
+        <p class="auth-error" hidden></p>
+        <button type="submit" class="auth-submit"><span class="auth-submit-label">Log in</span></button>
+      </form>
+      <form class="auth-panel" id="auth-panel-register" novalidate hidden>
+        <label class="auth-label">Join code</label>
+        <input class="auth-input" name="join_code" placeholder="Ask your manager" autocomplete="off" required>
+        <label class="auth-label">Your name</label>
+        <input class="auth-input" name="name" placeholder="First and last name" autocomplete="name" required>
+        <label class="auth-label">Choose a 4-digit PIN</label>
+        <div class="auth-pin-row">
+          <input class="auth-input auth-pin" name="pin" type="password" placeholder="••••" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="new-password" required>
+          <button type="button" class="auth-pin-toggle" aria-label="Show PIN">Show</button>
+        </div>
+        <p class="auth-error" hidden></p>
+        <button type="submit" class="auth-submit"><span class="auth-submit-label">Create account</span></button>
+      </form>
+    </div>
   `;
   app.appendChild(wrap);
 
   const tabs = wrap.querySelectorAll(".auth-tab");
+  const indicator = wrap.querySelector(".auth-tab-indicator");
   const panels = {
     login: wrap.querySelector("#auth-panel-login"),
     register: wrap.querySelector("#auth-panel-register")
   };
+
+  function moveIndicator(tab) {
+    indicator.style.width = `${tab.offsetWidth}px`;
+    indicator.style.transform = `translateX(${tab.offsetLeft}px)`;
+  }
+  moveIndicator(tabs[0]);
+  window.addEventListener("resize", () => {
+    const active = wrap.querySelector(".auth-tab.active");
+    if (active) moveIndicator(active);
+  });
+
   tabs.forEach((tab) => {
     tab.onclick = () => {
+      if (tab.classList.contains("active")) return;
       tabs.forEach((t) => t.classList.toggle("active", t === tab));
-      panels.login.hidden = tab.dataset.tab !== "login";
-      panels.register.hidden = tab.dataset.tab !== "register";
+      moveIndicator(tab);
+      const showLogin = tab.dataset.tab === "login";
+      const incoming = showLogin ? panels.login : panels.register;
+      const outgoing = showLogin ? panels.register : panels.login;
+      outgoing.classList.add("auth-panel-leaving");
+      incoming.hidden = false;
+      incoming.classList.remove("auth-panel-leaving");
+      requestAnimationFrame(() => {
+        outgoing.hidden = true;
+        outgoing.classList.remove("auth-panel-leaving");
+      });
+    };
+  });
+
+  wrap.querySelectorAll(".auth-pin-toggle").forEach((btn) => {
+    btn.onclick = () => {
+      const input = btn.previousElementSibling;
+      const showing = input.type === "text";
+      input.type = showing ? "password" : "text";
+      btn.textContent = showing ? "Show" : "Hide";
+      btn.setAttribute("aria-label", showing ? "Show PIN" : "Hide PIN");
     };
   });
 
@@ -121,7 +162,8 @@ function renderAuthScreen(onSuccess) {
   function setLoading(form, loading, idleLabel) {
     const btn = form.querySelector(".auth-submit");
     btn.disabled = loading;
-    btn.textContent = loading ? "..." : idleLabel;
+    btn.classList.toggle("is-loading", loading);
+    btn.querySelector(".auth-submit-label").textContent = loading ? "" : idleLabel;
   }
 
   panels.login.addEventListener("submit", async (e) => {

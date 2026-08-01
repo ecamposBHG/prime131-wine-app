@@ -52,7 +52,7 @@ app.addEventListener("keydown", (e) => {
   el.click();
 });
 
-function findWine(id) { return WINES.find(w => w.id === id); }
+function findWine(id) { return WINES.find(w => w.id === id) || HRW_WINES.find(w => w.id === id); }
 function findDish(id) { return DISHES.find(d => d.id === id); }
 
 function groupByStyle(wines) {
@@ -142,7 +142,7 @@ function buildFaceHTML(wine, similar, idx) {
 }
 
 function renderFlipCard(wine) {
-  const similar = similarPour(wine);
+  const similar = wine.id.startsWith("hrw") ? similarHrwPour(wine) : similarPour(wine);
   const flipcard = document.createElement("div");
   flipcard.className = "flipcard";
   const inner = document.createElement("div");
@@ -166,6 +166,12 @@ function renderFlipCard(wine) {
 
 function similarPour(wine) {
   const sameStyle = WINES.filter(w => w.style === wine.style && w.id !== wine.id);
+  if (!sameStyle.length) return null;
+  return sameStyle[0];
+}
+
+function similarHrwPour(wine) {
+  const sameStyle = HRW_WINES.filter(w => w.style === wine.style && w.id !== wine.id);
   if (!sameStyle.length) return null;
   return sameStyle[0];
 }
@@ -230,6 +236,8 @@ function render() {
   if (current.view === "home") renderHome();
   else if (current.view === "study-list") renderStudyList();
   else if (current.view === "study-card") renderStudyCard(current.params.wineId);
+  else if (current.view === "hrw-list") renderHrwList();
+  else if (current.view === "hrw-card") renderHrwCard(current.params.wineId);
   else if (current.view === "pairwf-list") renderPairWineFoodList();
   else if (current.view === "pairwf-detail") renderWineDetailWithPairing(current.params.wineId);
   else if (current.view === "pairfw-list") renderPairFoodWineList();
@@ -536,7 +544,8 @@ function renderHome() {
   app.appendChild(learningCard);
 }
 
-function renderSearchableWineList(onSelect, placeholder) {
+function renderSearchableWineList(onSelect, placeholder, wineSource) {
+  const source = wineSource || WINES;
   const wrap = document.createElement("div");
   const input = document.createElement("input");
   input.className = "search-input";
@@ -548,7 +557,7 @@ function renderSearchableWineList(onSelect, placeholder) {
 
   function draw(filter) {
     listWrap.innerHTML = "";
-    const filtered = WINES.filter(w => w.name.toLowerCase().includes(filter.toLowerCase()));
+    const filtered = source.filter(w => w.name.toLowerCase().includes(filter.toLowerCase()));
     const groups = groupByStyle(filtered);
     STYLE_ORDER.forEach(style => {
       const wines = groups[style];
@@ -580,6 +589,10 @@ function renderWineTypeChooser() {
   const options = document.createElement("div");
   options.className = "home-options";
   options.innerHTML = `
+    <div class="home-option" data-go="hrw">
+      <div class="home-icon-circle">&#127881;</div>
+      <div class="home-option-text"><p>HRW Wine Selections</p><span>Houston Restaurant Weeks list</span></div>
+    </div>
     <div class="home-option" data-go="glass">
       <div class="home-icon-circle">&#127863;</div>
       <div class="home-option-text"><p>By The Glass</p><span>Learn the full BTG list</span></div>
@@ -597,6 +610,7 @@ function renderWineTypeChooser() {
       <div class="home-option-text"><p>Pair Food with Wine</p><span>Start from the dish</span></div>
     </div>
   `;
+  options.querySelector('[data-go="hrw"]').onclick = () => go("hrw-list");
   options.querySelector('[data-go="glass"]').onclick = () => go("study-list");
   options.querySelector('[data-go="bottle"]').onclick = () => go("wine-bottle-list");
   options.querySelector('[data-go="pairwf"]').onclick = () => go("pairwf-list");
@@ -619,6 +633,60 @@ function renderStudyList() {
     (wineId) => go("study-card", { wineId }),
     "Search wines"
   ));
+}
+
+function renderHrwList() {
+  header("HRW Wine Selections");
+  app.appendChild(renderSearchableWineList(
+    (wineId) => go("hrw-card", { wineId }),
+    "Search HRW wines",
+    HRW_WINES
+  ));
+}
+
+function renderHrwCard(wineId) {
+  const wine = HRW_WINES.find(w => w.id === wineId) || HRW_WINES[0];
+  const idx = HRW_WINES.findIndex(w => w.id === wine.id);
+
+  header("HRW Wine Selections");
+  app.appendChild(renderNavChips(wine.id, (id) => go("hrw-card", { wineId: id }, false), HRW_WINES));
+  app.appendChild(renderWineCardBody(wine));
+
+  const footerNav = document.createElement("div");
+  footerNav.className = "card-footer-nav";
+
+  const backBtn = document.createElement("button");
+  backBtn.className = "footer-btn";
+  backBtn.textContent = "\u2190 Back";
+  backBtn.disabled = idx === 0;
+  backBtn.onclick = () => go("hrw-card", { wineId: HRW_WINES[idx - 1].id }, false);
+
+  const homeBtn = document.createElement("button");
+  homeBtn.className = "footer-btn footer-btn-home";
+  homeBtn.textContent = "Home";
+  homeBtn.onclick = () => go("home", {});
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "footer-btn";
+  nextBtn.textContent = "Next \u2192";
+  nextBtn.disabled = idx === HRW_WINES.length - 1;
+  nextBtn.onclick = () => go("hrw-card", { wineId: HRW_WINES[idx + 1].id }, false);
+
+  footerNav.appendChild(backBtn);
+  footerNav.appendChild(homeBtn);
+  footerNav.appendChild(nextBtn);
+  app.appendChild(footerNav);
+
+  let touchStartX = null;
+  app.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; }, { once: true });
+  app.addEventListener("touchend", (e) => {
+    if (touchStartX === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 60) {
+      const nextIdx = dx < 0 ? Math.min(idx + 1, HRW_WINES.length - 1) : Math.max(idx - 1, 0);
+      go("hrw-card", { wineId: HRW_WINES[nextIdx].id }, false);
+    }
+  }, { once: true });
 }
 
 function renderPairWineFoodList() {
@@ -959,10 +1027,11 @@ function renderCocktailDetail(cocktailId) {
   app.appendChild(container);
 }
 
-function renderNavChips(activeWineId, onSelect) {
+function renderNavChips(activeWineId, onSelect, wineSource) {
+  const source = wineSource || WINES;
   const wrap = document.createElement("div");
   wrap.className = "nav-chips";
-  WINES.forEach(w => {
+  source.forEach(w => {
     const chip = document.createElement("button");
     chip.className = "nav-chip" + (w.id === activeWineId ? " active" : "");
     chip.textContent = w.name.split(" ").slice(0, 2).join(" ");

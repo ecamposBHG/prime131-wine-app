@@ -344,6 +344,116 @@ const WINES = [
   }
 ];
 
+// Houston Restaurant Weeks — a separate, smaller wine list shown above the
+// regular By The Glass list during HRW only. Kept as its own array (not
+// merged into WINES) so repeat bottles like the Telmont and Caymus stay
+// distinct entries here rather than duplicating/overwriting the year-round
+// BTG cards, per the brief this was built from.
+const HRW_WINES = [
+  {
+    id: "hrw1", name: "Telmont \"Réserve Brut\" NV", style: "sparkling",
+    grape: "53% Pinot Meunier, 31% Chardonnay, 16% Pinot Noir", producer: "Champagne Telmont", region: "Épernay, Champagne, France",
+    winemaker: "Bertrand Lhôpital, Cellar Master",
+    flavorTags: ["White Peach", "Green Apple", "Brioche", "Toasted Almond"],
+    structure: { sweetness: 1, acidity: 4, tannin: 0, alcohol: 2, body: 3 },
+    guestDescription: "This is real Champagne &mdash; white peach, green apple, a little brioche and toasted almond from full malolactic. Beautiful for the raw bar or the caviar.",
+    sellingPoints: ["Real Champagne, full malolactic for a creamy, toasty edge", "Family-run since 1912, led today by fourth-generation cellar master Bertrand Lh&ocirc;pital", "Comprises the bulk of the house's production &mdash; their flagship pour, not an entry-level bottle"],
+    winemakingNote: "A Pinot Meunier-led blend that goes through full malolactic fermentation, which is what builds the creamy, brioche-and-honeysuckle character alongside the core apple and quince fruit.",
+    moment: "The opening pour for an HRW table, or anyone ordering oysters or caviar.",
+    memory: "Toasty, chalky, elegant real Champagne to open the meal.",
+    pairingDishIds: ["d-oysters", "d-caviar"],
+    arsenal: "This is real Champagne from a small French house — a great way to kick off an HRW table.",
+    funFact: "Telmont is racing toward a fully organic estate and grower-vineyard base by 2031, one of the stronger sustainability pushes in Champagne.",
+    funFact2: "The house was founded in 1912 by Henri Lh\u00f4pital in Damery, near \u00c9pernay, and is still family-run four generations later.",
+    shortStory: "Founded in a small village near \u00c9pernay in 1912, Telmont has stayed a family house for four generations \u2014 today led by cellar master Bertrand Lh\u00f4pital, with sustainability as a defining focus of the current era."
+  },
+  {
+    id: "hrw2", name: "Domaine de la Ch\u00e9zatte Sancerre Ros\u00e9", style: "white",
+    grape: "100% Pinot Noir, direct-press", producer: "Domaine de la Ch\u00e9zatte", region: "Cr\u00e9zancy, Sancerre, Loire Valley, France",
+    winemaker: "Estate winemaking team",
+    flavorTags: ["Strawberry", "Red Currant", "Red Cherry", "Citrus Zest"],
+    structure: { sweetness: 1, acidity: 4, tannin: 0, alcohol: 3, body: 1 },
+    guestDescription: "A Sancerre ros\u00e9, direct-pressed from Pinot Noir \u2014 strawberry, red currant, citrus zest, no oak. Pure, precise fruit, not a fruity poolside pour.",
+    sellingPoints: ["Made from Pinot Noir, direct-pressed for pure fruit with no oak", "Their smallest cuvée \u2014 just 5% of production, genuinely a rarity", "Frame it as a serious, food-friendly Loire ros\u00e9, not a sweet summer pour"],
+    winemakingNote: "The Pinot Noir is direct-pressed rather than macerated, which keeps the wine dry, precise, and true to its Sancerre terroir instead of leaning sweet or jammy.",
+    moment: "A guest who wants a serious, mineral-driven ros\u00e9 rather than a sweet poolside style.",
+    memory: "Precise, food-friendly Loire ros\u00e9 \u2014 not a fruity default.",
+    pairingDishIds: [],
+    arsenal: "Steer this away from 'fruity poolside' and toward 'serious, food-friendly Loire rosé.'",
+    funFact: "This rosé is just 5% of the estate's total production \u2014 their smallest cuvée, and a bit of a rarity next to their Sauvignon Blanc.",
+    funFact2: "The estate farms sustainably on south-facing flint and limestone soils in Cr\u00e9zancy, the most northerly village in Sancerre.",
+    shortStory: "A family-owned Sancerre estate best known for Sauvignon Blanc, Domaine de la Ch\u00e9zatte also direct-presses a small amount of Pinot Noir into this pale, precise ros\u00e9 \u2014 sustainably farmed on the region's flint and limestone slopes."
+  },
+  {
+    id: "hrw3", name: "Neal Family \"Rutherford Dust Vineyard\" White", style: "white",
+    grape: "Likely Vermentino \u2014 confirm exact varietal against the bottle label before service", producer: "Neal Family Vineyards", region: "Rutherford, Napa Valley, California",
+    winemaker: "Mark Neal & family",
+    flavorTags: ["Lemon Flower", "Tangerine Rind", "Bay Leaf", "Lychee"],
+    structure: { sweetness: 1, acidity: 5, tannin: 0, alcohol: 4, body: 3 },
+    guestDescription: "A Napa white off the Rutherford Dust vineyard \u2014 lemon flower, tangerine rind, a little lychee and fresh herb, partly aged in French oak.",
+    sellingPoints: ["A genuine Napa white curiosity \u2014 most guests only know this vineyard for Cabernet", "From a 54-year organic Napa grower, now certified biodynamic on this site", "Good pitch for 'only drink red' guests who still want something local"],
+    winemakingNote: "Partly aged in a mix of new and neutral French oak, and grown using Mark Neal's own 'stacked' vine-training system \u2014 white grapes trained low to catch reflected heat while red grapes shield them from above.",
+    moment: "A red-only drinker who wants something local and interesting to start the meal.",
+    memory: "A Napa white curiosity from a vineyard famous for Cabernet.",
+    pairingDishIds: [],
+    arsenal: "Rutherford Dust is famous as a Cabernet vineyard \u2014 this is the white curiosity from the same site.",
+    funFact: "Mark Neal has farmed organic Napa vineyards for over 54 years, building Neal Family Vineyards in 1998 with his children.",
+    funFact2: "Neal invented a proprietary 'stacked' vine-training system that grows white grapes low to the ground to catch reflected heat, with red grapes trained above to shield them.",
+    shortStory: "Mark Neal spent decades farming organic Napa fruit for other producers before founding his own family label in 1998 \u2014 today it's a biodynamic, certified-organic operation across Howell Mountain and Rutherford, run with his children."
+  },
+  {
+    id: "hrw4", name: "Alexana \"Mosaic\" Pinot Noir", style: "red",
+    grape: "Pinot Noir, multiple clones", producer: "Alexana Winery", region: "Dundee Hills, Willamette Valley, Oregon",
+    winemaker: "Estate winemaking team",
+    flavorTags: ["Black Cherry", "Raspberry", "Violet", "Sage"],
+    structure: { sweetness: 1, acidity: 4, tannin: 2, alcohol: 4, body: 3 },
+    guestDescription: "An Oregon Pinot from Alexana and Kinney Ranch fruit \u2014 black cherry, raspberry, violet, a little sage. Bright, food-forward, velvety tannin.",
+    sellingPoints: ["Blended from multiple Pinot clones, fermented and aged separately", "Estate Vineyard has been a two-time Wine Spectator Top 100 pick", "Grown in Dundee Hills \u2014 the birthplace of Willamette Valley Pinot"],
+    winemakingNote: "Fruit from the Alexana Estate and Kinney Ranch vineyards is fermented and aged separately by clone, then blended \u2014 building layered fruit and spice rather than a single-note wine.",
+    moment: "A Burgundy lover, or a steak guest who wants red without heavy tannin.",
+    memory: "Lively, food-forward Oregon Pinot with velvety tannin.",
+    pairingDishIds: [],
+    arsenal: "Good crossover pour for Burgundy lovers and steak guests who don't want heavy tannin.",
+    funFact: "Dundee Hills is the birthplace of Willamette Valley Pinot Noir \u2014 David Lett planted the valley's first Pinot vineyard there in 1966.",
+    funFact2: "Alexana's Estate Vineyard sits across 32 distinct blocks on a rare mix of volcanic and marine sedimentary soils.",
+    shortStory: "Planted on a patchwork of volcanic and marine soils across 32 blocks in Dundee Hills \u2014 the same ground where Willamette Valley Pinot Noir got its start in 1966 \u2014 Alexana's Estate Vineyard has twice been named to Wine Spectator's Top 100."
+  },
+  {
+    id: "hrw5", name: "Caymus Cabernet Sauvignon", style: "red",
+    grape: "Cabernet Sauvignon", producer: "Caymus Vineyards", region: "Napa Valley, California",
+    winemaker: "Chuck Wagner",
+    flavorTags: ["Blackcurrant", "Black Cherry", "Cocoa", "Cedar"],
+    structure: { sweetness: 1, acidity: 2, tannin: 3, alcohol: 5, body: 5 },
+    guestDescription: "This is Caymus \u2014 blackcurrant, black cherry, cocoa and cedar, soft velvety tannin. The steakhouse benchmark bottle most guests already know.",
+    sellingPoints: ["The name guests already ask for by default", "Blended across Napa's best sub-AVAs \u2014 Coombsville, Calistoga, Rutherford, Oakville", "Built for immediate drinkability, not austerity \u2014 an easy 'safe splurge' recommendation"],
+    winemakingNote: "Blended across fruit from several Napa sub-AVAs and aged extensively in oak, built for soft, velvety tannin and plush drinkability right out of the gate.",
+    moment: "A guest unsure what to order who wants a safe, plush splurge.",
+    memory: "The Cabernet everyone already trusts.",
+    pairingDishIds: [],
+    arsenal: "This one sells itself \u2014 plush, rich, crowd-pleasing.",
+    funFact: "Chuck Wagner and his parents opened Caymus in 1972 with 240 cases \u2014 it remains 100% family-owned today.",
+    funFact2: "Caymus takes its name from 'Rancho Caymus,' the original Spanish land grant covering part of Napa Valley.",
+    shortStory: "Founded with just 240 cases in 1972, Caymus is still entirely family-run over 50 years later \u2014 and remains one of the most recognized Cabernet names in America."
+  },
+  {
+    id: "hrw6", name: "Altamura Cabernet Sauvignon", style: "red",
+    grape: "100% Cabernet Sauvignon", producer: "Altamura Vineyards & Winery", region: "Wooden Valley, Napa Valley, California",
+    winemaker: "Frank Altamura",
+    flavorTags: ["Blackcurrant", "Black Olive", "Tobacco Leaf", "Cedar"],
+    structure: { sweetness: 1, acidity: 4, tannin: 4, alcohol: 5, body: 5 },
+    guestDescription: "100% estate-grown Cabernet from Wooden Valley, Napa's most secluded sub-AVA \u2014 blackcurrant, black olive, tobacco leaf, cedar. Velvety but firm, built to age.",
+    sellingPoints: ["The only winery located in Wooden Valley within the Napa Valley appellation", "Up to half the crop dropped each year, free-run juice only, for concentration and purity", "The 'insider's Napa Cab' \u2014 same lineage as Caymus, more structured, built for 10-12+ years"],
+    winemakingNote: "Aged roughly 70% in new French oak for two-plus years before release, from fruit that's deliberately thinned \u2014 up to half the crop dropped each year \u2014 using only free-run juice.",
+    moment: "A guest who wants something less ubiquitous than Caymus at a similar price tier.",
+    memory: "The insider's Napa Cab \u2014 same pedigree, more structure.",
+    pairingDishIds: [],
+    arsenal: "Same Napa Cab pedigree lineage as Caymus, but more structured and age-worthy — the insider's pick.",
+    funFact: "Founder Frank Altamura trained under Ric Forman at Sterling and worked alongside Chuck Wagner and Randy Dunn at Caymus before founding Altamura in 1985.",
+    funFact2: "Altamura is the only winery located in Wooden Valley, Napa's most secluded sub-AVA, within the Napa Valley appellation.",
+    shortStory: "Frank Altamura learned the craft at Sterling and later worked alongside the Caymus and Dunn families before striking out on his own in 1985 \u2014 building the only winery in Napa's secluded Wooden Valley, dropping up to half the crop each year for concentration."
+  }
+];
+
 const DISHES = [
   { id: "d-oysters", name: "East Coast Oysters", section: "Raw Bar", description: "Chilled: fresh wasabi, shallots, ponzu. Roasted: coconut, chili, cilantro, lime.", pairedWineIds: ["w1", "w5"], quizClue: "Served two ways: raw on the half shell with shallot ponzu and fresh wasabi, or shocked and finished with a charred fresno-coconut vinaigrette and toasted panko.", dropLine: "eastern oysters with shallot ponzu and fresh wasabi / roasted oysters with charred fresno and coconut vinaigrette", ingredients: "house made shallot ponzu - gluten free soy sauce, mirin, rice vinegar, sake, konbu, bonito flakes, minced shallots, orange peel and orange juice. | charred fresno and coconut vinaigrette- red bell pepper, shiro dashi (bonito flakes, konbu, soy sauce, mirin, sake, salt, sugar), fresno pepper, fish sauce, rice vinegar, coconu milk, lime juice, lime zest, sugar", chefPrep: "6 each freshly shucked eastern oyster served with housemade shallot ponzu sauce, fresh grated wasabi root and lemon wedge | for charred fresno vinaigrette all ingredients blended well until smooth and strained. For oysters shocked fresh and dresed with charred fresno vin, toasted panko and roasted in the oven until done. Plated with plating salt underneath and garnished with lemon wedge", allergensInRecipe: ["alcohol", "fish", "soy", "vinegar", "citrus", "chili", "shellfish", "onion"], allergensRemovable: ["onion", "mustard"] },
   { id: "d-tuna-tartare", name: "Tuna Tartare", section: "Raw Bar", description: "Avocado purée, wakamomo, chives, taro chips, sesame garlic soy dressing", pairedWineIds: ["w3"], quizClue: "Diced yellowfin mixed with olive oil and chives, built in a ring mold over a piped avocado-yuzu puree.", dropLine: "yellowfin tuna tartar with avocado puree and taro chips", ingredients: "tartar build- diced yellowfin tuna, chives, avocado puree, yuzu garlic soy dressing,  olive oil.  avocado puree- yuzu juice, evoo, olive oil, black pepper, avocado. Sesame garlic soy dressing- garlic, mirin, sesame oil, soy sauce, yuzu juice, rice vinegar. Garnish- taro chips, wakamomo(young peach in syrup), radish", chefPrep: "finely diced yellowfin tuna mixed with olive oil, chives, salt and pepper. Then ring mold placed on the bowl and avocado puree piped nicely. Follow by tuna mix. Garnished with julienne red radish, wakamomo, sesame garlic soy dressing. Served with taro chips on the side. if guest has glutten Allergy sub for Ponzu Sauce", allergensInRecipe: ["fish", "soy", "sesame", "garlic", "alcohol", "vinegar", "citrus", "onion", "gluten"], allergensRemovable: ["onion", "garlic", "gluten", "sesame"] },

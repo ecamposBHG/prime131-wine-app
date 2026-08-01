@@ -810,6 +810,7 @@ button, input {
 .auth-tab.active { color: var(--shoyu-700); border-bottom-color: var(--bronze-500); }
 
 .auth-panel { display: flex; flex-direction: column; }
+.auth-panel[hidden] { display: none; }
 .auth-label {
   font-family: var(--font-mono); font-size: 10px; font-weight: 500;
   color: var(--bronze-200); text-transform: uppercase; letter-spacing: 0.5px;

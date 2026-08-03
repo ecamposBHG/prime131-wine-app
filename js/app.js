@@ -435,6 +435,7 @@ function randomWine() {
 
 
 function renderHome() {
+  const authedUser = getStoredAuth();
   const hero = document.createElement("div");
   hero.className = "home-hero";
   hero.innerHTML = `
@@ -443,8 +444,17 @@ function renderHome() {
         <p class="home-title">${BRAND.fullName}</p>
         <p class="home-title-sub">Staff training</p>
       </div>
+      <div class="home-account">
+        ${authedUser ? `<p class="home-account-name">${authedUser.name || ""}</p>` : ""}
+        <button type="button" class="home-logout-btn">Log out</button>
+      </div>
     </div>
   `;
+  hero.querySelector(".home-logout-btn").onclick = () => {
+    if (!confirm("Log out of Chirius?")) return;
+    clearAuth();
+    location.reload();
+  };
   app.appendChild(hero);
 
   const currentDays = reviewStreakDays(REVIEW_STREAK_RECORD.start);

@@ -880,3 +880,39 @@ button, input {
   .auth-tab-indicator, .auth-panel, .auth-input, .auth-submit { transition: none; }
   .auth-submit.is-loading::after { animation-duration: 1200ms; }
 }
+
+/* In-app confirm modal (replaces native confirm()) */
+.confirm-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(11, 10, 8, 0.72);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  animation: confirm-fade 140ms ease-out;
+}
+.confirm-card {
+  background: var(--washi-200); border: 2px solid var(--washi-300);
+  max-width: 320px; width: 100%; padding: 22px 20px;
+  animation: confirm-pop 160ms ease-out;
+}
+.confirm-message {
+  font-family: var(--font-display); font-size: 17px; font-weight: 600;
+  color: var(--shoyu-700); margin: 0 0 18px; text-align: center;
+}
+.confirm-actions { display: flex; gap: 10px; }
+.confirm-cancel, .confirm-ok {
+  flex: 1; padding: 11px; font-family: var(--font-display); font-size: 12px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;
+}
+.confirm-cancel {
+  background: none; border: 1px solid var(--washi-300); color: var(--shoyu-500);
+}
+.confirm-cancel:active { background: var(--washi-300-soft); }
+.confirm-ok { background: var(--bronze-500); border: none; color: var(--ink-on-rust); }
+.confirm-ok:active { transform: scale(0.97); }
+
+@keyframes confirm-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes confirm-pop { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .confirm-overlay, .confirm-card { animation: none; }
+}

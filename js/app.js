@@ -285,6 +285,27 @@ function header(title, showBack = true) {
   app.appendChild(div);
 }
 
+/* In-app confirm modal -- used instead of the browser's native confirm(),
+   which shows the raw origin URL and can't be styled to match the product. */
+function showConfirm(message, confirmLabel, onConfirm) {
+  const overlay = document.createElement("div");
+  overlay.className = "confirm-overlay";
+  overlay.innerHTML = `
+    <div class="confirm-card">
+      <p class="confirm-message">${message}</p>
+      <div class="confirm-actions">
+        <button type="button" class="confirm-cancel">Cancel</button>
+        <button type="button" class="confirm-ok">${confirmLabel}</button>
+      </div>
+    </div>
+  `;
+  const close = () => overlay.remove();
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
+  overlay.querySelector(".confirm-cancel").onclick = close;
+  overlay.querySelector(".confirm-ok").onclick = () => { close(); onConfirm(); };
+  document.body.appendChild(overlay);
+}
+
 /* Device-local storage helpers (per-device, no accounts) */
 const PROGRESS_KEY = "p131-progress";
 
@@ -451,9 +472,10 @@ function renderHome() {
     </div>
   `;
   hero.querySelector(".home-logout-btn").onclick = () => {
-    if (!confirm("Log out of Chirius?")) return;
-    clearAuth();
-    location.reload();
+    showConfirm("Exit?", "Log out", () => {
+      clearAuth();
+      location.reload();
+    });
   };
   app.appendChild(hero);
 

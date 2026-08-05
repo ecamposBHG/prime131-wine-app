@@ -1128,7 +1128,7 @@ const LEARNING_MODULES = [
             type: "text",
             title: "A Genuine Unicorn",
             body: "Cured Oak is one of the most chased bottles in the whole E.H. Taylor lineup. The original 2015 release built a cult following, disappeared from production for over a decade, and only came back in 2026. Knowing that story is what turns this from just another bourbon on the back bar into a moment for the guest.",
-            note: "This isn't a bottle you'll pour every night — treat it like the rarity it is."
+            note: "This isn't a bottle you'll pour every night — treat it like the rarity it is. It's also the only Colonel E.H. Taylor bottle on our list — we carry other Buffalo Trace whiskeys, but not the rest of the Taylor line."
           },
           {
             type: "text",
@@ -1157,8 +1157,8 @@ const LEARNING_MODULES = [
           {
             type: "text",
             title: "The Pitch",
-            body: "Lead with \"the barrel is the star, not the age.\" That's the hook that separates Cured Oak from Small Batch or Single Barrel in the E.H. Taylor line. Strong upsell move: pour it side-by-side with a standard E.H. Taylor so the guest can taste directly what the extra curing time does.",
-            note: "A side-by-side pour is a tasting-menu moment, not just a pour — treat it that way with the guest."
+            body: "Lead with \"the barrel is the star, not the age.\" Cured Oak is the only Colonel E.H. Taylor bottle we carry — if a guest asks how it compares to Small Batch or Single Barrel, be upfront that we only pour Cured Oak from that line. For a side-by-side, pour it next to one of our other Buffalo Trace whiskeys so the guest can taste directly what the extra barrel curing time does.",
+            note: "A side-by-side pour against a standard Buffalo Trace is a tasting-menu moment, not just a pour — treat it that way with the guest."
           }
         ]
       }

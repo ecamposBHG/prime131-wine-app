@@ -991,23 +991,7 @@ const LEARNING_MODULES = [
         ]
       }
     ],
-    test: [
-      {
-        question: "What actually causes Olive Wagyu's lower melting point?",
-        options: ["A higher percentage of oleic acid from the olive-pulp diet", "The cattle are younger than standard A5 cattle", "It's aged longer than standard Wagyu"],
-        correctIndex: 0
-      },
-      {
-        question: "A guest says the steak is too expensive for them. What's the recommended move?",
-        options: ["Offer a discount to close the sale", "Sell the share — a 4oz cut as a split starter for the table", "Steer them away from Wagyu entirely"],
-        correctIndex: 1
-      },
-      {
-        question: "What should you proactively tell the table before it's cooked?",
-        options: ["There's no wrong way to prepare it", "Well-done brings out the best flavor", "Due to the extremely low melting point, the chef cooks it fast and precise"],
-        correctIndex: 2
-      }
-    ]
+    test: []
   },
   {
     id: "restaurant-week-floor-management",
@@ -1051,33 +1035,7 @@ const LEARNING_MODULES = [
         ]
       }
     ],
-    test: [
-      {
-        question: "A four-top has two guests seated and two guests running late. What's the rule?",
-        options: ["Seat them now to hold the table and lock in the reservation", "Do not host or seat the party until everyone has arrived", "Seat them but delay taking any drink orders"],
-        correctIndex: 1
-      },
-      {
-        question: "Why does seating incomplete parties hurt Restaurant Week service specifically?",
-        options: ["It's against health code", "It confuses the kitchen's ticket order", "It bogs down table pacing, delays drink orders, and reduces seating capacity during peak hours"],
-        correctIndex: 2
-      },
-      {
-        question: "Which check-drop line fits the \"proactive, never pushy\" standard?",
-        options: ["\"I'll leave this right here for your convenience — there's no rush at all, please take your time.\"", "\"I'll go ahead and drop this since we need the table back.\"", "\"Whenever you get a chance, we'll need this closed out.\""],
-        correctIndex: 0
-      },
-      {
-        question: "A happy table is lingering and a reservation is about to arrive. What's the recommended move?",
-        options: ["Ask them directly to wrap up", "Invite them to finish the evening at the bar with a generous offer, like a post-dinner pour or espresso", "Quietly seat the new reservation at a nearby table and let both parties share the space"],
-        correctIndex: 1
-      },
-      {
-        question: "Which phrase should never be used when checking on a table's plates?",
-        options: ["\"May I clear this space for you?\"", "\"Are you still working on that?\"", "\"Can I offer any coffee or digestifs?\""],
-        correctIndex: 1
-      }
-    ]
+    test: []
   },
   {
     id: "hrw-service-excellence",
@@ -1155,33 +1113,7 @@ const LEARNING_MODULES = [
         ]
       }
     ],
-    test: [
-      {
-        question: "A guest is ordering only from the HRW promotional menu. How should they be treated?",
-        options: ["With the same prestige and presence as a high-roller regular", "Efficiently, but with less tableside attention than full-menu guests", "The same, but table clears can wait until they leave"],
-        correctIndex: 0
-      },
-      {
-        question: "What is the \"Fire-on-Drop\" standard?",
-        options: ["Fire the next course only after plates are fully cleared", "Fire the next course as soon as the current course drops, without waiting for clearing", "Fire all courses at once at the start of the meal"],
-        correctIndex: 1
-      },
-      {
-        question: "A table is celebrating an anniversary and dining slowly. What should you do?",
-        options: ["Fire on drop regardless, since that's the benchmark", "Adjust your firing interval to match their slower tempo", "Suggest they move to the bar to free the table faster"],
-        correctIndex: 1
-      },
-      {
-        question: "Why do courses sometimes take longer during peak HRW volume?",
-        options: ["The kitchen is understaffed during HRW", "Live open-fire cooking over wood embers requires deliberate, temperature-sensitive time", "HRW tickets are deprioritized behind full-price tickets"],
-        correctIndex: 1
-      },
-      {
-        question: "What's the recommended approach to beverage pairings during HRW?",
-        options: ["Offer a full list of pairing options for every course", "Suggest one specific, targeted glass pairing during the initial order consult", "Avoid mentioning pairings unless the guest asks first"],
-        correctIndex: 1
-      }
-    ]
+    test: []
   },
   {
     id: "eh-taylor-cured-oak",
@@ -1231,33 +1163,7 @@ const LEARNING_MODULES = [
         ]
       }
     ],
-    test: [
-      {
-        question: "A guest asks why Cured Oak costs more than your other E.H. Taylor pours. What's your answer?",
-        options: ["It's older than the other releases", "It's the barrel, not the age — staves are air-dried over double the standard time, changing the flavor before the whiskey goes in", "It's a limited label design"],
-        correctIndex: 1
-      },
-      {
-        question: "A guest is deciding between Cured Oak and E.H. Taylor Small Batch. What's your move?",
-        options: ["Recommend whichever is cheaper", "Suggest pouring them side-by-side so the guest can taste the curing difference directly", "Tell them they taste basically the same"],
-        correctIndex: 1
-      },
-      {
-        question: "A guest says they don't like harsh, tannic whiskey. Why might you point them toward Cured Oak?",
-        options: ["It has no oak influence at all", "The extended air-drying mellows the wood's harsher tannins before use, so it tends to drink smoother", "It's diluted to a lower proof"],
-        correctIndex: 1
-      },
-      {
-        question: "A guest wants fruit-forward tasting notes, not smoke or oak. What do you highlight?",
-        options: ["Apricot, lemon oil, and honey on the nose, moving into stone fruit and orange blossom", "Tobacco and leather", "Char and campfire smoke"],
-        correctIndex: 0
-      },
-      {
-        question: "What proof should you tell a guest this is bottled at, and why does it matter to a Bottled-in-Bond fan?",
-        options: ["80 proof — smooth and easy drinking", "100 proof — Bottled-in-Bond signals a specific, regulated production standard some guests specifically seek out", "120 proof — cask strength"],
-        correctIndex: 1
-      }
-    ]
+    test: []
   }
 ];
 

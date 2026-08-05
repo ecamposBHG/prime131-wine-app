@@ -1182,6 +1182,82 @@ const LEARNING_MODULES = [
         correctIndex: 1
       }
     ]
+  },
+  {
+    id: "eh-taylor-cured-oak",
+    title: "Colonel E.H. Taylor Cured Oak: Selling a Unicorn Pour",
+    category: "Bar",
+    unlockAfter: null,
+    chapters: [
+      {
+        title: "The Story & The Pour",
+        sections: [
+          {
+            type: "text",
+            title: "A Genuine Unicorn",
+            body: "Cured Oak is one of the most chased bottles in the whole E.H. Taylor lineup. The original 2015 release built a cult following, disappeared from production for over a decade, and only came back in 2026. Knowing that story is what turns this from just another bourbon on the back bar into a moment for the guest.",
+            note: "This isn't a bottle you'll pour every night — treat it like the rarity it is."
+          },
+          {
+            type: "text",
+            title: "Who Was Colonel E.H. Taylor",
+            body: "Colonel E.H. Taylor Jr. shaped how bourbon gets made and regulated. In the late 1800s he pushed the legislation that became the Bottled-in-Bond Act, and brought techniques like copper fermentation tanks and steam-heated warehouses into Buffalo Trace that are still used today.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "What Makes It Different: The Wood, Not the Age",
+            body: "The staves for these barrels air-dry for 13 months — more than double Buffalo Trace's standard six-month cure. That extra time lets the wood shed its harsher tannins and mellow out before the whiskey ever touches it, so a lot of the flavor work happens before fermentation even starts.",
+            note: "This is the single fact that makes Cured Oak worth explaining to a guest — the barrel prep is the whole story."
+          },
+          {
+            type: "text",
+            title: "The Specs",
+            body: "100 proof, Bottled-in-Bond, aged 10 years for this 2026 release (the original 2015 bottling carried a 17-year statement — different release, don't mix them up). Aged in Warehouse C, built by the Colonel himself in 1885. Mash Bill #1, Buffalo Trace's standard bourbon mash.",
+            note: "Guests who know Bottled-in-Bond will ask — 100 proof, government-regulated production standard, single distillery and distilling season."
+          },
+          {
+            type: "image",
+            title: "On the Back Bar",
+            imageUrl: "images/learning/taylor-cured-oak-bottle.jpg",
+            caption: "Tasting notes to give guests: tobacco, dried fruit, vanilla, toffee, seasoned oak, long dry finish. Also worth mentioning if a guest wants something brighter: apricot, lemon oil, and honey on the nose, moving into stone fruit, toasted cedar spice, and orange blossom on the palate."
+          },
+          {
+            type: "text",
+            title: "The Pitch",
+            body: "Lead with \"the barrel is the star, not the age.\" That's the hook that separates Cured Oak from Small Batch or Single Barrel in the E.H. Taylor line. Strong upsell move: pour it side-by-side with a standard E.H. Taylor so the guest can taste directly what the extra curing time does.",
+            note: "A side-by-side pour is a tasting-menu moment, not just a pour — treat it that way with the guest."
+          }
+        ]
+      }
+    ],
+    test: [
+      {
+        question: "A guest asks why Cured Oak costs more than your other E.H. Taylor pours. What's your answer?",
+        options: ["It's older than the other releases", "It's the barrel, not the age — staves are air-dried over double the standard time, changing the flavor before the whiskey goes in", "It's a limited label design"],
+        correctIndex: 1
+      },
+      {
+        question: "A guest is deciding between Cured Oak and E.H. Taylor Small Batch. What's your move?",
+        options: ["Recommend whichever is cheaper", "Suggest pouring them side-by-side so the guest can taste the curing difference directly", "Tell them they taste basically the same"],
+        correctIndex: 1
+      },
+      {
+        question: "A guest says they don't like harsh, tannic whiskey. Why might you point them toward Cured Oak?",
+        options: ["It has no oak influence at all", "The extended air-drying mellows the wood's harsher tannins before use, so it tends to drink smoother", "It's diluted to a lower proof"],
+        correctIndex: 1
+      },
+      {
+        question: "A guest wants fruit-forward tasting notes, not smoke or oak. What do you highlight?",
+        options: ["Apricot, lemon oil, and honey on the nose, moving into stone fruit and orange blossom", "Tobacco and leather", "Char and campfire smoke"],
+        correctIndex: 0
+      },
+      {
+        question: "What proof should you tell a guest this is bottled at, and why does it matter to a Bottled-in-Bond fan?",
+        options: ["80 proof — smooth and easy drinking", "100 proof — Bottled-in-Bond signals a specific, regulated production standard some guests specifically seek out", "120 proof — cask strength"],
+        correctIndex: 1
+      }
+    ]
   }
 ];
 

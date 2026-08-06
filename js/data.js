@@ -177,7 +177,7 @@ const WINES = [
     grape: "100% Pinot Noir", producer: "Flowers Vineyard & Winery", region: "Sonoma Coast, California",
     winemaker: "Chantal Forthun, Director of Winemaking",
     flavorTags: ["Wild Strawberry", "Dark Cherry", "Baking Spice", "Earthy Mineral"],
-    structure: { sweetness: 1, acidity: 3, tannin: 2, alcohol: 3, body: 3 },
+    structure: { sweetness: 1, acidity: 3, tannin: 2, alcohol: 4, body: 3 },
     guestDescription: "Pinot Noir from the wildest part of the Sonoma Coast &mdash; wild strawberry, dark cherry, real earthy. Structured enough to handle the skirt steak.",
     sellingPoints: ["Grown on the most extreme coastline in Sonoma", "Elegant but has real backbone", "Stands up to steak, unlike most Pinot"],
     winemakingNote: "Uses native yeast fermentation and minimal intervention, letting the cool, foggy vineyard site speak for itself rather than winemaking technique.",

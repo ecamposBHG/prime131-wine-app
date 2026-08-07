@@ -101,11 +101,25 @@ function pickChallenger(pool, championId, usedOpponentIds, deltaPreference) {
 // Builds a full themed block: a chain of rounds under one fixed axis,
 // with the winner of each round carrying forward as champion into the
 // next. `startingWineId` is optional -- if omitted, a random scoped wine
-// with at least one valid pairing is chosen.
-function buildKnockoutBlock(wines, axisKey, roundCount = 6, startingWineId = null) {
-  const pool = buildAxisPool(wines, axisKey);
+// with at least one valid pairing is chosen. `excludeWineId` is optional --
+// if provided, that wine is removed from the pool entirely for this block
+// (used to keep the previous session's undefeated winner from dominating
+// the next session too). If excluding it would leave the axis unbuildable,
+// the exclusion is silently dropped rather than failing the block.
+function buildKnockoutBlock(wines, axisKey, roundCount = 6, startingWineId = null, excludeWineId = null) {
+  let activeWines = wines;
+  if (excludeWineId) {
+    const withoutExcluded = wines.filter((w) => w.id !== excludeWineId);
+    try {
+      const testPool = buildAxisPool(withoutExcluded, axisKey);
+      const hasAnyPairs = Object.values(testPool.buckets).some((b) => b.length > 0);
+      if (hasAnyPairs) activeWines = withoutExcluded;
+    } catch (e) { /* fall through and keep the full pool */ }
+  }
+
+  const pool = buildAxisPool(activeWines, axisKey);
   const wineById = {};
-  wines.forEach((w) => { wineById[w.id] = w; });
+  activeWines.forEach((w) => { wineById[w.id] = w; });
 
   const eligibleStarters = pool.scoped.filter((w) =>
     Object.values(pool.buckets).some((bucket) =>

@@ -2086,6 +2086,14 @@ function setKnockoutBest(axisKey, val) {
   try { localStorage.setItem(KNOCKOUT_BEST_PREFIX + axisKey, String(val)); } catch (e) {}
 }
 
+const KNOCKOUT_LAST_CHAMP_PREFIX = "p131-last-champ-knockout-";
+function getKnockoutLastChampion(axisKey) {
+  try { return localStorage.getItem(KNOCKOUT_LAST_CHAMP_PREFIX + axisKey) || null; } catch (e) { return null; }
+}
+function setKnockoutLastChampion(axisKey, wineId) {
+  try { localStorage.setItem(KNOCKOUT_LAST_CHAMP_PREFIX + axisKey, wineId); } catch (e) {}
+}
+
 function knockoutWineIcon(wine) {
   return wine.style === "sake" ? "\u{1F376}" : wine.style === "sparkling" ? "\u{1F942}" : "\u{1F377}";
 }
@@ -2149,7 +2157,8 @@ function renderKnockoutRun() {
   if (!current.params.block) {
     let block;
     try {
-      block = ChiriusKnockout.buildKnockoutBlock(WINES, axisKey, 6);
+      const lastChamp = getKnockoutLastChampion(axisKey);
+      block = ChiriusKnockout.buildKnockoutBlock(WINES, axisKey, 6, null, lastChamp);
     } catch (e) {
       go("knockout", {}, false);
       return;
@@ -2283,6 +2292,7 @@ function renderKnockoutEnd(axisKey, block, playerCorrect) {
   const best = getKnockoutBest(axisKey);
   const isRecord = maxStreak > best;
   if (isRecord) { setKnockoutBest(axisKey, maxStreak); celebrate(); }
+  setKnockoutLastChampion(axisKey, block.finalChampionId);
 
   const wrap = document.createElement("div");
   wrap.className = "speed-end";
@@ -2292,6 +2302,7 @@ function renderKnockoutEnd(axisKey, block, playerCorrect) {
     <p class="speed-end-label">correct calls \u00b7 ${axisKey}</p>
     <p class="speed-end-best">${isRecord ? "&#127942; New personal best streak!" : `Best streak so far: ${best}`}</p>
     <p class="knockout-streak" style="margin-top:14px;">Reigning champion: <b>${finalChampion ? finalChampion.name : "\u2014"}</b> (${finalStreak} round${finalStreak === 1 ? "" : "s"} running)</p>
+    <p class="knockout-streak" style="margin-top:2px; text-transform:none; font-size:9px;">${finalChampion ? finalChampion.name : "This wine"} sits out the next ${axisKey} session</p>
   `;
   app.appendChild(wrap);
 

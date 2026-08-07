@@ -259,6 +259,7 @@ function render() {
   else if (current.view === "match-it-picker") renderMatchItPicker();
   else if (current.view === "knockout") renderKnockout();
   else if (current.view === "knockout-run") renderKnockoutRun();
+  else if (current.view === "allergy-sort") renderAllergyIntro();
   else if (current.view === "allergy-sort-run") renderAllergySortRun();
   else if (current.view === "cocktail-type") renderCocktailTypeChooser();
   else if (current.view === "cocktail-list") renderCocktailList();
@@ -2073,7 +2074,7 @@ function renderGameRoom() {
   options.querySelector('[data-go="imposter"]').onclick = () => go("imposter");
   options.querySelector('[data-go="sommsays"]').onclick = () => go("somm-says");
   options.querySelector('[data-go="knockout"]').onclick = () => go("knockout");
-  options.querySelector('[data-go="allergy-sort"]').onclick = () => go("allergy-sort-run", { streak: 0, prevAllergen: null });
+  options.querySelector('[data-go="allergy-sort"]').onclick = () => go("allergy-sort");
   app.appendChild(options);
 }
 
@@ -2339,6 +2340,49 @@ function renderKnockoutEnd(axisKey, block, playerCorrect) {
    render() would tear down the very card being dragged, same reasoning as
    the existing Test Me swipe screen. */
 
+function renderAllergyIntro() {
+  header("Allergy Sort", true, () => go("game-room"));
+
+  const eyebrow = document.createElement("p");
+  eyebrow.className = "hero-meta strong";
+  eyebrow.style.textAlign = "center";
+  eyebrow.textContent = "Survival Streak";
+  app.appendChild(eyebrow);
+
+  const title = document.createElement("p");
+  title.className = "hero-name";
+  title.style.textAlign = "center";
+  title.textContent = "Sort by allergen.";
+  app.appendChild(title);
+
+  const sub = document.createElement("p");
+  sub.className = "testme-counter";
+  sub.style.textTransform = "none";
+  sub.style.letterSpacing = "normal";
+  sub.style.fontFamily = "var(--font-body)";
+  sub.style.fontSize = "13px";
+  sub.style.lineHeight = "1.5";
+  sub.style.margin = "0 0 18px";
+  sub.textContent = "Six real dishes, one allergen. Drag each into the right bin. Clear all six and the streak continues with a new allergen \u2014 one miss ends it.";
+  app.appendChild(sub);
+
+  const best = getAllergyBestStreak();
+  if (best > 0) {
+    const bestLine = document.createElement("p");
+    bestLine.className = "testme-counter";
+    bestLine.textContent = "Best streak: " + best;
+    app.appendChild(bestLine);
+  }
+
+  const playBtn = document.createElement("button");
+  playBtn.className = "btn-start";
+  playBtn.style.width = "100%";
+  playBtn.style.marginTop = "8px";
+  playBtn.textContent = "Play";
+  playBtn.onclick = () => go("allergy-sort-run", { streak: 0, prevAllergen: null });
+  app.appendChild(playBtn);
+}
+
 const ALLERGY_BEST_STREAK_KEY = "p131-best-allergy-streak";
 function getAllergyBestStreak() {
   try { return parseInt(localStorage.getItem(ALLERGY_BEST_STREAK_KEY)) || 0; } catch (e) { return 0; }
@@ -2362,7 +2406,7 @@ function renderAllergySortRun() {
   const prevAllergen = current.params.prevAllergen || null;
   const allergen = pickRandomAllergen(prevAllergen);
   const label = ChiriusAllergySort.ALLERGY_SORT_LABELS[allergen];
-  header("Allergy Sort", true, () => go("game-room"));
+  header("Allergy Sort", true, () => go("allergy-sort"));
 
   let round;
   try {
@@ -2497,11 +2541,11 @@ function renderAllergySortRun() {
     fallbackRow.className = "asort-fallback-row";
     const hasBtn = document.createElement("button");
     hasBtn.className = "asort-fallback-btn";
-    hasBtn.textContent = "\u2190 Contains " + label;
+    hasBtn.textContent = "\u2190 Contains it";
     hasBtn.onclick = () => commitPlacement(dish, "has");
     const withoutBtn = document.createElement("button");
     withoutBtn.className = "asort-fallback-btn";
-    withoutBtn.textContent = label + "-Free \u2192";
+    withoutBtn.textContent = "Free of it \u2192";
     withoutBtn.onclick = () => commitPlacement(dish, "without");
     fallbackRow.appendChild(hasBtn);
     fallbackRow.appendChild(withoutBtn);

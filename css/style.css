@@ -607,10 +607,10 @@ button, input {
 .asort-bin { flex: 1; display: flex; flex-direction: column; }
 .asort-bin-header { font-family: var(--font-display); font-size: 13px; font-weight: 600; text-align: center; margin: 0 0 6px; }
 .asort-well {
-  flex: 1; min-height: 150px; border: 2px dashed var(--washi-300); background: var(--washi-200);
+  flex: 1; min-height: 150px; border: 2px solid var(--washi-300); background: var(--washi-200);
   position: relative; padding: 8px 6px; transition: border-color 120ms ease, background 120ms ease;
 }
-.asort-well.drag-over { border-color: var(--bronze-500); border-style: solid; background: var(--sumi-700); }
+.asort-well.drag-over { border-color: var(--bronze-500); background: var(--sumi-700); }
 .asort-count {
   position: absolute; top: -10px; right: -6px; width: 20px; height: 20px;
   background: var(--washi-300); color: var(--shoyu-700); font-family: var(--font-mono);
@@ -618,17 +618,18 @@ button, input {
   border: 1px solid var(--sumi-900); z-index: 2;
 }
 .asort-placed {
-  background: var(--sumi-700); border: 1.5px solid var(--washi-300); padding: 6px 8px;
-  margin-bottom: 5px; font-family: var(--font-body); font-size: 10.5px; font-weight: 600;
-  color: var(--shoyu-500); position: relative;
+  background: var(--sumi-700); border: 1.5px solid var(--washi-300); padding: 8px 9px;
+  margin-bottom: 6px; font-family: var(--font-body); font-size: 11px; font-weight: 600;
+  color: var(--shoyu-500); position: relative; animation: asortDropIn 180ms ease-out;
 }
+@keyframes asortDropIn { from { opacity: 0; transform: translateY(-6px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
 .asort-placed.correct { border-color: var(--wasabi-500); color: var(--shoyu-700); }
 .asort-placed.wrong { border-color: var(--error-500); color: var(--shoyu-700); cursor: pointer; }
-.asort-placed.wrong::after { content: "tap to learn"; display: block; font-family: var(--font-mono); font-size: 7.5px; color: var(--error-500); text-transform: uppercase; margin-top: 2px; font-weight: 400; }
-.asort-placed.correct.learn::after { content: "tap to learn"; display: block; font-family: var(--font-mono); font-size: 7.5px; color: var(--wasabi-500); text-transform: uppercase; margin-top: 2px; font-weight: 400; }
+.asort-placed.wrong::after { content: "tap to learn"; display: block; font-family: var(--font-mono); font-size: 9px; color: var(--error-500); text-transform: uppercase; margin-top: 3px; font-weight: 400; }
+.asort-placed.correct.learn::after { content: "tap to learn"; display: block; font-family: var(--font-mono); font-size: 9px; color: var(--wasabi-500); text-transform: uppercase; margin-top: 3px; font-weight: 400; }
 .asort-placed.learn { cursor: pointer; }
 .asort-badge {
-  position: absolute; top: -6px; right: -6px; width: 15px; height: 15px; font-size: 9px;
+  position: absolute; top: -7px; right: -7px; width: 17px; height: 17px; font-size: 10px;
   display: flex; align-items: center; justify-content: center; color: var(--ink-on-rust); font-weight: 700;
 }
 .asort-placed.correct .asort-badge { background: var(--wasabi-500); }
@@ -638,13 +639,13 @@ button, input {
   width: 100%; max-width: 260px; background: var(--sumi-700); border: 2px solid var(--washi-300);
   padding: 16px 14px; text-align: center; cursor: grab; touch-action: none; position: relative; z-index: 5;
 }
-.asort-active-section { font-family: var(--font-mono); font-size: 8px; color: var(--bronze-200); text-transform: uppercase; letter-spacing: 0.4px; margin: 0 0 6px; }
+.asort-active-section { font-family: var(--font-mono); font-size: 9px; color: var(--bronze-200); text-transform: uppercase; letter-spacing: 0.4px; margin: 0 0 6px; }
 .asort-active-name { font-family: var(--font-display); font-size: 15px; font-weight: 600; margin: 0 0 4px; }
 .asort-active-desc { font-family: var(--font-body); font-size: 10.5px; color: var(--shoyu-300); margin: 0; line-height: 1.4; }
 .asort-fallback-row { display: flex; gap: 8px; margin-top: 10px; width: 100%; max-width: 260px; }
 .asort-fallback-btn {
   flex: 1; background: none; border: 1px solid var(--washi-300); color: var(--shoyu-300);
-  font-family: var(--font-mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.3px;
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px;
   padding: 8px 4px; cursor: pointer;
 }
 .asort-verdict-sub { font-family: var(--font-body); font-size: 11.5px; color: var(--shoyu-300); text-align: center; margin: 0 0 4px; }
@@ -853,7 +854,7 @@ button, input {
   .wotd-strip, .wotd-shuffle, .theme-toggle, .back-btn, .section-toggle,
   .allergen-filter-chip, .testme-reset, .predict-btn, .somm-btn,
   .flipcard, .dish-flipcard, .testme-card, .imposter-tile,
-  .learning-card, .quiz-opt, .btn-start, .video-frame, .wcard, .knockout-hint-btn {
+  .learning-card, .quiz-opt, .btn-start, .video-frame, .wcard, .knockout-hint-btn, .asort-placed {
     animation: none !important;
     transition: background var(--press-duration) ease-out, border-color var(--press-duration) ease-out !important;
     transform: none !important;

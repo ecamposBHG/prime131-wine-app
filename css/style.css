@@ -567,6 +567,41 @@ button, input {
 .tot-verdict { font-size: 15px; font-weight: 600; color: var(--shoyu-700); margin: 0 0 6px; }
 .tot-explain .footer-btn { width: 100%; margin-top: 12px; }
 
+/* Knockout */
+.knockout-streak {
+  font-family: var(--font-mono); font-size: 10px; color: var(--shoyu-300);
+  text-transform: uppercase; letter-spacing: 0.4px; text-align: center; margin: 8px 0 14px;
+}
+.knockout-streak b { color: var(--bronze-200); font-family: var(--font-display); font-size: 13px; text-transform: none; letter-spacing: 0; }
+.matchup { display: flex; gap: 10px; margin: 0 0 4px; }
+.wcard {
+  flex: 1; background: var(--washi-200); border: 2px solid var(--washi-300);
+  cursor: pointer; text-align: center; padding: 14px 10px 16px; position: relative;
+}
+.wcard.correct { border-color: var(--wasabi-500); }
+.wcard.wrong { border-color: var(--error-500); }
+.wcard-badge {
+  position: absolute; top: -2px; right: -2px; width: 20px; height: 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: var(--washi-100);
+}
+.wcard.correct .wcard-badge { background: var(--wasabi-500); }
+.wcard.wrong .wcard-badge { background: var(--error-500); }
+.wcard-crown {
+  font-family: var(--font-mono); font-size: 9px; color: var(--bronze-200);
+  text-transform: uppercase; letter-spacing: 0.5px; min-height: 12px; margin-bottom: 8px;
+}
+.wcard-icon { font-size: 26px; margin-bottom: 8px; }
+.wcard-name { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--shoyu-700); margin: 0 0 4px; line-height: 1.2; }
+.wcard-meta { font-family: var(--font-mono); font-size: 9px; color: var(--shoyu-300); line-height: 1.5; }
+.knockout-explain { margin-top: 16px; }
+.knockout-hint-row { display: flex; justify-content: center; margin: 12px 0 0; }
+.knockout-hint-btn {
+  background: none; border: 1px solid var(--washi-300); color: var(--shoyu-300);
+  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.4px; padding: 7px 14px; cursor: pointer;
+}
+
 /* Match It */
 .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .match-tile {
@@ -725,7 +760,7 @@ button, input {
 .wotd-strip, .wotd-main, .wotd-shuffle, .theme-toggle, .back-btn, .section-toggle,
 .match-tile, .allergen-filter-chip, .testme-reset, .predict-btn, .somm-btn,
 .flipcard, .dish-flipcard, .testme-card, .imposter-tile,
-.learning-card, .quiz-opt, .btn-start, .video-frame {
+.learning-card, .quiz-opt, .btn-start, .video-frame, .wcard, .knockout-hint-btn {
   transition: transform var(--press-duration) ease-out, background var(--press-duration) ease-out, border-color var(--press-duration) ease-out;
 }
 .home-option:active, .home-card:active, .list-row:active, .pill:active, .nav-chip:active,
@@ -735,7 +770,8 @@ button, input {
 .testme-reset:active, .predict-btn:active, .somm-btn:active,
 .flipcard:active, .dish-flipcard:active, .testme-card:active,
 .imposter-tile:not(.revealed):active,
-.learning-card:active, .quiz-opt:active, .btn-start:active, .video-frame:active {
+.learning-card:active, .quiz-opt:active, .btn-start:active, .video-frame:active,
+.wcard:not(.correct):not(.wrong):active, .knockout-hint-btn:not(:disabled):active {
   transform: scale(0.97);
 }
 
@@ -749,7 +785,8 @@ button, input {
 .allergen-filter-chip:focus-visible, .predict-btn:focus-visible, .somm-btn:focus-visible,
 .flipcard:focus-visible, .dish-flipcard:focus-visible, .testme-card:focus-visible,
 .imposter-tile:focus-visible, .search-input:focus-visible,
-.learning-card:focus-visible, .quiz-opt:focus-visible, .btn-start:focus-visible, .video-frame:focus-visible {
+.learning-card:focus-visible, .quiz-opt:focus-visible, .btn-start:focus-visible, .video-frame:focus-visible,
+.wcard:focus-visible, .knockout-hint-btn:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
 }
@@ -763,7 +800,7 @@ button, input {
   .wotd-strip, .wotd-shuffle, .theme-toggle, .back-btn, .section-toggle,
   .allergen-filter-chip, .testme-reset, .predict-btn, .somm-btn,
   .flipcard, .dish-flipcard, .testme-card, .imposter-tile,
-  .learning-card, .quiz-opt, .btn-start, .video-frame {
+  .learning-card, .quiz-opt, .btn-start, .video-frame, .wcard, .knockout-hint-btn {
     animation: none !important;
     transition: background var(--press-duration) ease-out, border-color var(--press-duration) ease-out !important;
     transform: none !important;

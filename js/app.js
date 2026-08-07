@@ -34,7 +34,7 @@ history.replaceState({ view: "home", params: {} }, "", "");
 // subtitle, flip-card faces, etc). Give them button semantics and
 // keyboard support once per render rather than repeating this in every
 // render function.
-const KEYBOARD_TAPPABLE_SELECTOR = ".home-option, .home-card, .list-row, .speed-toggle, .wotd-main, .flipcard, .dish-flipcard, .testme-card, .video-frame";
+const KEYBOARD_TAPPABLE_SELECTOR = ".home-option, .home-card, .list-row, .speed-toggle, .wotd-main, .flipcard, .dish-flipcard, .testme-card, .video-frame, .wcard";
 
 function makeDivsKeyboardAccessible() {
   app.querySelectorAll(KEYBOARD_TAPPABLE_SELECTOR).forEach((el) => {
@@ -257,6 +257,8 @@ function render() {
   else if (current.view === "somm-says-run") renderSommSaysRun(current.params.seconds);
   else if (current.view === "match-it") renderMatchIt(current.params.matchType);
   else if (current.view === "match-it-picker") renderMatchItPicker();
+  else if (current.view === "knockout") renderKnockout();
+  else if (current.view === "knockout-run") renderKnockoutRun();
   else if (current.view === "cocktail-type") renderCocktailTypeChooser();
   else if (current.view === "cocktail-list") renderCocktailList();
   else if (current.view === "classic-cocktail-list") renderClassicCocktailList();
@@ -2055,13 +2057,257 @@ function renderGameRoom() {
       <div class="home-icon-circle">&#9889;</div>
       <div class="home-option-text"><p>Sommelier Says</p><span>Rapid-fire true or false, against the clock</span></div>
     </div>
+    <div class="home-option" data-go="knockout">
+      <div class="home-icon-circle">&#128081;</div>
+      <div class="home-option-text"><p>Knockout</p><span>One structure axis, one champion &mdash; defend the title or dethrone it</span></div>
+    </div>
   `;
   options.querySelector('[data-go="testme"]').onclick = () => go("test-me");
   options.querySelector('[data-go="thisorthat"]').onclick = () => go("this-or-that");
   options.querySelector('[data-go="matchit"]').onclick = () => go("match-it-picker");
   options.querySelector('[data-go="imposter"]').onclick = () => go("imposter");
   options.querySelector('[data-go="sommsays"]').onclick = () => go("somm-says");
+  options.querySelector('[data-go="knockout"]').onclick = () => go("knockout");
   app.appendChild(options);
+}
+
+/* ---------- Knockout: fixed-axis structure duel with a persistent champion.
+   Matchup generation, delta-weighted difficulty, and anti-repeat logic all
+   live in knockout-engine.js (window.ChiriusKnockout) -- this section is
+   render/state only. A block's outcomes (who wins each round) are fully
+   determined by real structure data the moment the block is built; only
+   the player's guesses and accuracy are decided at render time. */
+
+const KNOCKOUT_BEST_PREFIX = "p131-best-knockout-";
+function getKnockoutBest(axisKey) {
+  try { return parseInt(localStorage.getItem(KNOCKOUT_BEST_PREFIX + axisKey)) || 0; } catch (e) { return 0; }
+}
+function setKnockoutBest(axisKey, val) {
+  try { localStorage.setItem(KNOCKOUT_BEST_PREFIX + axisKey, String(val)); } catch (e) {}
+}
+
+function knockoutWineIcon(wine) {
+  return wine.style === "sake" ? "\u{1F376}" : wine.style === "sparkling" ? "\u{1F942}" : "\u{1F377}";
+}
+
+/* Longest run of consecutive wins by the same wine, and the length of the
+   run still active at the end of the block (0 if not needed). */
+function knockoutStreaks(rounds) {
+  const winners = rounds.map(r => r.winnerId);
+  let maxStreak = 1, curLen = 1;
+  for (let i = 1; i < winners.length; i++) {
+    curLen = winners[i] === winners[i - 1] ? curLen + 1 : 1;
+    if (curLen > maxStreak) maxStreak = curLen;
+  }
+  let finalStreak = 1;
+  for (let i = winners.length - 1; i > 0; i--) {
+    if (winners[i] === winners[i - 1]) finalStreak++; else break;
+  }
+  return { maxStreak, finalStreak };
+}
+
+function renderKnockout() {
+  header("Knockout");
+
+  const intro = document.createElement("p");
+  intro.className = "testme-counter";
+  intro.textContent = "Pick a structure axis. One wine defends its title until something knocks it out.";
+  app.appendChild(intro);
+
+  const options = document.createElement("div");
+  options.className = "home-options";
+  Object.keys(ChiriusKnockout.KNOCKOUT_AXES).forEach((axisKey) => {
+    let pairCount = 0;
+    try {
+      const pool = ChiriusKnockout.buildAxisPool(WINES, axisKey);
+      pairCount = Object.values(pool.buckets).reduce((n, b) => n + b.length, 0);
+    } catch (e) { pairCount = 0; }
+    if (pairCount === 0) return; // axis has no valid pairs at all -- don't offer it
+    const best = getKnockoutBest(axisKey);
+    const label = axisKey.charAt(0).toUpperCase() + axisKey.slice(1);
+    const opt = document.createElement("div");
+    opt.className = "home-option";
+    opt.innerHTML = `
+      <div class="home-option-text">
+        <p>${label}</p>
+        <span>${pairCount} matchups${best ? ` \u00b7 Best streak: ${best}` : ""}</span>
+      </div>
+    `;
+    opt.onclick = () => go("knockout-run", { axis: axisKey });
+    options.appendChild(opt);
+  });
+  app.appendChild(options);
+}
+
+function renderKnockoutRun() {
+  const axisKey = current.params.axis;
+  const axisDef = ChiriusKnockout.KNOCKOUT_AXES[axisKey];
+  header("Knockout");
+
+  if (!axisDef) { go("knockout", {}, false); return; }
+
+  if (!current.params.block) {
+    let block;
+    try {
+      block = ChiriusKnockout.buildKnockoutBlock(WINES, axisKey, 6);
+    } catch (e) {
+      go("knockout", {}, false);
+      return;
+    }
+    current.params.block = block;
+    current.params.roundIndex = 0;
+    current.params.playerCorrect = 0;
+    current.params.hintsLeft = 2;
+    current.params.guessId = null;
+  }
+
+  const block = current.params.block;
+  const roundIndex = current.params.roundIndex;
+
+  if (roundIndex >= block.rounds.length) {
+    renderKnockoutEnd(axisKey, block, current.params.playerCorrect);
+    return;
+  }
+
+  const round = block.rounds[roundIndex];
+  const champion = findWine(round.championId);
+  const challenger = findWine(round.challengerId);
+  if (!champion || !challenger) { go("knockout", {}, false); return; }
+
+  if (current.params.cardOrderRound !== roundIndex) {
+    current.params.cardOrder = Math.random() < 0.5 ? ["champion", "challenger"] : ["challenger", "champion"];
+    current.params.cardOrderRound = roundIndex;
+    current.params.hintPeek = false;
+  }
+
+  let streak = 1;
+  for (let i = roundIndex - 1; i >= 0; i--) {
+    if (block.rounds[i].winnerId === round.championId) streak++;
+    else break;
+  }
+
+  const progressLine = document.createElement("p");
+  progressLine.className = "testme-counter";
+  progressLine.textContent = `Round ${roundIndex + 1} of ${block.rounds.length} \u00b7 ${current.params.playerCorrect} correct so far`;
+  app.appendChild(progressLine);
+
+  const prompt = document.createElement("p");
+  prompt.className = "hero-name";
+  prompt.style.textAlign = "center";
+  prompt.style.marginBottom = "4px";
+  prompt.textContent = axisDef.label;
+  app.appendChild(prompt);
+
+  const streakLine = document.createElement("p");
+  streakLine.className = "knockout-streak";
+  streakLine.innerHTML = `${champion.name}'s streak: <b>${streak}</b> round${streak === 1 ? "" : "s"}`;
+  app.appendChild(streakLine);
+
+  const matchup = document.createElement("div");
+  matchup.className = "matchup";
+  const revealed = !!current.params.guessId;
+  const roles = { champion, challenger };
+
+  current.params.cardOrder.forEach((role) => {
+    const wine = roles[role];
+    const card = document.createElement("div");
+    card.className = "wcard";
+    const isWinner = wine.id === round.winnerId;
+    let badge = "";
+    if (revealed) {
+      if (isWinner) { card.classList.add("correct"); badge = `<div class="wcard-badge">&#10003;</div>`; }
+      else if (wine.id === current.params.guessId) { card.classList.add("wrong"); badge = `<div class="wcard-badge">&#10005;</div>`; }
+    }
+    const val = wine.structure[axisKey];
+    const showBand = revealed || current.params.hintPeek;
+    const bandLine = showBand ? `<div class="wcard-meta" style="color:var(--bronze-200); margin-top:4px;">${WSET_BANDS[axisKey][val - 1]}</div>` : "";
+    card.innerHTML = `
+      ${badge}
+      <div class="wcard-crown">${role === "champion" ? "\u2605 Champion" : "&nbsp;"}</div>
+      <div class="wcard-icon">${knockoutWineIcon(wine)}</div>
+      <p class="wcard-name">${wine.name}</p>
+      <div class="wcard-meta">${wine.grape}<br>${wine.region}</div>
+      ${bandLine}
+    `;
+    if (!revealed) {
+      card.onclick = () => {
+        current.params.guessId = wine.id;
+        if (isWinner) current.params.playerCorrect++;
+        render();
+      };
+    }
+    matchup.appendChild(card);
+  });
+  app.appendChild(matchup);
+
+  if (!revealed && current.params.hintsLeft > 0 && !current.params.hintPeek) {
+    const hintRow = document.createElement("div");
+    hintRow.className = "knockout-hint-row";
+    hintRow.innerHTML = `<button class="knockout-hint-btn">Hint &middot; ${current.params.hintsLeft} left</button>`;
+    hintRow.querySelector("button").onclick = () => {
+      current.params.hintsLeft--;
+      current.params.hintPeek = true;
+      render();
+    };
+    app.appendChild(hintRow);
+  }
+
+  if (revealed) {
+    const winner = findWine(round.winnerId);
+    const loser = winner.id === champion.id ? challenger : champion;
+    const winnerBand = WSET_BANDS[axisKey][winner.structure[axisKey] - 1];
+    const loserBand = WSET_BANDS[axisKey][loser.structure[axisKey] - 1];
+    const guessedRight = current.params.guessId === round.winnerId;
+    const explain = document.createElement("div");
+    explain.className = "tot-explain knockout-explain";
+    explain.innerHTML = `
+      <p class="tot-verdict">${guessedRight ? "&#9989; That's right." : "&#10060; Not quite."}</p>
+      <p class="pairing-reason">${winner.name} shows ${winnerBand} ${axisKey}, ahead of ${loser.name}'s ${loserBand}.</p>
+      <button class="footer-btn footer-btn-home">Next round &rarr;</button>
+    `;
+    explain.querySelector("button").onclick = () => {
+      current.params.roundIndex++;
+      current.params.guessId = null;
+      render();
+    };
+    app.appendChild(explain);
+  }
+}
+
+function renderKnockoutEnd(axisKey, block, playerCorrect) {
+  app.innerHTML = "";
+  header("Knockout");
+
+  const { maxStreak, finalStreak } = knockoutStreaks(block.rounds);
+  const finalChampion = findWine(block.finalChampionId);
+  const best = getKnockoutBest(axisKey);
+  const isRecord = maxStreak > best;
+  if (isRecord) { setKnockoutBest(axisKey, maxStreak); celebrate(); }
+
+  const wrap = document.createElement("div");
+  wrap.className = "speed-end";
+  wrap.innerHTML = `
+    <p class="speed-end-icon">&#128081;</p>
+    <p class="speed-end-score">${playerCorrect}<span class="speed-end-total">/${block.rounds.length}</span></p>
+    <p class="speed-end-label">correct calls \u00b7 ${axisKey}</p>
+    <p class="speed-end-best">${isRecord ? "&#127942; New personal best streak!" : `Best streak so far: ${best}`}</p>
+    <p class="knockout-streak" style="margin-top:14px;">Reigning champion: <b>${finalChampion ? finalChampion.name : "\u2014"}</b> (${finalStreak} round${finalStreak === 1 ? "" : "s"} running)</p>
+  `;
+  app.appendChild(wrap);
+
+  const btnRow = document.createElement("div");
+  btnRow.className = "card-footer-nav";
+  const backBtn = document.createElement("button");
+  backBtn.className = "footer-btn";
+  backBtn.textContent = "Game Room";
+  backBtn.onclick = () => go("game-room");
+  const againBtn = document.createElement("button");
+  againBtn.className = "footer-btn footer-btn-home";
+  againBtn.textContent = "Play Again \u{1F451}";
+  againBtn.onclick = () => go("knockout-run", { axis: axisKey });
+  btnRow.appendChild(backBtn);
+  btnRow.appendChild(againBtn);
+  app.appendChild(btnRow);
 }
 
 /* ---------- Learning: modules/courses, same engine for every restaurant ---------- */

@@ -34,7 +34,7 @@ history.replaceState({ view: "home", params: {} }, "", "");
 // subtitle, flip-card faces, etc). Give them button semantics and
 // keyboard support once per render rather than repeating this in every
 // render function.
-const KEYBOARD_TAPPABLE_SELECTOR = ".home-option, .home-card, .list-row, .speed-toggle, .wotd-main, .flipcard, .dish-flipcard, .testme-card, .video-frame, .wcard";
+const KEYBOARD_TAPPABLE_SELECTOR = ".home-option, .home-card, .list-row, .speed-toggle, .wotd-main, .flipcard, .dish-flipcard, .testme-card, .video-frame, .wcard, .asort-placed";
 
 function makeDivsKeyboardAccessible() {
   app.querySelectorAll(KEYBOARD_TAPPABLE_SELECTOR).forEach((el) => {
@@ -259,6 +259,8 @@ function render() {
   else if (current.view === "match-it-picker") renderMatchItPicker();
   else if (current.view === "knockout") renderKnockout();
   else if (current.view === "knockout-run") renderKnockoutRun();
+  else if (current.view === "allergy-sort") renderAllergySort();
+  else if (current.view === "allergy-sort-run") renderAllergySortRun();
   else if (current.view === "cocktail-type") renderCocktailTypeChooser();
   else if (current.view === "cocktail-list") renderCocktailList();
   else if (current.view === "classic-cocktail-list") renderClassicCocktailList();
@@ -2061,6 +2063,10 @@ function renderGameRoom() {
       <div class="home-icon-circle">&#128081;</div>
       <div class="home-option-text"><p>Knockout</p><span>One structure axis, one champion &mdash; defend the title or dethrone it</span></div>
     </div>
+    <div class="home-option" data-go="allergy-sort">
+      <div class="home-icon-circle">&#9888;</div>
+      <div class="home-option-text"><p>Allergy Sort</p><span>Drag real dishes into the right bin &mdash; contains it, or doesn't</span></div>
+    </div>
   `;
   options.querySelector('[data-go="testme"]').onclick = () => go("test-me");
   options.querySelector('[data-go="thisorthat"]').onclick = () => go("this-or-that");
@@ -2068,6 +2074,7 @@ function renderGameRoom() {
   options.querySelector('[data-go="imposter"]').onclick = () => go("imposter");
   options.querySelector('[data-go="sommsays"]').onclick = () => go("somm-says");
   options.querySelector('[data-go="knockout"]').onclick = () => go("knockout");
+  options.querySelector('[data-go="allergy-sort"]').onclick = () => go("allergy-sort");
   app.appendChild(options);
 }
 
@@ -2319,6 +2326,311 @@ function renderKnockoutEnd(axisKey, block, playerCorrect) {
   btnRow.appendChild(backBtn);
   btnRow.appendChild(againBtn);
   app.appendChild(btnRow);
+}
+
+/* ---------- Allergy Sort: drag real dishes into "contains X" / "X-free" bins.
+   Round data comes from allergy-sort-engine.js (window.ChiriusAllergySort),
+   built from DISHES' real allergensInRecipe field -- dishes with no allergen
+   data are never shown, never assumed allergen-free. Unlike Knockout, this
+   screen builds its DOM once and manages all interaction (drag, placement,
+   guess, correction) through direct mutation, not repeated calls to the
+   global render() -- a mid-drag render() would tear down the very card
+   being dragged. This mirrors how the existing Test Me swipe screen works. */
+
+const ALLERGY_PERFECT_PREFIX = "p131-perfect-allergy-";
+function getAllergyPerfectCount(allergen) {
+  try { return parseInt(localStorage.getItem(ALLERGY_PERFECT_PREFIX + allergen)) || 0; } catch (e) { return 0; }
+}
+function bumpAllergyPerfectCount(allergen) {
+  try { localStorage.setItem(ALLERGY_PERFECT_PREFIX + allergen, String(getAllergyPerfectCount(allergen) + 1)); } catch (e) {}
+}
+
+function renderAllergySort() {
+  header("Allergy Sort", true, () => go("game-room"));
+
+  const intro = document.createElement("p");
+  intro.className = "testme-counter";
+  intro.textContent = "Pick an allergen. Drag 6 real dishes into the right bin.";
+  app.appendChild(intro);
+
+  const options = document.createElement("div");
+  options.className = "home-options";
+  ChiriusAllergySort.ALLERGY_SORT_PLAYABLE.forEach((allergen) => {
+    let has = 0, without = 0;
+    try {
+      const pool = ChiriusAllergySort.buildAllergenPool(DISHES, allergen);
+      has = pool.has.length; without = pool.without.length;
+    } catch (e) { /* skip below */ }
+    if (has < 3 || without < 3) return;
+    const label = ChiriusAllergySort.ALLERGY_SORT_LABELS[allergen];
+    const perfect = getAllergyPerfectCount(allergen);
+    const opt = document.createElement("div");
+    opt.className = "home-option";
+    opt.innerHTML = `
+      <div class="home-option-text">
+        <p>${label}</p>
+        <span>${has} contain it \u00b7 ${without} don't${perfect ? ` \u00b7 ${perfect} perfect clear${perfect === 1 ? "" : "s"}` : ""}</span>
+      </div>
+    `;
+    opt.onclick = () => go("allergy-sort-run", { allergen });
+    options.appendChild(opt);
+  });
+  app.appendChild(options);
+}
+
+function renderAllergySortRun() {
+  const allergen = current.params.allergen;
+  const label = ChiriusAllergySort.ALLERGY_SORT_LABELS[allergen];
+  header("Allergy Sort", true, () => go("allergy-sort"));
+
+  let round;
+  try {
+    round = ChiriusAllergySort.buildSortRound(DISHES, allergen, 6);
+  } catch (e) {
+    go("allergy-sort", {}, false);
+    return;
+  }
+
+  const prompt = document.createElement("p");
+  prompt.className = "hero-name";
+  prompt.style.textAlign = "center";
+  prompt.style.marginBottom = "2px";
+  prompt.textContent = "Contains " + label + "?";
+  app.appendChild(prompt);
+
+  const deckCountLine = document.createElement("p");
+  deckCountLine.className = "testme-counter";
+  app.appendChild(deckCountLine);
+
+  const bins = document.createElement("div");
+  bins.className = "asort-bins";
+  bins.innerHTML = `
+    <div class="asort-bin">
+      <p class="asort-bin-header">Contains ${label}</p>
+      <div class="asort-well" data-bin="has"><div class="asort-count">0</div></div>
+    </div>
+    <div class="asort-bin">
+      <p class="asort-bin-header">${label}-Free</p>
+      <div class="asort-well" data-bin="without"><div class="asort-count">0</div></div>
+    </div>
+  `;
+  app.appendChild(bins);
+  const binHas = bins.querySelector('[data-bin="has"]');
+  const binWithout = bins.querySelector('[data-bin="without"]');
+  const countHas = binHas.querySelector(".asort-count");
+  const countWithout = binWithout.querySelector(".asort-count");
+
+  const deckZone = document.createElement("div");
+  deckZone.className = "asort-deck-zone";
+  app.appendChild(deckZone);
+
+  const guessBtn = document.createElement("button");
+  guessBtn.className = "footer-btn footer-btn-home";
+  guessBtn.style.width = "100%";
+  guessBtn.style.marginTop = "14px";
+  guessBtn.disabled = true;
+  guessBtn.textContent = "Sort all 6 to guess";
+  app.appendChild(guessBtn);
+
+  const verdictArea = document.createElement("div");
+  app.appendChild(verdictArea);
+
+  const learnPanel = document.createElement("div");
+  learnPanel.className = "asort-learn-panel";
+  app.appendChild(learnPanel);
+
+  // ---- state (local to this screen instance, intentionally not in
+  // current.params -- leaving this screen always starts a fresh round) ----
+  let deckIndex = 0;
+  const placements = {}; // dish.id -> "has" | "without"
+  let guessed = false;
+  let wrongAttemptMade = false;
+
+  function allCorrect() {
+    return round.cards.every((c) => placements[c.id] === c.truth);
+  }
+
+  function renderCounts() {
+    countHas.textContent = Object.values(placements).filter((v) => v === "has").length;
+    countWithout.textContent = Object.values(placements).filter((v) => v === "without").length;
+    deckCountLine.textContent = (round.cards.length - deckIndex) + " of " + round.cards.length + " left to sort";
+    guessBtn.disabled = deckIndex < round.cards.length;
+    guessBtn.textContent = deckIndex < round.cards.length ? "Sort all 6 to guess" : "Guess";
+  }
+
+  function placedCardEl(dish) {
+    const el = document.createElement("div");
+    el.className = "asort-placed";
+    if (guessed) {
+      const isCorrect = placements[dish.id] === dish.truth;
+      el.classList.add(isCorrect ? "correct" : "wrong");
+      el.innerHTML = `<span class="asort-badge">${isCorrect ? "&#10003;" : "&#10005;"}</span>${dish.name}`;
+      if (!isCorrect) {
+        el.onclick = () => moveWrongCard(dish);
+      } else if (allCorrect()) {
+        el.classList.add("learn");
+        el.onclick = () => {
+          learnPanel.innerHTML = `<b>${dish.name}</b> (${dish.section}) contains: ${dish.allergens.join(", ")}.`;
+          learnPanel.classList.add("show");
+        };
+      }
+    } else {
+      el.textContent = dish.name;
+    }
+    return el;
+  }
+
+  function renderBins() {
+    binHas.querySelectorAll(".asort-placed").forEach((e) => e.remove());
+    binWithout.querySelectorAll(".asort-placed").forEach((e) => e.remove());
+    round.cards.forEach((dish) => {
+      if (!(dish.id in placements)) return;
+      const target = placements[dish.id] === "has" ? binHas : binWithout;
+      target.appendChild(placedCardEl(dish));
+    });
+  }
+
+  function moveWrongCard(dish) {
+    placements[dish.id] = placements[dish.id] === "has" ? "without" : "has";
+    renderBins();
+    renderCounts();
+    if (allCorrect()) showWinVerdict();
+  }
+
+  function commitPlacement(dish, bin) {
+    placements[dish.id] = bin;
+    deckIndex++;
+    renderBins();
+    renderCounts();
+    spawnActiveCard();
+  }
+
+  function spawnActiveCard() {
+    deckZone.querySelectorAll(".asort-active, .asort-fallback-row").forEach((e) => e.remove());
+    if (deckIndex >= round.cards.length) return;
+    const dish = round.cards[deckIndex];
+    const card = document.createElement("div");
+    card.className = "asort-active";
+    card.innerHTML = `
+      <p class="asort-active-section">${dish.section}</p>
+      <p class="asort-active-name">${dish.name}</p>
+      <p class="asort-active-desc">${dish.desc}</p>
+    `;
+    const fallbackRow = document.createElement("div");
+    fallbackRow.className = "asort-fallback-row";
+    const hasBtn = document.createElement("button");
+    hasBtn.className = "asort-fallback-btn";
+    hasBtn.textContent = "\u2190 Contains " + label;
+    hasBtn.onclick = () => commitPlacement(dish, "has");
+    const withoutBtn = document.createElement("button");
+    withoutBtn.className = "asort-fallback-btn";
+    withoutBtn.textContent = label + "-Free \u2192";
+    withoutBtn.onclick = () => commitPlacement(dish, "without");
+    fallbackRow.appendChild(hasBtn);
+    fallbackRow.appendChild(withoutBtn);
+
+    deckZone.appendChild(card);
+    deckZone.appendChild(fallbackRow);
+    attachDrag(card, dish);
+  }
+
+  function attachDrag(card, dish) {
+    let startX = 0, startY = 0, dragging = false;
+    const threshold = 55;
+
+    function onDown(e) {
+      const p = e.touches ? e.touches[0] : e;
+      startX = p.clientX; startY = p.clientY; dragging = true;
+      card.style.transition = "none";
+    }
+    function onMove(e) {
+      if (!dragging) return;
+      const p = e.touches ? e.touches[0] : e;
+      const dx = p.clientX - startX, dy = p.clientY - startY;
+      card.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx / 20}deg)`;
+      binHas.classList.toggle("drag-over", dx < -threshold);
+      binWithout.classList.toggle("drag-over", dx > threshold);
+      if (e.cancelable) e.preventDefault();
+    }
+    function onUp(e) {
+      if (!dragging) return;
+      dragging = false;
+      const p = e.changedTouches ? e.changedTouches[0] : e;
+      const dx = p.clientX - startX;
+      binHas.classList.remove("drag-over");
+      binWithout.classList.remove("drag-over");
+      if (Math.abs(dx) > threshold) {
+        const bin = dx < 0 ? "has" : "without";
+        card.style.transition = "transform 180ms ease, opacity 180ms ease";
+        card.style.transform = `translate(${dx < 0 ? -260 : 260}px, -40px) rotate(${dx < 0 ? -20 : 20}deg)`;
+        card.style.opacity = "0";
+        setTimeout(() => commitPlacement(dish, bin), 160);
+      } else {
+        card.style.transition = "transform 180ms ease";
+        card.style.transform = "translate(0,0) rotate(0)";
+      }
+    }
+
+    card.addEventListener("pointerdown", onDown);
+    card.addEventListener("pointermove", onMove);
+    card.addEventListener("pointerup", onUp);
+    card.addEventListener("pointercancel", onUp);
+    card.addEventListener("touchstart", onDown, { passive: true });
+    card.addEventListener("touchmove", onMove, { passive: false });
+    card.addEventListener("touchend", onUp);
+  }
+
+  function showWinVerdict() {
+    verdictArea.innerHTML = "";
+    if (!wrongAttemptMade) { bumpAllergyPerfectCount(allergen); celebrate(); }
+    const v = document.createElement("p");
+    v.className = "tot-verdict";
+    v.style.textAlign = "center";
+    v.textContent = "\u2705 That's right!";
+    const sub = document.createElement("p");
+    sub.className = "asort-verdict-sub";
+    sub.textContent = "Tap a card to see what's actually in it.";
+    verdictArea.appendChild(v);
+    verdictArea.appendChild(sub);
+    const btnRow = document.createElement("div");
+    btnRow.className = "card-footer-nav";
+    const backBtn = document.createElement("button");
+    backBtn.className = "footer-btn";
+    backBtn.textContent = "Choose Allergen";
+    backBtn.onclick = () => go("allergy-sort");
+    const againBtn = document.createElement("button");
+    againBtn.className = "footer-btn footer-btn-home";
+    againBtn.textContent = "New Round";
+    againBtn.onclick = () => go("allergy-sort-run", { allergen });
+    btnRow.appendChild(backBtn);
+    btnRow.appendChild(againBtn);
+    verdictArea.appendChild(btnRow);
+  }
+
+  guessBtn.onclick = () => {
+    if (deckIndex < round.cards.length) return;
+    guessed = true;
+    renderBins();
+    verdictArea.innerHTML = "";
+    const win = allCorrect();
+    if (!win) {
+      wrongAttemptMade = true;
+      const v = document.createElement("p");
+      v.className = "tot-verdict";
+      v.style.textAlign = "center";
+      v.textContent = "\u274c Not quite!";
+      const sub = document.createElement("p");
+      sub.className = "asort-verdict-sub";
+      sub.textContent = "Tap the red cards to move them into the right bin.";
+      verdictArea.appendChild(v);
+      verdictArea.appendChild(sub);
+    } else {
+      showWinVerdict();
+    }
+  };
+
+  renderCounts();
+  spawnActiveCard();
 }
 
 /* ---------- Learning: modules/courses, same engine for every restaurant ---------- */

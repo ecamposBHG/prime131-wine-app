@@ -276,14 +276,14 @@ function render() {
   window.scrollTo(0, 0);
 }
 
-function header(title, showBack = true) {
+function header(title, showBack = true, onBack = goBack) {
   const div = document.createElement("div");
   div.className = "app-header";
   div.innerHTML = `
     ${showBack ? `<button class="back-btn" aria-label="Back">&#8592;</button>` : ""}
     <p class="header-title">${title}</p>
   `;
-  if (showBack) div.querySelector(".back-btn").onclick = goBack;
+  if (showBack) div.querySelector(".back-btn").onclick = onBack;
   app.appendChild(div);
 }
 
@@ -2107,7 +2107,7 @@ function knockoutStreaks(rounds) {
 }
 
 function renderKnockout() {
-  header("Knockout");
+  header("Knockout", true, () => go("game-room"));
 
   const intro = document.createElement("p");
   intro.className = "testme-counter";
@@ -2142,7 +2142,7 @@ function renderKnockout() {
 function renderKnockoutRun() {
   const axisKey = current.params.axis;
   const axisDef = ChiriusKnockout.KNOCKOUT_AXES[axisKey];
-  header("Knockout");
+  header("Knockout", true, () => go("knockout"));
 
   if (!axisDef) { go("knockout", {}, false); return; }
 
@@ -2276,7 +2276,7 @@ function renderKnockoutRun() {
 
 function renderKnockoutEnd(axisKey, block, playerCorrect) {
   app.innerHTML = "";
-  header("Knockout");
+  header("Knockout", true, () => go("knockout"));
 
   const { maxStreak, finalStreak } = knockoutStreaks(block.rounds);
   const finalChampion = findWine(block.finalChampionId);

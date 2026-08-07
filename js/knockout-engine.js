@@ -116,9 +116,21 @@ function buildKnockoutBlock(wines, axisKey, roundCount = 6, startingWineId = nul
     throw new Error(`Axis "${axisKey}" has no valid pairs at all -- cannot build a block.`);
   }
 
-  let championId = startingWineId && eligibleStarters.some((w) => w.id === startingWineId)
+  // A wine holding the single highest value on this axis can never lose a
+  // "higher wins" comparison -- no opponent's value can exceed it. Starting
+  // the block on one guarantees a champion that can't be dethroned, which
+  // isn't a game, it's a coin landing on the same side forever. Exclude
+  // max-value holders from the starting pool (they can still show up later
+  // as challengers and dethrone someone else -- only the *opening* pick is
+  // restricted). Fall back to the unfiltered pool only if that would leave
+  // no eligible starter at all.
+  const axisMax = Math.max(...pool.scoped.map((w) => w.structure[axisKey]));
+  const nonMaxStarters = eligibleStarters.filter((w) => w.structure[axisKey] !== axisMax);
+  const starterPool = nonMaxStarters.length > 0 ? nonMaxStarters : eligibleStarters;
+
+  let championId = startingWineId && starterPool.some((w) => w.id === startingWineId)
     ? startingWineId
-    : eligibleStarters[Math.floor(Math.random() * eligibleStarters.length)].id;
+    : starterPool[Math.floor(Math.random() * starterPool.length)].id;
 
   const rounds = [];
   const usedOpponentIds = new Set([championId]);

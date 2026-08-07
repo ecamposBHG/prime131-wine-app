@@ -259,7 +259,6 @@ function render() {
   else if (current.view === "match-it-picker") renderMatchItPicker();
   else if (current.view === "knockout") renderKnockout();
   else if (current.view === "knockout-run") renderKnockoutRun();
-  else if (current.view === "allergy-sort") renderAllergySort();
   else if (current.view === "allergy-sort-run") renderAllergySortRun();
   else if (current.view === "cocktail-type") renderCocktailTypeChooser();
   else if (current.view === "cocktail-list") renderCocktailList();
@@ -2074,7 +2073,7 @@ function renderGameRoom() {
   options.querySelector('[data-go="imposter"]').onclick = () => go("imposter");
   options.querySelector('[data-go="sommsays"]').onclick = () => go("somm-says");
   options.querySelector('[data-go="knockout"]').onclick = () => go("knockout");
-  options.querySelector('[data-go="allergy-sort"]').onclick = () => go("allergy-sort");
+  options.querySelector('[data-go="allergy-sort"]').onclick = () => go("allergy-sort-run", { streak: 0, prevAllergen: null });
   app.appendChild(options);
 }
 
@@ -2328,68 +2327,55 @@ function renderKnockoutEnd(axisKey, block, playerCorrect) {
   app.appendChild(btnRow);
 }
 
-/* ---------- Allergy Sort: drag real dishes into "contains X" / "X-free" bins.
-   Round data comes from allergy-sort-engine.js (window.ChiriusAllergySort),
-   built from DISHES' real allergensInRecipe field -- dishes with no allergen
-   data are never shown, never assumed allergen-free. Unlike Knockout, this
-   screen builds its DOM once and manages all interaction (drag, placement,
-   guess, correction) through direct mutation, not repeated calls to the
-   global render() -- a mid-drag render() would tear down the very card
-   being dragged. This mirrors how the existing Test Me swipe screen works. */
+/* ---------- Allergy Sort: survival streak, drag real dishes into "contains X" /
+   "X-free" bins. A random allergen each round (never the same as the round
+   just played); one wrong card on the guess ends the run. Round data comes
+   from allergy-sort-engine.js (window.ChiriusAllergySort), built from DISHES'
+   real allergensInRecipe field -- dishes with no allergen data are never
+   shown, never assumed allergen-free. Session progress (streak, previous
+   allergen) lives in current.params so it survives the go() call between
+   rounds; everything within a single round is managed by direct DOM
+   mutation, not repeated calls to the global render() -- a mid-drag
+   render() would tear down the very card being dragged, same reasoning as
+   the existing Test Me swipe screen. */
 
-const ALLERGY_PERFECT_PREFIX = "p131-perfect-allergy-";
-function getAllergyPerfectCount(allergen) {
-  try { return parseInt(localStorage.getItem(ALLERGY_PERFECT_PREFIX + allergen)) || 0; } catch (e) { return 0; }
+const ALLERGY_BEST_STREAK_KEY = "p131-best-allergy-streak";
+function getAllergyBestStreak() {
+  try { return parseInt(localStorage.getItem(ALLERGY_BEST_STREAK_KEY)) || 0; } catch (e) { return 0; }
 }
-function bumpAllergyPerfectCount(allergen) {
-  try { localStorage.setItem(ALLERGY_PERFECT_PREFIX + allergen, String(getAllergyPerfectCount(allergen) + 1)); } catch (e) {}
+function setAllergyBestStreak(val) {
+  try { localStorage.setItem(ALLERGY_BEST_STREAK_KEY, String(val)); } catch (e) {}
 }
 
-function renderAllergySort() {
-  header("Allergy Sort", true, () => go("game-room"));
-
-  const intro = document.createElement("p");
-  intro.className = "testme-counter";
-  intro.textContent = "Pick an allergen. Drag 6 real dishes into the right bin.";
-  app.appendChild(intro);
-
-  const options = document.createElement("div");
-  options.className = "home-options";
-  ChiriusAllergySort.ALLERGY_SORT_PLAYABLE.forEach((allergen) => {
-    let has = 0, without = 0;
-    try {
-      const pool = ChiriusAllergySort.buildAllergenPool(DISHES, allergen);
-      has = pool.has.length; without = pool.without.length;
-    } catch (e) { /* skip below */ }
-    if (has < 3 || without < 3) return;
-    const label = ChiriusAllergySort.ALLERGY_SORT_LABELS[allergen];
-    const perfect = getAllergyPerfectCount(allergen);
-    const opt = document.createElement("div");
-    opt.className = "home-option";
-    opt.innerHTML = `
-      <div class="home-option-text">
-        <p>${label}</p>
-        <span>${has} contain it \u00b7 ${without} don't${perfect ? ` \u00b7 ${perfect} perfect clear${perfect === 1 ? "" : "s"}` : ""}</span>
-      </div>
-    `;
-    opt.onclick = () => go("allergy-sort-run", { allergen });
-    options.appendChild(opt);
+function pickRandomAllergen(excludeAllergen) {
+  const pool = ChiriusAllergySort.ALLERGY_SORT_PLAYABLE.filter((a) => {
+    if (a === excludeAllergen) return false;
+    const p = ChiriusAllergySort.buildAllergenPool(DISHES, a);
+    return p.has.length >= 3 && p.without.length >= 3;
   });
-  app.appendChild(options);
+  const finalPool = pool.length > 0 ? pool : ChiriusAllergySort.ALLERGY_SORT_PLAYABLE;
+  return finalPool[Math.floor(Math.random() * finalPool.length)];
 }
 
 function renderAllergySortRun() {
-  const allergen = current.params.allergen;
+  const streak = current.params.streak || 0;
+  const prevAllergen = current.params.prevAllergen || null;
+  const allergen = pickRandomAllergen(prevAllergen);
   const label = ChiriusAllergySort.ALLERGY_SORT_LABELS[allergen];
-  header("Allergy Sort", true, () => go("allergy-sort"));
+  header("Allergy Sort", true, () => go("game-room"));
 
   let round;
   try {
     round = ChiriusAllergySort.buildSortRound(DISHES, allergen, 6);
   } catch (e) {
-    go("allergy-sort", {}, false);
+    go("game-room", {}, false);
     return;
   }
+
+  const streakLine = document.createElement("p");
+  streakLine.className = "testme-counter";
+  streakLine.textContent = "Round " + (streak + 1) + " \u00b7 streak: " + streak;
+  app.appendChild(streakLine);
 
   const prompt = document.createElement("p");
   prompt.className = "hero-name";
@@ -2435,16 +2421,10 @@ function renderAllergySortRun() {
   const verdictArea = document.createElement("div");
   app.appendChild(verdictArea);
 
-  const learnPanel = document.createElement("div");
-  learnPanel.className = "asort-learn-panel";
-  app.appendChild(learnPanel);
-
-  // ---- state (local to this screen instance, intentionally not in
-  // current.params -- leaving this screen always starts a fresh round) ----
+  // ---- state local to this round (intentionally not in current.params --
+  // only streak/prevAllergen need to survive the jump to the next round) ----
   let deckIndex = 0;
-  const placements = {}; // dish.id -> "has" | "without"
-  let guessed = false;
-  let wrongAttemptMade = false;
+  const placements = {};
 
   function allCorrect() {
     return round.cards.every((c) => placements[c.id] === c.truth);
@@ -2458,49 +2438,46 @@ function renderAllergySortRun() {
     guessBtn.textContent = deckIndex < round.cards.length ? "Sort all 6 to guess" : "Guess";
   }
 
-  function placedCardEl(dish) {
+  function placedCardEl(dish, revealed) {
     const el = document.createElement("div");
     el.className = "asort-placed";
-    if (guessed) {
+    if (revealed) {
       const isCorrect = placements[dish.id] === dish.truth;
       el.classList.add(isCorrect ? "correct" : "wrong");
       el.innerHTML = `<span class="asort-badge">${isCorrect ? "&#10003;" : "&#10005;"}</span>${dish.name}`;
-      if (!isCorrect) {
-        el.onclick = () => moveWrongCard(dish);
-      } else if (allCorrect()) {
-        el.classList.add("learn");
-        el.onclick = () => {
-          learnPanel.innerHTML = `<b>${dish.name}</b> (${dish.section}) contains: ${dish.allergens.join(", ")}.`;
-          learnPanel.classList.add("show");
-        };
-      }
+      el.classList.add("learn");
+      el.onclick = () => {
+        learnPanelFor(dish);
+      };
     } else {
       el.textContent = dish.name;
     }
     return el;
   }
 
-  function renderBins() {
+  let learnPanel = null;
+  function learnPanelFor(dish) {
+    if (learnPanel) learnPanel.remove();
+    learnPanel = document.createElement("div");
+    learnPanel.className = "asort-learn-panel show";
+    learnPanel.innerHTML = `<b>${dish.name}</b> (${dish.section}) contains: ${dish.allergens.join(", ")}.`;
+    verdictArea.appendChild(learnPanel);
+  }
+
+  function renderBins(revealed) {
     binHas.querySelectorAll(".asort-placed").forEach((e) => e.remove());
     binWithout.querySelectorAll(".asort-placed").forEach((e) => e.remove());
     round.cards.forEach((dish) => {
       if (!(dish.id in placements)) return;
       const target = placements[dish.id] === "has" ? binHas : binWithout;
-      target.appendChild(placedCardEl(dish));
+      target.appendChild(placedCardEl(dish, revealed));
     });
-  }
-
-  function moveWrongCard(dish) {
-    placements[dish.id] = placements[dish.id] === "has" ? "without" : "has";
-    renderBins();
-    renderCounts();
-    if (allCorrect()) showWinVerdict();
   }
 
   function commitPlacement(dish, bin) {
     placements[dish.id] = bin;
     deckIndex++;
-    renderBins();
+    renderBins(false);
     renderCounts();
     spawnActiveCard();
   }
@@ -2580,52 +2557,54 @@ function renderAllergySortRun() {
     card.addEventListener("touchend", onUp);
   }
 
-  function showWinVerdict() {
-    verdictArea.innerHTML = "";
-    if (!wrongAttemptMade) { bumpAllergyPerfectCount(allergen); celebrate(); }
-    const v = document.createElement("p");
-    v.className = "tot-verdict";
-    v.style.textAlign = "center";
-    v.textContent = "\u2705 That's right!";
-    const sub = document.createElement("p");
-    sub.className = "asort-verdict-sub";
-    sub.textContent = "Tap a card to see what's actually in it.";
-    verdictArea.appendChild(v);
-    verdictArea.appendChild(sub);
-    const btnRow = document.createElement("div");
-    btnRow.className = "card-footer-nav";
-    const backBtn = document.createElement("button");
-    backBtn.className = "footer-btn";
-    backBtn.textContent = "Choose Allergen";
-    backBtn.onclick = () => go("allergy-sort");
-    const againBtn = document.createElement("button");
-    againBtn.className = "footer-btn footer-btn-home";
-    againBtn.textContent = "New Round";
-    againBtn.onclick = () => go("allergy-sort-run", { allergen });
-    btnRow.appendChild(backBtn);
-    btnRow.appendChild(againBtn);
-    verdictArea.appendChild(btnRow);
-  }
-
   guessBtn.onclick = () => {
     if (deckIndex < round.cards.length) return;
-    guessed = true;
-    renderBins();
-    verdictArea.innerHTML = "";
+    renderBins(true);
     const win = allCorrect();
-    if (!win) {
-      wrongAttemptMade = true;
+
+    if (win) {
       const v = document.createElement("p");
       v.className = "tot-verdict";
       v.style.textAlign = "center";
-      v.textContent = "\u274c Not quite!";
+      v.textContent = "\u2705 That's right!";
       const sub = document.createElement("p");
       sub.className = "asort-verdict-sub";
-      sub.textContent = "Tap the red cards to move them into the right bin.";
+      sub.textContent = "Streak: " + (streak + 1) + ". On to the next allergen.";
       verdictArea.appendChild(v);
       verdictArea.appendChild(sub);
+      const nextBtn = document.createElement("button");
+      nextBtn.className = "footer-btn footer-btn-home";
+      nextBtn.style.width = "100%";
+      nextBtn.style.marginTop = "10px";
+      nextBtn.textContent = "Next Round \u2192";
+      nextBtn.onclick = () => go("allergy-sort-run", { streak: streak + 1, prevAllergen: allergen });
+      verdictArea.appendChild(nextBtn);
     } else {
-      showWinVerdict();
+      const best = getAllergyBestStreak();
+      const isRecord = streak > best;
+      if (isRecord) { setAllergyBestStreak(streak); celebrate(); }
+      const v = document.createElement("p");
+      v.className = "tot-verdict";
+      v.style.textAlign = "center";
+      v.textContent = "\u274c Streak over";
+      const sub = document.createElement("p");
+      sub.className = "asort-verdict-sub";
+      sub.textContent = `You cleared ${streak} round${streak === 1 ? "" : "s"} before this one. ${isRecord ? "New personal best!" : "Best streak: " + best}. Tap any card to see what's really in it.`;
+      verdictArea.appendChild(v);
+      verdictArea.appendChild(sub);
+      const btnRow = document.createElement("div");
+      btnRow.className = "card-footer-nav";
+      const homeBtn = document.createElement("button");
+      homeBtn.className = "footer-btn";
+      homeBtn.textContent = "Game Room";
+      homeBtn.onclick = () => go("game-room");
+      const againBtn = document.createElement("button");
+      againBtn.className = "footer-btn footer-btn-home";
+      againBtn.textContent = "Play Again";
+      againBtn.onclick = () => go("allergy-sort-run", { streak: 0, prevAllergen: null });
+      btnRow.appendChild(homeBtn);
+      btnRow.appendChild(againBtn);
+      verdictArea.appendChild(btnRow);
     }
   };
 

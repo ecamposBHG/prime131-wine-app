@@ -2604,6 +2604,8 @@ function renderAllergySortRun() {
   guessBtn.onclick = () => {
     if (deckIndex < round.cards.length) return;
     renderBins(true);
+    verdictArea.innerHTML = "";
+    guessBtn.disabled = true;
     const win = allCorrect();
 
     if (win) {

@@ -535,9 +535,14 @@ button, input {
   background: var(--washi-200); color: var(--shoyu-500);
 }
 .confidence-row .confidence-btn:last-child { border-right: none; }
-.confidence-btn[data-rating="1"] { background: var(--error-600); color: var(--shoyu-700); }
-.confidence-btn[data-rating="2"] { background: var(--bronze-600); color: var(--shoyu-700); }
-.confidence-btn[data-rating="4"] { background: var(--bronze-500); color: var(--ink-on-rust); }
+/* A deliberate 5-step ramp (not the palette's literal red/green, which
+   would clash with the app's warm bronze identity) -- deep red through
+   amber to wasabi green, so "3" reads as a real midpoint instead of
+   disappearing against the dark background. */
+.confidence-btn[data-rating="1"] { background: #9C3B2E; color: var(--shoyu-700); }
+.confidence-btn[data-rating="2"] { background: #B15A2A; color: var(--shoyu-700); }
+.confidence-btn[data-rating="3"] { background: #B98026; color: var(--ink-on-rust); }
+.confidence-btn[data-rating="4"] { background: #8FA042; color: var(--ink-on-rust); }
 .confidence-btn[data-rating="5"] { background: var(--wasabi-500); color: var(--ink-on-rust); }
 
 /* Answer reconnects to clue */

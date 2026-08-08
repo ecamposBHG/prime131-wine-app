@@ -325,6 +325,56 @@ function resetProgress() {
   try { localStorage.removeItem(PROGRESS_KEY); } catch (e) {}
 }
 
+/* Confidence-Based Repetition (CBR) store for Test Me.
+   Shape: { [itemId]: { rating: 1-5, lastSeen: <epoch ms> } }
+   rating is the player's own 1-5 self-assessment after active recall,
+   matching Brainscape's confidence scale (1 = "Not at all", 5 = "Totally
+   confident"). lastSeen drives the staleness component of scheduling so
+   a well-rated card still resurfaces occasionally instead of vanishing
+   forever. This replaces the old learning/known binary in PROGRESS_KEY;
+   see migrateProgressToConfidence() below for the one-time upgrade path. */
+const CONFIDENCE_KEY = "p131-confidence";
+const CONFIDENCE_MIGRATED_KEY = "p131-confidence-migrated";
+
+function getConfidenceMap() {
+  try { return JSON.parse(localStorage.getItem(CONFIDENCE_KEY)) || {}; } catch (e) { return {}; }
+}
+function getConfidence(itemId) {
+  const map = getConfidenceMap();
+  return map[itemId] || null;
+}
+function setConfidence(itemId, rating) {
+  rating = Math.max(1, Math.min(5, Math.round(rating)));
+  const map = getConfidenceMap();
+  map[itemId] = { rating, lastSeen: Date.now() };
+  try { localStorage.setItem(CONFIDENCE_KEY, JSON.stringify(map)); } catch (e) {}
+  return map[itemId];
+}
+function resetConfidence() {
+  try { localStorage.removeItem(CONFIDENCE_KEY); } catch (e) {}
+}
+
+/* One-time migration: old known/learning items become a sane starting
+   confidence instead of reverting to "unseen." Runs once (guarded by
+   CONFIDENCE_MIGRATED_KEY) so it never clobbers real CBR ratings entered
+   after rollout. Old PROGRESS_KEY data is left in place, untouched --
+   harmless, and lets a rollback still see the old known/learning state. */
+function migrateProgressToConfidence() {
+  try {
+    if (localStorage.getItem(CONFIDENCE_MIGRATED_KEY)) return;
+    const old = getProgress();
+    const map = getConfidenceMap();
+    Object.keys(old).forEach(itemId => {
+      if (map[itemId]) return; // don't override anything already rated
+      const status = old[itemId];
+      if (status === "known") map[itemId] = { rating: 4, lastSeen: Date.now() };
+      else if (status === "learning") map[itemId] = { rating: 2, lastSeen: Date.now() };
+    });
+    localStorage.setItem(CONFIDENCE_KEY, JSON.stringify(map));
+    localStorage.setItem(CONFIDENCE_MIGRATED_KEY, "1");
+  } catch (e) {}
+}
+
 /* Learning modules: dedicated progress store, keyed by module id.
    Shape: { [moduleId]: { furthest: <flat content index reached>, completed: <bool>, testFurthest: <index reached in the test> }
    This is the layer that will eventually get backed by the database
@@ -1597,7 +1647,14 @@ function renderPairingExplain(wineId, dishId) {
   app.appendChild(linksRow);
 }
 
-/* Test Me — flashcard drill with device-local progress */
+/* Test Me — Confidence-Based Repetition (CBR), modeled on Brainscape's
+   publicly documented algorithm: active recall (see the clue, try to
+   answer in your head, reveal), then a 1-5 self-rated confidence that
+   determines how soon the card resurfaces. Low ratings come back soon;
+   high ratings hardly ever, but never disappear entirely (staleness).
+   Speed Round is a separate, verified multiple-choice timed mode --
+   self-rated confidence can't be trusted for a competitive score, so it
+   intentionally does not read from or write to the CBR store below. */
 function quizPool(mode, focus) {
   if (mode === "food") {
     let pool = DISHES.filter(d => d.quizClue);
@@ -1618,26 +1675,86 @@ function quizPool(mode, focus) {
 function isWineItem(item) { return item.id.charAt(0) === "w" && /^\d+$/.test(item.id.slice(1)); }
 function isCocktailItem(item) { return item.id.charAt(0) === "c" && /^\d+$/.test(item.id.slice(1)); }
 
-let testQueues = {};
 function queueKey(mode, focus) { return mode === "mixed" ? "mixed" : mode + ":" + (focus || "all"); }
 
-function buildTestQueue(mode, focus) {
-  const progress = getProgress();
-  const learning = [], unseen = [], known = [];
-  quizPool(mode, focus).forEach(item => {
-    const status = progress[item.id];
-    if (status === "learning") learning.push(item.id);
-    else if (status === "known") known.push(item.id);
-    else unseen.push(item.id);
-  });
-  const shuffle = (arr) => {
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-  };
-  return [...shuffle(learning), ...shuffle(unseen), ...shuffle(known)];
+function shuffleArr(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ---- CBR scheduling ---- */
+
+// Base "due weight" per confidence rating. Directly reflects Brainscape's
+// own description of the system: 1s come up most frequently, 5s hardly
+// ever. Exact numbers are ours (their formula is proprietary/undisclosed)
+// but the ordering and steepness match their stated behavior.
+const CBR_RATING_WEIGHT = { 1: 100, 2: 60, 3: 30, 4: 12, 5: 4 };
+const CBR_UNSEEN_WEIGHT = 50;
+
+function cbrBatchSize(poolLength) {
+  return Math.max(4, Math.min(10, Math.ceil(poolLength * 0.15)));
+}
+
+// Throttles new material: only the front slice of never-rated items is
+// eligible to appear at once, so a new user isn't shown the whole deck
+// as "new" simultaneously. As those items get any rating they leave the
+// unseen bucket and the next slice opens up on its own.
+function cbrEligibleUnseen(pool, confidenceMap) {
+  const unseen = pool.filter(item => !confidenceMap[item.id]);
+  return unseen.slice(0, cbrBatchSize(pool.length)).map(i => i.id);
+}
+
+function cbrDueWeight(itemId, confidenceMap) {
+  const rec = confidenceMap[itemId];
+  if (!rec) return CBR_UNSEEN_WEIGHT;
+  const base = CBR_RATING_WEIGHT[rec.rating] || 30;
+  const hoursSince = (Date.now() - rec.lastSeen) / 3600000;
+  // Staleness: a well-rated card slowly becomes more likely to resurface
+  // the longer it's gone unreviewed, capped so it can never outweigh a
+  // genuinely weak card that was just seen.
+  const stalenessMultiplier = 1 + Math.min(hoursSince / 24, 3);
+  return base * stalenessMultiplier;
+}
+
+let cbrLastShown = {}; // qKey -> itemId, avoids showing the same card twice in a row
+
+function pickCBRItem(mode, focus) {
+  const pool = quizPool(mode, focus);
+  if (!pool.length) return null;
+  const confidenceMap = getConfidenceMap();
+  const eligibleUnseenIds = new Set(cbrEligibleUnseen(pool, confidenceMap));
+  const candidates = pool.filter(item => confidenceMap[item.id] || eligibleUnseenIds.has(item.id));
+  const usable = candidates.length ? candidates : pool;
+  const qKey = queueKey(mode, focus);
+  const lastId = cbrLastShown[qKey];
+  let weighted = usable.map(item => ({ id: item.id, weight: cbrDueWeight(item.id, confidenceMap) }));
+  if (weighted.length > 1) weighted = weighted.filter(w => w.id !== lastId);
+  const total = weighted.reduce((sum, w) => sum + w.weight, 0);
+  let roll = Math.random() * total;
+  for (const w of weighted) {
+    roll -= w.weight;
+    if (roll <= 0) return w.id;
+  }
+  return weighted[weighted.length - 1].id;
+}
+
+/* Mastery %: weighted average confidence across the pool, unseen items
+   counting as 0 -- mirrors Brainscape's Deck/Class Mastery score, which
+   they describe as a weighted average of confidence across all cards. */
+function cbrMastery(pool) {
+  if (!pool.length) return 0;
+  const confidenceMap = getConfidenceMap();
+  const sum = pool.reduce((s, item) => s + ((confidenceMap[item.id] && confidenceMap[item.id].rating) || 0), 0);
+  return Math.round((sum / (pool.length * 5)) * 100);
+}
+function cbrMasteredCount(pool, threshold) {
+  threshold = threshold || 4;
+  const confidenceMap = getConfidenceMap();
+  return pool.filter(item => confidenceMap[item.id] && confidenceMap[item.id].rating >= threshold).length;
 }
 
 let speedPref = { testme: false, match: false };
@@ -1735,66 +1852,62 @@ function renderTestMeRun(mode) {
   const focus = current.params.focus || "all";
   header("Quiz tool");
 
-  const isSpeed = speedPref.testme;
-  const qKey = queueKey(mode, focus);
+  const pool = quizPool(mode, focus);
+  if (!pool.length) { go("test-me", {}, false); return; }
 
-  if (!testQueues[qKey] || !testQueues[qKey].length) testQueues[qKey] = buildTestQueue(mode, focus);
-  const itemId = testQueues[qKey][0];
+  if (speedPref.testme) {
+    renderSpeedRound(mode, focus, pool);
+  } else {
+    renderCBRCard(mode, focus, pool);
+  }
+}
+
+/* ---- Practice mode: Brainscape-style confidence study loop ---- */
+function renderCBRCard(mode, focus, pool) {
+  const qKey = queueKey(mode, focus);
+  const itemId = pickCBRItem(mode, focus);
+  if (!itemId) { go("test-me", {}, false); return; }
+  cbrLastShown[qKey] = itemId;
+
   let itemKind;
   if (mode === "mixed") itemKind = itemId.startsWith("d-") ? "food" : "wine";
   else itemKind = mode === "food" ? "food" : mode === "cocktail" ? "cocktail" : "wine";
   const isFood = itemKind === "food";
   const isCocktail = itemKind === "cocktail";
   const item = isFood ? findDish(itemId) : isCocktail ? findCocktail(itemId) : findWine(itemId);
-  if (!item) { testQueues[qKey] = []; go("test-me", {}, false); return; }
-  const pool = quizPool(mode, focus);
-  const progress = getProgress();
-  const knownCount = pool.filter(x => progress[x.id] === "known").length;
+  if (!item) { render(); return; }
 
-  if (isSpeed) {
-    if (typeof current.params.score !== "number") {
-      current.params.score = 0;
-      current.params.endsAt = Date.now() + 60000;
-    }
-    const remaining = Math.max(0, current.params.endsAt - Date.now());
-    if (remaining <= 0) {
-      renderSpeedEnd(mode, current.params.score);
-      return;
-    }
-    const timerWrap = document.createElement("div");
-    timerWrap.className = "timer-wrap";
-    timerWrap.innerHTML = `
-      <div class="timer-row"><span class="timer-score">&#9889; Score: ${current.params.score}</span><span class="timer-count">${Math.ceil(remaining / 1000)}s</span></div>
-      <div class="timer-track"><div class="timer-fill" style="width:${(remaining / 60000) * 100}%;"></div></div>
-    `;
-    app.appendChild(timerWrap);
-    activeTimer = setInterval(() => {
-      const left = Math.max(0, current.params.endsAt - Date.now());
-      const countEl = timerWrap.querySelector(".timer-count");
-      const fillEl = timerWrap.querySelector(".timer-fill");
-      if (countEl) countEl.textContent = Math.ceil(left / 1000) + "s";
-      if (fillEl) fillEl.style.width = (left / 60000) * 100 + "%";
-      if (left <= 0) {
-        clearInterval(activeTimer); activeTimer = null;
-        renderSpeedEnd(mode, current.params.score);
-      }
-    }, 250);
-  } else {
-    const counter = document.createElement("p");
-    counter.className = "testme-counter";
-    counter.textContent = `${knownCount} of ${pool.length} marked as known`;
-    app.appendChild(counter);
+  const mastery = cbrMastery(pool);
+  const masteredCount = cbrMasteredCount(pool);
+  const remaining = pool.length - masteredCount;
+
+  const counter = document.createElement("p");
+  counter.className = "testme-counter";
+  counter.textContent = `${mastery}% mastery \u00b7 ${masteredCount} of ${pool.length} confident`;
+  app.appendChild(counter);
+
+  const masteryTrack = document.createElement("div");
+  masteryTrack.className = "mastery-track";
+  masteryTrack.innerHTML = `<div class="mastery-fill" style="width:${mastery}%;"></div>`;
+  app.appendChild(masteryTrack);
+
+  if (masteredCount > 0 && remaining > 0 && remaining <= 5) {
+    const nudge = document.createElement("p");
+    nudge.className = "testme-nudge";
+    nudge.textContent = remaining === 1
+      ? "1 card away from mastering this deck."
+      : `${remaining} cards away from mastering this deck.`;
+    app.appendChild(nudge);
   }
 
   const card = document.createElement("div");
   card.className = "testme-card";
-  let phase = "clue"; // clue -> predicting -> revealed (predicting skipped in speed mode)
-  let predicted = null;
+  let phase = "clue"; // clue -> revealed
 
   function clueBlockHTML() {
     if (isFood) {
       return `
-        <p class="dish-flip-tag">Guess the dish &middot; tap to ${isSpeed ? "reveal" : "continue"}</p>
+        <p class="dish-flip-tag">Guess the dish &middot; tap to reveal</p>
         <p class="face-h3" style="margin-top:8px;"><span class="ic">&#128269;</span> Clues</p>
         <p class="face-desc" style="margin-bottom:10px;">${getSectionIcon(item.section)} ${item.section}</p>
         <p class="chefprep-text">${item.quizClue}</p>
@@ -1802,14 +1915,14 @@ function renderTestMeRun(mode) {
     }
     if (isCocktail) {
       return `
-        <p class="dish-flip-tag">Guess the cocktail &middot; tap to ${isSpeed ? "reveal" : "continue"}</p>
+        <p class="dish-flip-tag">Guess the cocktail &middot; tap to reveal</p>
         <p class="face-h3" style="margin-top:8px;"><span class="ic">&#128269;</span> Clues</p>
         <p class="face-desc" style="margin-bottom:10px;">${item.glassware} &middot; ${item.method}</p>
         <div class="flavor-grid">${item.flavorTags.map(t => `<div class="flavor-item"><div class="icon">${getFlavorIcon(t)}</div><p>${t}</p></div>`).join("")}</div>
       `;
     }
     return `
-      <p class="dish-flip-tag">Guess the wine &middot; tap to ${isSpeed ? "reveal" : "continue"}</p>
+      <p class="dish-flip-tag">Guess the wine &middot; tap to reveal</p>
       <p class="face-h3" style="margin-top:8px;"><span class="ic">&#128269;</span> Clues</p>
       <p class="face-desc" style="margin-bottom:10px;">${STYLE_LABELS[item.style]} &middot; ${item.region}</p>
       <div class="flavor-grid">${item.flavorTags.map(t => `<div class="flavor-item"><div class="icon">${getFlavorIcon(t)}</div><p>${t}</p></div>`).join("")}</div>
@@ -1825,7 +1938,7 @@ function renderTestMeRun(mode) {
         <p class="dish-flip-tag">That's&hellip;</p>
         <p class="testme-answer-name">${item.name}</p>
         <p class="face-desc">${item.section}</p>
-        <p class="face-desc" style="margin-top:12px; color:var(--bronze-500);">Swipe right if you knew it, left if you're still learning &mdash; or use the buttons below.</p>
+        <p class="face-desc" style="margin-top:12px; color:var(--bronze-500);">How well did you know it? Rate yourself below.</p>
       `;
     }
     if (isCocktail) {
@@ -1834,7 +1947,7 @@ function renderTestMeRun(mode) {
         <p class="dish-flip-tag">That's&hellip;</p>
         <p class="testme-answer-name">${item.name}</p>
         <p class="face-desc">Garnish: ${item.garnish}</p>
-        <p class="face-desc" style="margin-top:12px; color:var(--bronze-500);">Swipe right if you knew it, left if you're still learning &mdash; or use the buttons below.</p>
+        <p class="face-desc" style="margin-top:12px; color:var(--bronze-500);">How well did you know it? Rate yourself below.</p>
       `;
     }
     return `
@@ -1843,7 +1956,7 @@ function renderTestMeRun(mode) {
       <p class="testme-answer-name">${item.name}</p>
       <p class="face-desc">${item.grape}</p>
       <p class="face-desc">Producer: ${item.producer}</p>
-      <p class="face-desc" style="margin-top:12px; color:var(--bronze-500);">Swipe right if you knew it, left if you're still learning &mdash; or use the buttons below.</p>
+      <p class="face-desc" style="margin-top:12px; color:var(--bronze-500);">How well did you know it? Rate yourself below.</p>
     `;
   }
 
@@ -1863,70 +1976,46 @@ function renderTestMeRun(mode) {
     phase = "revealed";
     answerBlock.innerHTML = answerBlockHTML();
     answerBlock.style.display = "block";
-    btnRow.style.display = "flex";
+    confidenceWrap.style.display = "block";
   }
 
-  const predictRow = document.createElement("div");
-  predictRow.className = "predict-row";
-  predictRow.style.display = "none";
-  predictRow.innerHTML = `
-    <button class="predict-btn predict-unsure">Not sure</button>
-    <button class="predict-btn predict-know">I know this</button>
-  `;
-  predictRow.querySelector(".predict-unsure").onclick = (e) => { e.stopPropagation(); predicted = false; predictRow.style.display = "none"; reveal(); };
-  predictRow.querySelector(".predict-know").onclick = (e) => { e.stopPropagation(); predicted = true; predictRow.style.display = "none"; reveal(); };
+  card.onclick = () => { if (phase === "clue") reveal(); };
 
-  card.onclick = () => {
-    if (phase === "clue") {
-      if (isSpeed) { reveal(); return; }
-      phase = "predicting";
-      predictRow.style.display = "flex";
+  /* Confidence rating: Brainscape's own 1-5 scale, asked only after
+     reveal (active recall first, self-assessment second -- no
+     pre-reveal prediction step, matching their documented flow). */
+  const confidenceWrap = document.createElement("div");
+  confidenceWrap.className = "confidence-wrap";
+  confidenceWrap.style.display = "none";
+  confidenceWrap.innerHTML = `
+    <div class="confidence-labels"><span>Not at all</span><span>Totally confident</span></div>
+    <div class="confidence-row">
+      <button class="confidence-btn" data-rating="1">1</button>
+      <button class="confidence-btn" data-rating="2">2</button>
+      <button class="confidence-btn" data-rating="3">3</button>
+      <button class="confidence-btn" data-rating="4">4</button>
+      <button class="confidence-btn" data-rating="5">5</button>
+    </div>
+  `;
+  confidenceWrap.querySelectorAll(".confidence-btn").forEach(btn => {
+    btn.onclick = (e) => { e.stopPropagation(); rate(parseInt(btn.dataset.rating, 10)); };
+  });
+
+  function rate(rating) {
+    const wasFullyMastered = cbrMasteredCount(pool) === pool.length;
+    setConfidence(item.id, rating);
+    const isFullyMasteredNow = cbrMasteredCount(pool) === pool.length;
+    if (isFullyMasteredNow && !wasFullyMastered && markMilestone("testme-cbr-" + mode + "-" + focus + "-mastered")) {
+      celebrate();
+      setTimeout(() => render(), 1200);
       return;
     }
-  };
-
-  function calibrationMessage(pred, status) {
-    if (pred === true && status === "known") return { cls: "cal-good", text: "&#10003; Nailed it \u2014 you called that." };
-    if (pred === true && status === "learning") return { cls: "cal-warn", text: "Worth another look \u2014 you were more sure than it turned out." };
-    if (pred === false && status === "known") return { cls: "cal-good", text: "You knew more than you gave yourself credit for." };
-    return { cls: "cal-neutral", text: "Fair call \u2014 flagged for review." };
+    render();
   }
 
-  function advance(status) {
-    setWineProgress(item.id, status);
-    const doFinalize = () => {
-      testQueues[qKey].shift();
-      if (status === "learning") testQueues[qKey].push(item.id);
-      if (!testQueues[qKey].length) testQueues[qKey] = buildTestQueue(mode, focus);
-      if (isSpeed) {
-        if (status === "known") current.params.score++;
-        render();
-        return;
-      }
-      const updated = getProgress();
-      const allKnown = pool.every(x => updated[x.id] === "known");
-      if (allKnown && markMilestone("testme-" + mode + "-" + focus + "-complete")) {
-        celebrate();
-        setTimeout(() => render(), 1200);
-        return;
-      }
-      render();
-    };
-    if (!isSpeed && predicted !== null) {
-      const msg = calibrationMessage(predicted, status);
-      const toast = document.createElement("div");
-      toast.className = "calibration-toast " + msg.cls;
-      toast.textContent = msg.text;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 1400);
-      setTimeout(doFinalize, 500);
-    } else {
-      doFinalize();
-    }
-  }
-
-  /* Swipe with live drag feedback: card follows the finger, tilts, and hints
-     the direction; snaps back if released before the threshold. */
+  /* Swipe stays as a fast shortcut for the two ends of the same scale --
+     right = 5 (nailed it), left = 1 (not at all) -- the button row still
+     gives full 1-5 granularity for anything in between. */
   let touchStartX = null;
   let dragging = false;
   card.addEventListener("touchstart", (e) => {
@@ -1950,11 +2039,11 @@ function renderTestMeRun(mode) {
     if (dx > 60) {
       inner.style.transition = "transform 0.25s ease";
       inner.style.transform = `translateX(120%) rotate(12deg)`;
-      setTimeout(() => advance("known"), 220);
+      setTimeout(() => rate(5), 220);
     } else if (dx < -60) {
       inner.style.transition = "transform 0.25s ease";
       inner.style.transform = `translateX(-120%) rotate(-12deg)`;
-      setTimeout(() => advance("learning"), 220);
+      setTimeout(() => rate(1), 220);
     } else {
       inner.style.transition = "transform 0.25s ease";
       inner.style.transform = "translateX(0) rotate(0)";
@@ -1963,32 +2052,124 @@ function renderTestMeRun(mode) {
   });
 
   app.appendChild(card);
-  app.appendChild(predictRow);
-
-  const btnRow = document.createElement("div");
-  btnRow.className = "card-footer-nav";
-  btnRow.style.display = "none";
-  const learningBtn = document.createElement("button");
-  learningBtn.className = "footer-btn";
-  learningBtn.textContent = "\u2190 Still learning";
-  learningBtn.onclick = () => advance("learning");
-  const knownBtn = document.createElement("button");
-  knownBtn.className = "footer-btn footer-btn-home";
-  knownBtn.textContent = "Got it \u2192";
-  knownBtn.onclick = () => advance("known");
-  btnRow.appendChild(learningBtn);
-  btnRow.appendChild(knownBtn);
-  app.appendChild(btnRow);
+  app.appendChild(confidenceWrap);
 
   const resetLink = document.createElement("p");
   resetLink.className = "testme-reset";
   resetLink.textContent = "Reset my progress";
   resetLink.onclick = () => {
+    resetConfidence();
     resetProgress();
-    testQueues = {};
+    cbrLastShown = {};
     render();
   };
   app.appendChild(resetLink);
+}
+
+/* ---- Speed Round: separate, verified, timed multiple-choice ---- */
+function renderSpeedRound(mode, focus, pool) {
+  if (typeof current.params.score !== "number") {
+    current.params.score = 0;
+    current.params.endsAt = Date.now() + 60000;
+  }
+  const remaining = Math.max(0, current.params.endsAt - Date.now());
+  if (remaining <= 0) {
+    renderSpeedEnd(mode, current.params.score);
+    return;
+  }
+
+  const timerWrap = document.createElement("div");
+  timerWrap.className = "timer-wrap";
+  timerWrap.innerHTML = `
+    <div class="timer-row"><span class="timer-score">&#9889; Score: ${current.params.score}</span><span class="timer-count">${Math.ceil(remaining / 1000)}s</span></div>
+    <div class="timer-track"><div class="timer-fill" style="width:${(remaining / 60000) * 100}%;"></div></div>
+  `;
+  app.appendChild(timerWrap);
+  activeTimer = setInterval(() => {
+    const left = Math.max(0, current.params.endsAt - Date.now());
+    const countEl = timerWrap.querySelector(".timer-count");
+    const fillEl = timerWrap.querySelector(".timer-fill");
+    if (countEl) countEl.textContent = Math.ceil(left / 1000) + "s";
+    if (fillEl) fillEl.style.width = (left / 60000) * 100 + "%";
+    if (left <= 0) {
+      clearInterval(activeTimer); activeTimer = null;
+      renderSpeedEnd(mode, current.params.score);
+    }
+  }, 250);
+
+  // Draws uniformly from the whole pool each question -- independent of
+  // the CBR confidence store, since Speed Round scores need to stay
+  // trustworthy for a future leaderboard.
+  const item = pool[Math.floor(Math.random() * pool.length)];
+  const itemKind = mode === "mixed" ? (item.id.startsWith("d-") ? "food" : "wine") : (mode === "food" ? "food" : mode === "cocktail" ? "cocktail" : "wine");
+  const isFood = itemKind === "food";
+  const isCocktail = itemKind === "cocktail";
+
+  const card = document.createElement("div");
+  card.className = "testme-card no-flip";
+  const inner = document.createElement("div");
+  inner.className = "dish-flip-inner";
+  const clueBlock = document.createElement("div");
+  clueBlock.className = "clue-block";
+  clueBlock.innerHTML = speedClueHTML(item, isFood, isCocktail);
+  inner.appendChild(clueBlock);
+  card.appendChild(inner);
+  app.appendChild(card);
+
+  // Distractors from the same focused pool where possible; widens to the
+  // mode's full pool if the focus is too small to supply four distinct names.
+  const widePool = quizPool(mode, "all");
+  const namePool = pool.length >= 4 ? pool : widePool;
+  const distractSource = namePool.filter(x => x.id !== item.id && x.name !== item.name);
+  const distractors = shuffleArr(distractSource).slice(0, 3);
+  const options = shuffleArr([item, ...distractors]);
+
+  const mcRow = document.createElement("div");
+  mcRow.className = "mc-row";
+  options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.className = "mc-btn";
+    btn.textContent = opt.name;
+    btn.onclick = () => {
+      Array.from(mcRow.children).forEach(b => b.disabled = true);
+      const isCorrect = opt.id === item.id;
+      btn.classList.add(isCorrect ? "mc-correct" : "mc-incorrect");
+      if (!isCorrect) {
+        const correctBtn = Array.from(mcRow.children).find(b => b.textContent === item.name);
+        if (correctBtn) correctBtn.classList.add("mc-reveal-correct");
+      }
+      if (isCorrect) current.params.score++;
+      setTimeout(() => render(), 450);
+    };
+    mcRow.appendChild(btn);
+  });
+  app.appendChild(mcRow);
+}
+
+function speedClueHTML(item, isFood, isCocktail) {
+  if (isFood) {
+    return `
+      <p class="dish-flip-tag">Guess the dish</p>
+      <p class="face-h3" style="margin-top:8px;"><span class="ic">&#128269;</span> Clues</p>
+      <p class="face-desc" style="margin-bottom:10px;">${getSectionIcon(item.section)} ${item.section}</p>
+      <p class="chefprep-text">${item.quizClue}</p>
+    `;
+  }
+  if (isCocktail) {
+    return `
+      <p class="dish-flip-tag">Guess the cocktail</p>
+      <p class="face-h3" style="margin-top:8px;"><span class="ic">&#128269;</span> Clues</p>
+      <p class="face-desc" style="margin-bottom:10px;">${item.glassware} &middot; ${item.method}</p>
+      <div class="flavor-grid">${item.flavorTags.map(t => `<div class="flavor-item"><div class="icon">${getFlavorIcon(t)}</div><p>${t}</p></div>`).join("")}</div>
+    `;
+  }
+  return `
+    <p class="dish-flip-tag">Guess the wine</p>
+    <p class="face-h3" style="margin-top:8px;"><span class="ic">&#128269;</span> Clues</p>
+    <p class="face-desc" style="margin-bottom:10px;">${STYLE_LABELS[item.style]} &middot; ${item.region}</p>
+    <div class="flavor-grid">${item.flavorTags.map(t => `<div class="flavor-item"><div class="icon">${getFlavorIcon(t)}</div><p>${t}</p></div>`).join("")}</div>
+    ${structureBars(item.structure)}
+  `;
 }
 
 /* ---------- Game Room ---------- */
@@ -2024,15 +2205,14 @@ function celebrate() {
 function renderGameRoom() {
   header("Game Room");
 
-  const progress = getProgress();
-  const wineKnown = WINES.filter(w => progress[w.id] === "known").length;
+  const wineMastered = cbrMasteredCount(WINES);
   const foodPool = quizPool("food");
-  const foodKnown = foodPool.filter(d => progress[d.id] === "known").length;
+  const foodMastered = cbrMasteredCount(foodPool);
 
   const status = document.createElement("div");
   status.className = "milestone-strip";
   status.innerHTML = `
-    <p class="milestone-line">&#127942; Wines known: ${wineKnown}/${WINES.length} &middot; Dishes known: ${foodKnown}/${foodPool.length}</p>
+    <p class="milestone-line">&#127942; Wines confident: ${wineMastered}/${WINES.length} &middot; Dishes confident: ${foodMastered}/${foodPool.length}</p>
   `;
   app.appendChild(status);
 
@@ -4065,6 +4245,8 @@ function renderSommEnd(seconds, params) {
   btnRow.appendChild(againBtn);
   app.appendChild(btnRow);
 }
+
+migrateProgressToConfidence();
 
 if (getStoredAuth()) {
   render();

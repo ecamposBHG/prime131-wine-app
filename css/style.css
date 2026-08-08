@@ -511,31 +511,52 @@ button, input {
   text-transform: uppercase; letter-spacing: 0.3px; cursor: pointer; margin-top: 18px; text-decoration: none; border-top: 1px solid var(--washi-300-soft); padding-top: 14px;
 }
 
-/* Confidence prediction */
-.predict-row { display: none; gap: 0; margin-top: 12px; border: 2px solid var(--washi-300); }
-.predict-btn {
-  flex: 1; padding: 16px; border: none; font-size: 13px; font-weight: 700;
-  font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.4px; cursor: pointer;
+/* Mastery bar (replaces the old "known/learning" counter's implicit
+   progress -- now a literal weighted-confidence fill, mirroring
+   Brainscape's Deck Mastery score). */
+.mastery-track { height: 6px; background: var(--washi-300); overflow: hidden; margin-bottom: 14px; }
+.mastery-fill { height: 100%; background: var(--wasabi-500); transition: width 0.25s ease-out; }
+.testme-nudge {
+  font-family: var(--font-mono); font-size: 11px; color: var(--bronze-200); text-align: center;
+  margin: -8px 0 14px; text-transform: uppercase; letter-spacing: 0.3px;
 }
-.predict-row .predict-btn:first-child { border-right: 1px solid var(--washi-300-soft); }
-.predict-unsure { background: var(--washi-200); color: var(--shoyu-500); }
-.predict-know { background: var(--bronze-500); color: var(--ink-on-rust); }
+
+/* Confidence rating (Brainscape-style 1-5 scale, shown only after reveal) */
+.confidence-wrap { display: none; margin-top: 12px; }
+.confidence-labels {
+  display: flex; justify-content: space-between; font-family: var(--font-mono);
+  font-size: 10px; color: var(--shoyu-300); text-transform: uppercase; letter-spacing: 0.3px;
+  margin-bottom: 6px; padding: 0 2px;
+}
+.confidence-row { display: flex; gap: 0; border: 2px solid var(--washi-300); }
+.confidence-btn {
+  flex: 1; padding: 16px 0; border: none; border-right: 1px solid var(--washi-300-soft);
+  font-family: var(--font-display); font-size: 16px; font-weight: 700; cursor: pointer;
+  background: var(--washi-200); color: var(--shoyu-500);
+}
+.confidence-row .confidence-btn:last-child { border-right: none; }
+.confidence-btn[data-rating="1"] { background: var(--error-600); color: var(--shoyu-700); }
+.confidence-btn[data-rating="2"] { background: var(--bronze-600); color: var(--shoyu-700); }
+.confidence-btn[data-rating="4"] { background: var(--bronze-500); color: var(--ink-on-rust); }
+.confidence-btn[data-rating="5"] { background: var(--wasabi-500); color: var(--ink-on-rust); }
 
 /* Answer reconnects to clue */
 .answer-connector { text-align: center; font-family: var(--font-mono); font-size: 11px; color: var(--bronze-200); text-transform: uppercase; letter-spacing: 0.5px; margin: 14px 0 10px; }
 .answer-block { border-top: 2px solid var(--washi-300); padding-top: 10px; margin-top: 4px; }
 
-/* Calibration toast */
-.calibration-toast {
-  position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%);
-  padding: 12px 20px; border: 2px solid var(--washi-300); font-size: 13px; font-weight: 600;
-  z-index: 90; max-width: 85%; text-align: center;
-  animation: toast-in 0.2s ease-out;
+/* Speed Round: verified multiple choice */
+.testme-card.no-flip { height: auto; cursor: default; margin-bottom: 12px; }
+.testme-card.no-flip .dish-flip-inner { min-height: 0; }
+.mc-row { display: flex; flex-direction: column; gap: 0; border: 2px solid var(--washi-300); }
+.mc-btn {
+  padding: 16px; border: none; border-bottom: 1px solid var(--washi-300-soft);
+  background: var(--washi-200); color: var(--shoyu-700); font-family: var(--font-body);
+  font-size: 14px; font-weight: 600; text-align: left; cursor: pointer;
 }
-@keyframes toast-in { from { opacity: 0; transform: translateX(-50%) translateY(8px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
-.calibration-toast.cal-good { background: var(--sumi-700); color: var(--wasabi-500); border-color: var(--wasabi-500); }
-.calibration-toast.cal-warn { background: var(--sumi-700); color: var(--bronze-200); border-color: var(--bronze-500); }
-.calibration-toast.cal-neutral { background: var(--sumi-700); color: var(--shoyu-500); }
+.mc-row .mc-btn:last-child { border-bottom: none; }
+.mc-btn:disabled { cursor: default; }
+.mc-btn.mc-correct, .mc-btn.mc-reveal-correct { background: var(--wasabi-500); color: var(--ink-on-rust); }
+.mc-btn.mc-incorrect { background: var(--error-500); color: var(--shoyu-700); }
 
 /* Milestone celebration */
 .celebrate-overlay {
@@ -812,7 +833,7 @@ button, input {
    ============================================================ */
 .home-option, .home-card, .list-row, .pill, .nav-chip, .footer-btn, .speed-toggle,
 .wotd-strip, .wotd-main, .wotd-shuffle, .theme-toggle, .back-btn, .section-toggle,
-.match-tile, .allergen-filter-chip, .testme-reset, .predict-btn, .somm-btn,
+.match-tile, .allergen-filter-chip, .testme-reset, .confidence-btn, .mc-btn, .somm-btn,
 .flipcard, .dish-flipcard, .testme-card, .imposter-tile,
 .learning-card, .quiz-opt, .btn-start, .video-frame, .wcard, .knockout-hint-btn {
   transition: transform var(--press-duration) ease-out, background var(--press-duration) ease-out, border-color var(--press-duration) ease-out;
@@ -821,7 +842,7 @@ button, input {
 .footer-btn:not(:disabled):active, .speed-toggle:active, .wotd-strip:active,
 .wotd-main:active, .wotd-shuffle:active, .theme-toggle:active, .back-btn:active, .section-toggle:active,
 .match-tile:not(.matched):not(.picked):active, .allergen-filter-chip:active,
-.testme-reset:active, .predict-btn:active, .somm-btn:active,
+.testme-reset:active, .confidence-btn:active, .mc-btn:active, .somm-btn:active,
 .flipcard:active, .dish-flipcard:active, .testme-card:active,
 .imposter-tile:not(.revealed):active,
 .learning-card:active, .quiz-opt:active, .btn-start:active, .video-frame:active,
@@ -836,7 +857,7 @@ button, input {
 .nav-chip:focus-visible, .footer-btn:focus-visible, .speed-toggle:focus-visible,
 .wotd-strip:focus-visible, .wotd-main:focus-visible, .wotd-shuffle:focus-visible, .theme-toggle:focus-visible,
 .back-btn:focus-visible, .section-toggle:focus-visible, .match-tile:focus-visible,
-.allergen-filter-chip:focus-visible, .predict-btn:focus-visible, .somm-btn:focus-visible,
+.allergen-filter-chip:focus-visible, .confidence-btn:focus-visible, .mc-btn:focus-visible, .somm-btn:focus-visible,
 .flipcard:focus-visible, .dish-flipcard:focus-visible, .testme-card:focus-visible,
 .imposter-tile:focus-visible, .search-input:focus-visible,
 .learning-card:focus-visible, .quiz-opt:focus-visible, .btn-start:focus-visible, .video-frame:focus-visible,
@@ -849,10 +870,10 @@ button, input {
    Reduced motion — keep state/color feedback, drop movement.
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
-  .flip-inner, .dish-flip-inner, .confetti, .match-tile, .calibration-toast,
+  .flip-inner, .dish-flip-inner, .confetti, .match-tile,
   .home-option, .home-card, .list-row, .pill, .nav-chip, .footer-btn, .speed-toggle,
   .wotd-strip, .wotd-shuffle, .theme-toggle, .back-btn, .section-toggle,
-  .allergen-filter-chip, .testme-reset, .predict-btn, .somm-btn,
+  .allergen-filter-chip, .testme-reset, .confidence-btn, .mc-btn, .somm-btn,
   .flipcard, .dish-flipcard, .testme-card, .imposter-tile,
   .learning-card, .quiz-opt, .btn-start, .video-frame, .wcard, .knockout-hint-btn, .asort-placed {
     animation: none !important;

@@ -360,23 +360,6 @@ const WINES = [
     shortStory: "Kracher built its reputation in Austria's Burgenland region, where a shallow lake and warm inland climate create ideal conditions for noble rot. The Beerenauslese Cuvée is many guests' first taste of a sweet-wine style they've likely only heard of through Sauternes."
   },
   {
-    id: "w22", name: "Broadbent '10YR' Verdelho", style: "dessert", price: 18,
-    grape: "Verdelho", producer: "Broadbent Selections", region: "Madeira, Portugal",
-    winemaker: "Broadbent Selections winemaking team",
-    flavorTags: ["Cherry", "Orange Rind", "Cardamom", "Honey Cake"],
-    structure: { sweetness: 3, acidity: 5, tannin: 0, alcohol: 5, body: 3 },
-    guestDescription: "This is a Madeira, a fortified wine from Portugal &mdash; cherry, orange rind, a little cardamom and honey cake. Medium-dry, not syrupy, a nice change of pace from Port.",
-    sellingPoints: ["Not overly sweet — Verdelho is the drier side of Madeira", "Famous for holding up well once opened", "A change of pace from Port on the dessert list"],
-    winemakingNote: "Aged using Madeira's traditional canteiro method, where barrels rest in warm lofts instead of a climate-controlled cellar &mdash; the gentle heat is what gives Madeira its signature roasted, caramelized character.",
-    moment: "A guest who wants something lighter and less sweet than Port to close the meal.",
-    memory: "A Madeira that's drier and brighter than most guests expect.",
-    pairingDishIds: [],
-    arsenal: "Don't let 'Madeira' scare guests off — Verdelho is the drier, brighter side of the category, not the syrupy stuff.",
-    funFact: "Madeira is famously long-lived once opened — its production process, involving deliberate heat aging, means a bottle can last months or even years after being uncorked.",
-    funFact2: "Broadbent Madeira was founded in 1996 by Bartholomew Broadbent, inspired by his father Michael Broadbent, a legendary wine critic who called Madeira his desert-island wine.",
-    shortStory: "Founded in 1996, Broadbent Madeira set out to reintroduce serious Madeira to the US market after decades of neglect, sourcing and blending some of the island's best juice under one recognizable name."
-  },
-  {
     id: "w23", name: "Sandeman '20-Year-Old Tawny'", style: "dessert", price: 18,
     grape: "Touriga Nacional, Touriga Franca, Tinta Roriz, Tinta Barroca", producer: "Sandeman", region: "Douro Valley / Vila Nova de Gaia, Portugal",
     winemaker: "Sandeman winemaking team, Sogrape",

@@ -267,6 +267,7 @@ function render() {
   else if (current.view === "cocktail-detail") renderCocktailDetail(current.params.cocktailId);
   else if (current.view === "wine-type") renderWineTypeChooser();
   else if (current.view === "wine-bottle-list") renderByTheBottleList();
+  else if (current.view === "bottle-card") renderBottleCard(current.params.wineId);
   else if (current.view === "liquor-list") renderLiquorList();
   else if (current.view === "learning-hub") renderLearningHub();
   else if (current.view === "learning-intro") renderLearningIntro(current.params.moduleId);
@@ -707,11 +708,64 @@ function renderWineTypeChooser() {
 
 function renderByTheBottleList() {
   header("By The Bottle");
-  const empty = document.createElement("p");
-  empty.className = "empty-note";
-  empty.style.padding = "40px 0";
-  empty.textContent = "The bottle list hasn't been added yet.";
-  app.appendChild(empty);
+  if (!BOTTLE_WINES.length) {
+    const empty = document.createElement("p");
+    empty.className = "empty-note";
+    empty.style.padding = "40px 0";
+    empty.textContent = "The bottle list hasn't been added yet.";
+    app.appendChild(empty);
+    return;
+  }
+  app.appendChild(renderSearchableWineList(
+    (wineId) => go("bottle-card", { wineId }),
+    "Search the bottle list",
+    BOTTLE_WINES
+  ));
+}
+
+function renderBottleCard(wineId) {
+  const wine = BOTTLE_WINES.find(w => w.id === wineId) || BOTTLE_WINES[0];
+  const idx = BOTTLE_WINES.findIndex(w => w.id === wine.id);
+
+  header("By The Bottle");
+  app.appendChild(renderNavChips(wine.id, (id) => go("bottle-card", { wineId: id }, false), BOTTLE_WINES));
+  app.appendChild(renderWineCardBody(wine));
+
+  const footerNav = document.createElement("div");
+  footerNav.className = "card-footer-nav";
+
+  const backBtn = document.createElement("button");
+  backBtn.className = "footer-btn";
+  backBtn.textContent = "\u2190 Back";
+  backBtn.disabled = idx === 0;
+  backBtn.onclick = () => go("bottle-card", { wineId: BOTTLE_WINES[idx - 1].id }, false);
+
+  const homeBtn = document.createElement("button");
+  homeBtn.className = "footer-btn footer-btn-home";
+  homeBtn.textContent = "Home";
+  homeBtn.onclick = () => go("home", {});
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "footer-btn";
+  nextBtn.textContent = "Next \u2192";
+  nextBtn.disabled = idx === BOTTLE_WINES.length - 1;
+  nextBtn.onclick = () => go("bottle-card", { wineId: BOTTLE_WINES[idx + 1].id }, false);
+
+  footerNav.appendChild(backBtn);
+  footerNav.appendChild(homeBtn);
+  footerNav.appendChild(nextBtn);
+  app.appendChild(footerNav);
+
+  let touchStartX = null;
+  app.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; }, { once: true });
+  app.addEventListener("touchend", (e) => {
+    if (touchStartX === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 60) {
+      const nextIdx = dx < 0 ? Math.min(idx + 1, BOTTLE_WINES.length - 1) : Math.max(idx - 1, 0);
+      go("bottle-card", { wineId: BOTTLE_WINES[nextIdx].id }, false);
+    }
+  }, { once: true });
 }
 
 function renderStudyList() {

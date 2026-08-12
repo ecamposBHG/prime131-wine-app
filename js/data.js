@@ -946,6 +946,11 @@ const CLASSIC_COCKTAILS = [
   }
 ];
 
+// Wine By The Bottle — full bottle list, built out in phases by grape
+// variety. Kept as its own array (not merged into WINES) so it gets its
+// own browse/search flow, mirroring the HRW_WINES pattern above.
+const BOTTLE_WINES = [];
+
 // Liquor / back bar list -- empty until real bottle data is provided.
 // Each item will follow: { id: "l1", name: "...", category: "Whiskey" | "Gin" | "Rum" | "Tequila" | "Vodka" | "Brandy/Cognac", ... }
 const LIQUOR = [];

@@ -655,7 +655,8 @@ function renderSearchableWineList(onSelect, placeholder, wineSource) {
       wines.forEach(w => {
         const row = document.createElement("div");
         row.className = "list-row";
-        row.innerHTML = `<span class="list-row-main"><span class="style-dot ${w.style}"></span>${w.name}</span>`;
+        const priceHtml = typeof w.price === "number" ? `<span class="list-row-price">$${w.price}</span>` : "";
+        row.innerHTML = `<span class="list-row-main"><span class="style-dot ${w.style}"></span>${w.name}</span>${priceHtml}`;
         row.onclick = () => onSelect(w.id);
         listWrap.appendChild(row);
       });
@@ -1154,6 +1155,13 @@ function renderHeroHeader(wine) {
   meta4.className = "hero-meta strong";
   meta4.textContent = "Winemaker: " + wine.winemaker;
   frag.appendChild(meta4);
+
+  if (typeof wine.price === "number") {
+    const priceTag = document.createElement("p");
+    priceTag.className = "hero-price";
+    priceTag.innerHTML = `<span class="hero-price-amount">$${wine.price}</span><span class="hero-price-label">glass</span>`;
+    frag.appendChild(priceTag);
+  }
 
   return frag;
 }

@@ -3,7 +3,7 @@
 
 const WINES = [
   {
-    id: "w1", name: "Ruffino", style: "sparkling",
+    id: "w1", name: "Ruffino", style: "sparkling", price: 18,
     grape: "100% Glera", producer: "Ruffino", region: "Veneto DOC, Italy",
     winemaker: "Ruffino's technical winemaking team",
     flavorTags: ["Green Apple", "Pear", "Citrus", "White Flower"],
@@ -20,7 +20,7 @@ const WINES = [
     shortStory: "Ruffino started as a small Tuscan producer in the 1870s and grew into one of Italy's most exported wine names. Their Prosecco line is a newer chapter, built to bring that same reliability to the sparkling category."
   },
   {
-    id: "w2", name: "Telmont Réserve Brut", style: "sparkling",
+    id: "w2", name: "Telmont Réserve Brut", style: "sparkling", price: 28,
     grape: "Chardonnay, Pinot Meunier, Pinot Noir", producer: "Champagne Telmont", region: "Champagne, France",
     winemaker: "Bertrand Lhôpital, Cellar Master",
     flavorTags: ["Honeysuckle", "Baked Apple", "Brioche", "Chalky Mineral"],
@@ -37,7 +37,7 @@ const WINES = [
     shortStory: "Founded in a small Marne village in 1912, Telmont stayed under the radar for decades. Recent investment and a sustainability-first mission have turned it into one of Champagne's most talked-about small houses."
   },
   {
-    id: "w3", name: "Nicolas Feuillatte Rosé Brut", style: "sparkling",
+    id: "w3", name: "Nicolas Feuillatte Rosé Brut", style: "sparkling", price: 26,
     grape: "Pinot Noir, Pinot Meunier, Chardonnay", producer: "Champagne Nicolas Feuillatte", region: "Chouilly, Champagne, France",
     winemaker: "Cellar Master & blending team, Centre Vinicole",
     flavorTags: ["Raspberry", "Strawberry", "Red Currant", "Chalk"],
@@ -54,7 +54,7 @@ const WINES = [
     shortStory: "Built as a cooperative representing thousands of small grower families rather than one aristocratic estate, Nicolas Feuillatte proves Champagne doesn't need centuries of noble history to be excellent — just excellent fruit and blending."
   },
   {
-    id: "w4", name: "Santa Margherita", style: "white",
+    id: "w4", name: "Santa Margherita", style: "white", price: 17,
     grape: "100% Pinot Grigio", producer: "Santa Margherita", region: "Alto Adige DOC, Italy",
     winemaker: "Santa Margherita winemaking team",
     flavorTags: ["Green Apple", "Citrus", "White Flowers", "Mineral"],
@@ -71,7 +71,7 @@ const WINES = [
     shortStory: "Before Santa Margherita, most American drinkers had never heard of Pinot Grigio. Their clean, crisp house style became the template most people now picture when they think of the grape."
   },
   {
-    id: "w5", name: "Emmolo", style: "white",
+    id: "w5", name: "Emmolo", style: "white", price: 16,
     grape: "100% Sauvignon Blanc", producer: "Emmolo", region: "Napa Valley, California",
     winemaker: "Jenny Wagner",
     flavorTags: ["Citrus Zest", "White Peach", "Fresh Herb", "Wet Stone"],
@@ -88,7 +88,7 @@ const WINES = [
     shortStory: "Emmolo is Jenny Wagner's own label within the larger Wagner family of wines — named for her mother's side, Sicilian immigrants who ran a grapevine nursery in Napa for decades."
   },
   {
-    id: "w6", name: "Cambria 'Katherine's Vineyard'", style: "white",
+    id: "w6", name: "Cambria 'Katherine's Vineyard'", style: "white", price: 15,
     grape: "100% Chardonnay", producer: "Cambria", region: "Santa Maria Valley, California",
     winemaker: "Cambria estate winemaking team",
     flavorTags: ["Toasted Oak", "Tropical Fruit", "Baked Apple", "Vanilla"],
@@ -105,7 +105,7 @@ const WINES = [
     shortStory: "Katherine's Vineyard sits in the Santa Maria Valley, one of the few California AVAs that runs east-west, funneling cool Pacific air straight through the vines — part of why this Chardonnay keeps its richness without losing freshness."
   },
   {
-    id: "w7", name: "Stag's Leap", style: "white",
+    id: "w7", name: "Stag's Leap", style: "white", price: 18,
     grape: "100% Chardonnay", producer: "Stag's Leap Wine Cellars", region: "Napa Valley, California",
     winemaker: "Marcus Notaro, Head Winemaker",
     flavorTags: ["Baked Pear", "Honeysuckle", "Toasted Brioche", "Vanilla Oak"],
@@ -122,7 +122,7 @@ const WINES = [
     shortStory: "Stag's Leap built its reputation on Cabernet after the 1976 Judgment of Paris, but the estate's Chardonnay carries the same philosophy — richness balanced by restraint, an approach the winery calls 'an iron fist in a velvet glove.'"
   },
   {
-    id: "w8", name: "Miraval", style: "white",
+    id: "w8", name: "Miraval", style: "white", price: 16,
     grape: "Grenache, Cinsault, Syrah", producer: "Château Miraval", region: "Côtes de Provence, France",
     winemaker: "Estate winemaking team, Château Miraval",
     flavorTags: ["White Peach", "Citrus", "Floral"],
@@ -139,7 +139,7 @@ const WINES = [
     shortStory: "Long before it was a celebrity property, Miraval was a working wine estate in the hills of Correns, Provence. Today it's one of the region's most recognized rosé labels, made in a classic pale, dry Provençal style."
   },
   {
-    id: "w9", name: "Domaine de la Chezatte Sancerre", style: "white",
+    id: "w9", name: "Domaine de la Chezatte Sancerre", style: "white", price: 18,
     grape: "100% Pinot Noir", producer: "Domaine de la Chézatte", region: "Sancerre, Loire Valley, France",
     winemaker: "Estate winemaking team",
     flavorTags: ["Red Berry", "Citrus", "Flint"],
@@ -156,7 +156,7 @@ const WINES = [
     shortStory: "Sancerre is famous for white wine, but a small amount of Pinot Noir grown on the same limestone slopes goes into pale, mineral-driven rosé like this one — a style locals drink far more than tourists ever hear about."
   },
   {
-    id: "w10", name: "Benton-Lane", style: "red",
+    id: "w10", name: "Benton-Lane", style: "red", price: 16,
     grape: "100% Pinot Noir", producer: "Benton-Lane", region: "Willamette Valley, Oregon",
     winemaker: "Estate winemaking team",
     flavorTags: ["Red Cherry", "Cranberry", "Forest Floor", "Herbal"],
@@ -173,7 +173,7 @@ const WINES = [
     shortStory: "Founded in the early 1980s in the Willamette Valley, Benton-Lane was one of the earlier wineries to bet on Oregon Pinot Noir before the region became internationally famous for it."
   },
   {
-    id: "w11", name: "Flowers", style: "red",
+    id: "w11", name: "Flowers", style: "red", price: 24,
     grape: "100% Pinot Noir", producer: "Flowers Vineyard & Winery", region: "Sonoma Coast, California",
     winemaker: "Chantal Forthun, Director of Winemaking",
     flavorTags: ["Wild Strawberry", "Dark Cherry", "Baking Spice", "Earthy Mineral"],
@@ -190,7 +190,7 @@ const WINES = [
     shortStory: "Founded by Walt and Joan Flowers in 1989 on land most winemakers considered too extreme to farm, Flowers helped prove the far Sonoma Coast could produce some of California's most elegant Pinot Noir."
   },
   {
-    id: "w12", name: "Corazon del Sol", style: "red",
+    id: "w12", name: "Corazon del Sol", style: "red", price: 16,
     grape: "100% Malbec", producer: "Corazón del Sol", region: "Uco Valley, Mendoza, Argentina",
     winemaker: "Estate winemaking team, Uco Valley",
     flavorTags: ["Black Plum", "Blackberry", "Violet", "Tar & Spice"],
@@ -207,7 +207,7 @@ const WINES = [
     shortStory: "Malbec followed French immigrants to Argentina in the 1800s and nearly disappeared after a hard frost in the 1950s. High-altitude sites like this one in the Uco Valley are part of why the grape came roaring back as Argentina's signature red."
   },
   {
-    id: "w13", name: "Markham", style: "red",
+    id: "w13", name: "Markham", style: "red", price: 16,
     grape: "Merlot-dominant blend", producer: "Markham Vineyards", region: "Napa Valley, California",
     winemaker: "Estate winemaking team",
     flavorTags: ["Black Cherry", "Plum", "Cocoa", "Baking Spice"],
@@ -224,7 +224,7 @@ const WINES = [
     shortStory: "The winery's stone building dates to the 1870s, making Markham one of the physically oldest working wine properties in Napa Valley, even though the Markham name itself came later."
   },
   {
-    id: "w14", name: "Austin Hope", style: "red",
+    id: "w14", name: "Austin Hope", style: "red", price: 23,
     grape: "Cabernet Sauvignon", producer: "Austin Hope", region: "Paso Robles, California",
     winemaker: "Austin Hope",
     flavorTags: ["Blackberry", "Dark Chocolate", "Vanilla Oak", "Warm Spice"],
@@ -241,7 +241,7 @@ const WINES = [
     shortStory: "Built on ripe, generous Paso Robles Cabernet at a time when most collectors only took Napa seriously, Austin Hope's namesake wine helped change that conversation."
   },
   {
-    id: "w15", name: "Oberon", style: "red",
+    id: "w15", name: "Oberon", style: "red", price: 18,
     grape: "Cabernet Sauvignon", producer: "Oberon", region: "Napa Valley, California",
     winemaker: "Chuck Wagner",
     flavorTags: ["Dark Berry", "Cassis", "Oak Spice", "Mocha"],
@@ -258,7 +258,7 @@ const WINES = [
     shortStory: "Named after Shakespeare's fairy king, Oberon was built to be Caymus's more playful, easy-drinking little sibling — same winemaking hand, lighter price tag."
   },
   {
-    id: "w16", name: "Caymus", style: "red",
+    id: "w16", name: "Caymus", style: "red", price: 25,
     grape: "Cabernet Sauvignon", producer: "Caymus Vineyards", region: "California",
     winemaker: "Chuck Wagner",
     flavorTags: ["Black Currant", "Mocha", "Vanilla", "Toasted Oak"],
@@ -275,7 +275,7 @@ const WINES = [
     shortStory: "Caymus's 1984 and 1990 Special Selection Cabernets were both named Wine Spectator's 'Wine of the Year' — the only producer ever to win that honor twice — cementing Caymus as one of the most recognized Cabernet names in the world."
   },
   {
-    id: "w17", name: "Domaine de Cabasse 'Cuvée Marguerite'", style: "red",
+    id: "w17", name: "Domaine de Cabasse 'Cuvée Marguerite'", style: "red", price: 16,
     grape: "Grenache, Syrah", producer: "Domaine de Cabasse", region: "Côtes-du-Rhône, France",
     winemaker: "Estate winemaking team",
     flavorTags: ["Cranberry", "Wild Strawberry", "Garrigue Herbs", "Pepper"],
@@ -292,7 +292,7 @@ const WINES = [
     shortStory: "'Cabasse' is believed to come from an old term for 'the house below the village,' referring to its position just beneath the hilltop town — a name that's stuck since the days the Popes lived down the road in Avignon."
   },
   {
-    id: "w18", name: "Madame de Beaucaillou", style: "red",
+    id: "w18", name: "Madame de Beaucaillou", style: "red", price: 24,
     grape: "Merlot, Cabernet Sauvignon, Petit Verdot, Cabernet Franc", producer: "Château Ducru-Beaucaillou", region: "Haut-Médoc, Bordeaux, France",
     winemaker: "Winemaking team, Château Ducru-Beaucaillou",
     flavorTags: ["Blackcurrant", "Violet", "Morello Cherry", "Oak Spice"],
@@ -309,7 +309,7 @@ const WINES = [
     shortStory: "'Madame' gives guests a taste of real, classified Bordeaux château pedigree — made from younger vines and lots that don't quite make the cut for the flagship wine — without the flagship price tag."
   },
   {
-    id: "w19", name: "Trefethen 'Eshcol'", style: "red",
+    id: "w19", name: "Trefethen 'Eshcol'", style: "red", price: 18,
     grape: "Cabernet Sauvignon-led Bordeaux blend", producer: "Trefethen Family Vineyards", region: "Oak Knoll District, Napa Valley, California",
     winemaker: "Estate winemaking team",
     flavorTags: ["Black Cherry", "Dried Herb", "Cedar", "Baking Spice"],
@@ -326,7 +326,7 @@ const WINES = [
     shortStory: "The winery's original wooden building, called Eshcol, was built in 1886 and is one of the oldest wooden wine structures still in use in Napa Valley — the wine takes its name directly from it."
   },
   {
-    id: "w20", name: "Yoshi No Gawa 'Winter Warrior'", style: "sake",
+    id: "w20", name: "Yoshi No Gawa 'Winter Warrior'", style: "sake", price: 16,
     grape: "Gohyakumangoku rice, 60% polish", producer: "Yoshinogawa", region: "Niigata Prefecture, Japan",
     winemaker: "Toji (master brewer), Yoshinogawa Brewery",
     flavorTags: ["Melon", "Honeydew", "Lychee", "Floral"],
@@ -341,6 +341,74 @@ const WINES = [
     funFact: "Yoshinogawa was founded in 1548 — it's the oldest sake brewery in Niigata Prefecture and the eighth oldest in all of Japan.",
     funFact2: "Niigata is famous for heavy winter snowfall, which filters into extremely pure water used in brewing — part of why the region is known for clean, crisp sake styles.",
     shortStory: "Yoshinogawa has been brewing sake in the same Niigata region since 1548 — meaning this bottle carries nearly 500 years of continuous brewing tradition behind it."
+  },
+  {
+    id: "w21", name: "Kracher 'Beerenauslese Cuvée'", style: "dessert", price: 18,
+    grape: "Chardonnay, Welschriesling", producer: "Weinlaubenhof Kracher", region: "Burgenland, Austria",
+    winemaker: "Gerhard Kracher",
+    flavorTags: ["Dried Apricot", "Honey", "Orange Peel", "Botrytis Spice"],
+    structure: { sweetness: 5, acidity: 4, tannin: 0, alcohol: 2, body: 5 },
+    guestDescription: "This is a rich Austrian dessert wine, made from grapes affected by noble rot &mdash; think dried apricot, honey, and orange peel. Gorgeous on its own or with the citrus dessert.",
+    sellingPoints: ["Real botrytized dessert wine, not just a sweet pour", "Pairs beautifully with the citrus dessert", "One of the most respected names in sweet wine worldwide"],
+    winemakingNote: "Made from grapes affected by noble rot (botrytis cinerea), which shrivels the berries and concentrates sugar and flavor before pressing &mdash; the same process behind Sauternes, applied here to Chardonnay and Welschriesling in Austria's Burgenland.",
+    moment: "The table that wants a real dessert wine instead of (or alongside) dessert, or a pairing for the citrus dessert.",
+    memory: "Austria's answer to Sauternes — dried apricot and honey from noble rot.",
+    pairingDishIds: [],
+    arsenal: "This is real botrytized Austrian dessert wine — the same noble-rot process behind Sauternes, just from a different country.",
+    funFact: "Kracher's dessert wines come from Burgenland, Austria, where fog off nearby Lake Neusiedl encourages the same noble rot that makes Sauternes possible in France.",
+    funFact2: "Founder Alois Kracher built the estate's international reputation before passing away in 2007; his son Gerhard has run the winemaking ever since.",
+    shortStory: "Kracher built its reputation in Austria's Burgenland region, where a shallow lake and warm inland climate create ideal conditions for noble rot. The Beerenauslese Cuvée is many guests' first taste of a sweet-wine style they've likely only heard of through Sauternes."
+  },
+  {
+    id: "w22", name: "Broadbent '10YR' Verdelho", style: "dessert", price: 18,
+    grape: "Verdelho", producer: "Broadbent Selections", region: "Madeira, Portugal",
+    winemaker: "Broadbent Selections winemaking team",
+    flavorTags: ["Cherry", "Orange Rind", "Cardamom", "Honey Cake"],
+    structure: { sweetness: 3, acidity: 5, tannin: 0, alcohol: 5, body: 3 },
+    guestDescription: "This is a Madeira, a fortified wine from Portugal &mdash; cherry, orange rind, a little cardamom and honey cake. Medium-dry, not syrupy, a nice change of pace from Port.",
+    sellingPoints: ["Not overly sweet — Verdelho is the drier side of Madeira", "Famous for holding up well once opened", "A change of pace from Port on the dessert list"],
+    winemakingNote: "Aged using Madeira's traditional canteiro method, where barrels rest in warm lofts instead of a climate-controlled cellar &mdash; the gentle heat is what gives Madeira its signature roasted, caramelized character.",
+    moment: "A guest who wants something lighter and less sweet than Port to close the meal.",
+    memory: "A Madeira that's drier and brighter than most guests expect.",
+    pairingDishIds: [],
+    arsenal: "Don't let 'Madeira' scare guests off — Verdelho is the drier, brighter side of the category, not the syrupy stuff.",
+    funFact: "Madeira is famously long-lived once opened — its production process, involving deliberate heat aging, means a bottle can last months or even years after being uncorked.",
+    funFact2: "Broadbent Madeira was founded in 1996 by Bartholomew Broadbent, inspired by his father Michael Broadbent, a legendary wine critic who called Madeira his desert-island wine.",
+    shortStory: "Founded in 1996, Broadbent Madeira set out to reintroduce serious Madeira to the US market after decades of neglect, sourcing and blending some of the island's best juice under one recognizable name."
+  },
+  {
+    id: "w23", name: "Sandeman '20-Year-Old Tawny'", style: "dessert", price: 18,
+    grape: "Touriga Nacional, Touriga Franca, Tinta Roriz, Tinta Barroca", producer: "Sandeman", region: "Douro Valley / Vila Nova de Gaia, Portugal",
+    winemaker: "Sandeman winemaking team, Sogrape",
+    flavorTags: ["Dried Fig", "Toasted Almond", "Caramel", "Toffee"],
+    structure: { sweetness: 4, acidity: 3, tannin: 1, alcohol: 5, body: 4 },
+    guestDescription: "This is a 20-year Tawny Port &mdash; dried fig, toasted almond, caramel. Silky and rich, the classic way to close the meal.",
+    sellingPoints: ["Classic aged Tawny Port, 20 years average in barrel", "Silky and nutty, not heavy or cloying", "Tastes great served slightly chilled"],
+    winemakingNote: "A blend of Tawny Ports aged in oak casks for an average of 20 years, mellowing from a deep ruby into an amber-gold color as the wine slowly oxidizes and picks up nutty, dried-fruit character.",
+    moment: "The classic after-dinner pour, especially alongside cheese or dried-fruit forward desserts.",
+    memory: "20 years in oak, silky and nutty — the classic after-dinner Port.",
+    pairingDishIds: [],
+    arsenal: "Twenty years in oak is a long time — that oxidative aging is the whole reason it tastes the way it does, versus a young ruby Port.",
+    funFact: "Sandeman's 20 Year Old is a blend of Tawny Ports actually aged between 15 and 40 years, balanced to hit a consistent 20-year-old character every bottling.",
+    funFact2: "Sandeman is known for 'The Don' — its iconic silhouette logo of a figure in a wide-brimmed hat and cape, one of the oldest branded trademarks in the wine industry.",
+    shortStory: "Founded in 1790, Sandeman is one of the oldest Port houses in the Douro, built around its cellars in Vila Nova de Gaia. This 20-year Tawny sits at the classic mid-point of the aged-Tawny category — old enough to be serious, fresh enough to stay lively."
+  },
+  {
+    id: "w24", name: "Warre's 'Warrior Reserve'", style: "dessert", price: 12,
+    grape: "Touriga Nacional, Touriga Franca, Tinta Roriz, Tinta Barroca", producer: "Warre's", region: "Douro Valley, Portugal",
+    winemaker: "Charles Symington, Head Winemaker",
+    flavorTags: ["Blackberry", "Plum", "Dark Chocolate", "Baking Spice"],
+    structure: { sweetness: 4, acidity: 3, tannin: 3, alcohol: 5, body: 4 },
+    guestDescription: "This is a Reserve Ruby-style Port &mdash; blackberry, plum, dark chocolate. Bigger and more fruit-forward than the Tawny on the list.",
+    sellingPoints: ["Bigger, fruitier style than the Tawny on the list", "From the oldest Port brand in the world, shipping since the 1750s", "Great match for the chocolate desserts"],
+    winemakingNote: "A Reserve Ruby, meaning it's aged briefly in oak casks rather than for decades like a Tawny &mdash; that keeps more of the dark fruit character while still adding some barrel complexity.",
+    moment: "A guest who wants Port but with more fruit and less of the nutty, oxidized character of a Tawny.",
+    memory: "The fruitier, less oxidized Port on the list — from the oldest Port brand there is.",
+    pairingDishIds: [],
+    arsenal: "The oldest Port brand in the world, shipping continuously since the 1750s — that's a fun one to drop tableside.",
+    funFact: "Warre's is generally considered the oldest Port house still operating today, with records tracing its trade back to the 1670s.",
+    funFact2: "The 'Warrior' name has been branded onto Warre's finest Reserve Port casks since the company's earliest days in the 1750s, making it one of the longest-running names in wine.",
+    shortStory: "Warre's has been shipping Port continuously since the 1670s, making it the oldest Port house still in business. The Warrior name has marked its finest reserve casks since the 1750s, giving this bottling one of the longest-running brand identities in wine."
   }
 ];
 

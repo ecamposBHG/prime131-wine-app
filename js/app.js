@@ -706,6 +706,13 @@ function renderWineTypeChooser() {
   app.appendChild(options);
 }
 
+function groupByBottleCategory(wines) {
+  const groups = {};
+  BOTTLE_CATEGORY_ORDER.forEach(c => groups[c] = []);
+  wines.forEach(w => { if (groups[w.category]) groups[w.category].push(w); });
+  return groups;
+}
+
 function renderByTheBottleList() {
   header("By The Bottle");
   if (!BOTTLE_WINES.length) {
@@ -716,11 +723,76 @@ function renderByTheBottleList() {
     app.appendChild(empty);
     return;
   }
-  app.appendChild(renderSearchableWineList(
-    (wineId) => go("bottle-card", { wineId }),
-    "Search the bottle list",
-    BOTTLE_WINES
-  ));
+
+  const wrap = document.createElement("div");
+  const input = document.createElement("input");
+  input.className = "search-input";
+  input.placeholder = "Search the bottle list";
+  wrap.appendChild(input);
+
+  const listWrap = document.createElement("div");
+  wrap.appendChild(listWrap);
+
+  const manualExpanded = new Set();
+
+  function draw(filter) {
+    listWrap.innerHTML = "";
+    const filtered = BOTTLE_WINES.filter(w => w.name.toLowerCase().includes(filter.toLowerCase()));
+    const hasActiveFilter = filter.trim().length > 0;
+    const groups = groupByBottleCategory(filtered);
+
+    function appendWineRow(w) {
+      const row = document.createElement("div");
+      row.className = "list-row";
+      const priceHtml = typeof w.price === "number" ? `<span class="list-row-price">$${w.price}</span>` : "";
+      row.innerHTML = `<span class="list-row-main">${w.name}</span>${priceHtml}`;
+      row.onclick = () => go("bottle-card", { wineId: w.id });
+      listWrap.appendChild(row);
+    }
+
+    BOTTLE_CATEGORY_ORDER.forEach(category => {
+      const wines = groups[category];
+      if (!wines.length) return;
+
+      const isExpanded = hasActiveFilter || manualExpanded.has(category);
+
+      const label = document.createElement("button");
+      label.className = "section-label section-toggle";
+      label.innerHTML = `<span>${category} &middot; ${wines.length}</span><span class="section-chevron">${isExpanded ? "\u25BE" : "\u25B8"}</span>`;
+      label.onclick = () => {
+        if (hasActiveFilter) return;
+        if (manualExpanded.has(category)) manualExpanded.delete(category);
+        else manualExpanded.add(category);
+        draw(input.value);
+      };
+      listWrap.appendChild(label);
+
+      if (!isExpanded) return;
+
+      const subOrder = BOTTLE_SUBCATEGORY_ORDER[category];
+      if (subOrder) {
+        subOrder.forEach(sub => {
+          const subWines = wines.filter(w => w.subcategory === sub);
+          if (!subWines.length) return;
+          const subLabel = document.createElement("p");
+          subLabel.className = "section-label";
+          subLabel.textContent = sub;
+          listWrap.appendChild(subLabel);
+          subWines.forEach(appendWineRow);
+        });
+        wines.filter(w => !subOrder.includes(w.subcategory)).forEach(appendWineRow);
+      } else {
+        wines.forEach(appendWineRow);
+      }
+    });
+
+    if (!filtered.length) {
+      listWrap.innerHTML = `<p class="empty-note">No wines match that search.</p>`;
+    }
+  }
+  draw("");
+  input.oninput = () => draw(input.value);
+  app.appendChild(wrap);
 }
 
 function renderBottleCard(wineId) {

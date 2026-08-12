@@ -1,4 +1,4 @@
-const CACHE_NAME = "prime131-wines-v106";
+const CACHE_NAME = "prime131-wines-v107";
 const ASSETS = [
   "./",
   "./index.html",

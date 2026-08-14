@@ -510,15 +510,26 @@ function playStreakExtinguish(stripEl, onDone) {
   }, 650);
 }
 
+function wotdPool() {
+  return WINES.concat(BOTTLE_WINES);
+}
+
 function wineOfTheDay() {
+  const pool = wotdPool();
   const now = new Date();
   const start = new Date(now.getFullYear(), 0, 0);
   const dayOfYear = Math.floor((now - start) / 86400000);
-  return WINES[dayOfYear % WINES.length];
+  return pool[dayOfYear % pool.length];
 }
 
-function randomWine() {
-  return WINES[Math.floor(Math.random() * WINES.length)];
+function randomWine(excludeId) {
+  const pool = wotdPool();
+  if (pool.length <= 1) return pool[0];
+  let pick;
+  do {
+    pick = pool[Math.floor(Math.random() * pool.length)];
+  } while (pick.id === excludeId);
+  return pick;
 }
 
 
@@ -584,6 +595,8 @@ function renderHome() {
   }
 
   const wotd = wineOfTheDay();
+  let currentWotd = wotd;
+  let wotdSpinning = false;
   const wotdStrip = document.createElement("div");
   wotdStrip.className = "wotd-strip";
   wotdStrip.innerHTML = `
@@ -591,12 +604,57 @@ function renderHome() {
       <p class="wotd-label">Wine of the day</p>
       <p class="wotd-name">${wotd.name}</p>
     </div>
-    <button class="wotd-shuffle" aria-label="Surprise me with a random wine">Shuffle</button>
+    <button class="wotd-shuffle" aria-label="Shuffle to a random wine">Shuffle</button>
   `;
-  wotdStrip.querySelector(".wotd-main").onclick = () => go("study-card", { wineId: wotd.id });
-  wotdStrip.querySelector(".wotd-shuffle").onclick = (e) => {
+  const wotdNameEl = wotdStrip.querySelector(".wotd-name");
+  const wotdMainEl = wotdStrip.querySelector(".wotd-main");
+  const wotdShuffleBtn = wotdStrip.querySelector(".wotd-shuffle");
+
+  wotdMainEl.onclick = () => {
+    if (wotdSpinning) return;
+    const route = currentWotd.id.startsWith("bw") ? "bottle-card" : "study-card";
+    go(route, { wineId: currentWotd.id });
+  };
+
+  wotdShuffleBtn.onclick = (e) => {
     e.stopPropagation();
-    go("study-card", { wineId: randomWine().id });
+    if (wotdSpinning) return;
+
+    const next = randomWine(currentWotd.id);
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+      currentWotd = next;
+      wotdNameEl.textContent = currentWotd.name;
+      return;
+    }
+
+    wotdSpinning = true;
+    wotdShuffleBtn.disabled = true;
+    wotdNameEl.classList.add("spinning");
+    const pool = wotdPool();
+    const totalDuration = 1100;
+    const startTime = performance.now();
+    let lastTick = 0;
+
+    function tick(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / totalDuration, 1);
+      const interval = 45 + Math.pow(progress, 2) * 175;
+      if (now - lastTick >= interval) {
+        lastTick = now;
+        wotdNameEl.textContent = pool[Math.floor(Math.random() * pool.length)].name;
+      }
+      if (elapsed < totalDuration) {
+        requestAnimationFrame(tick);
+      } else {
+        currentWotd = next;
+        wotdNameEl.textContent = currentWotd.name;
+        wotdNameEl.classList.remove("spinning");
+        wotdShuffleBtn.disabled = false;
+        wotdSpinning = false;
+      }
+    }
+    requestAnimationFrame(tick);
   };
   app.appendChild(wotdStrip);
 

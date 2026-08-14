@@ -644,22 +644,22 @@ function renderHome() {
 
     function tick(now) {
       const elapsed = now - startTime;
-      const progress = Math.min(elapsed / totalDuration, 1);
+      if (elapsed >= totalDuration) {
+        currentWotd = next;
+        wotdNameEl.textContent = currentWotd.name;
+        playReelTick(220);
+        wotdShuffleBtn.disabled = false;
+        wotdSpinning = false;
+        return;
+      }
+      const progress = elapsed / totalDuration;
       const interval = 90 + Math.pow(progress, 2.4) * 340;
       if (now - lastTick >= interval) {
         lastTick = now;
-        const isFinalTick = elapsed >= totalDuration;
-        const displayed = isFinalTick ? next : pool[Math.floor(Math.random() * pool.length)];
-        wotdNameEl.textContent = displayed.name;
+        wotdNameEl.textContent = pool[Math.floor(Math.random() * pool.length)].name;
         playReelTick(Math.min(interval, 260));
       }
-      if (elapsed < totalDuration) {
-        requestAnimationFrame(tick);
-      } else {
-        currentWotd = next;
-        wotdShuffleBtn.disabled = false;
-        wotdSpinning = false;
-      }
+      requestAnimationFrame(tick);
     }
     requestAnimationFrame(tick);
   };

@@ -142,7 +142,7 @@ function buildFaceHTML(wine, similar, idx) {
 }
 
 function renderFlipCard(wine) {
-  const similar = wine.id.startsWith("hrw") ? similarHrwPour(wine) : similarPour(wine);
+  const similar = wine.id.startsWith("hrw") ? similarHrwPour(wine) : wine.id.startsWith("bw") ? similarBottlePour(wine) : similarPour(wine);
   const flipcard = document.createElement("div");
   flipcard.className = "flipcard";
   const inner = document.createElement("div");
@@ -172,6 +172,18 @@ function similarPour(wine) {
 
 function similarHrwPour(wine) {
   const sameStyle = HRW_WINES.filter(w => w.style === wine.style && w.id !== wine.id);
+  if (!sameStyle.length) return null;
+  return sameStyle[0];
+}
+
+function similarBottlePour(wine) {
+  if (wine.subcategory) {
+    const sameSubcategory = BOTTLE_WINES.filter(w => w.category === wine.category && w.subcategory === wine.subcategory && w.id !== wine.id);
+    if (sameSubcategory.length) return sameSubcategory[0];
+  }
+  const sameCategory = BOTTLE_WINES.filter(w => w.category === wine.category && w.id !== wine.id);
+  if (sameCategory.length) return sameCategory[0];
+  const sameStyle = BOTTLE_WINES.filter(w => w.style === wine.style && w.id !== wine.id);
   if (!sameStyle.length) return null;
   return sameStyle[0];
 }
@@ -1285,7 +1297,8 @@ function renderHeroHeader(wine) {
   if (typeof wine.price === "number") {
     const priceTag = document.createElement("p");
     priceTag.className = "hero-price";
-    priceTag.innerHTML = `<span class="hero-price-amount">$${wine.price}</span><span class="hero-price-label">glass</span>`;
+    const priceUnit = wine.id.startsWith("bw") ? "bottle" : "glass";
+    priceTag.innerHTML = `<span class="hero-price-amount">$${wine.price}</span><span class="hero-price-label">${priceUnit}</span>`;
     frag.appendChild(priceTag);
   }
 

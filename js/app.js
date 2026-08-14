@@ -630,26 +630,33 @@ function renderHome() {
 
     wotdSpinning = true;
     wotdShuffleBtn.disabled = true;
-    wotdNameEl.classList.add("spinning");
     const pool = wotdPool();
-    const totalDuration = 1100;
+    const totalDuration = 2000;
     const startTime = performance.now();
-    let lastTick = 0;
+    let lastTick = -Infinity;
+
+    function playReelTick(durationMs) {
+      wotdNameEl.classList.remove("reel-tick");
+      void wotdNameEl.offsetWidth; // force reflow so the animation restarts on every tick
+      wotdNameEl.style.animationDuration = durationMs + "ms";
+      wotdNameEl.classList.add("reel-tick");
+    }
 
     function tick(now) {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / totalDuration, 1);
-      const interval = 45 + Math.pow(progress, 2) * 175;
+      const interval = 90 + Math.pow(progress, 2.4) * 340;
       if (now - lastTick >= interval) {
         lastTick = now;
-        wotdNameEl.textContent = pool[Math.floor(Math.random() * pool.length)].name;
+        const isFinalTick = elapsed >= totalDuration;
+        const displayed = isFinalTick ? next : pool[Math.floor(Math.random() * pool.length)];
+        wotdNameEl.textContent = displayed.name;
+        playReelTick(Math.min(interval, 260));
       }
       if (elapsed < totalDuration) {
         requestAnimationFrame(tick);
       } else {
         currentWotd = next;
-        wotdNameEl.textContent = currentWotd.name;
-        wotdNameEl.classList.remove("spinning");
         wotdShuffleBtn.disabled = false;
         wotdSpinning = false;
       }

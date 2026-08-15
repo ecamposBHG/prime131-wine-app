@@ -3962,26 +3962,52 @@ let imposterPref = { difficulty: "easy", rounds: 10 };
 
 function buildImposterRules(difficulty) {
   const rules = [];
+  const allWines = WINES.concat(BOTTLE_WINES); // BTG + bottle list: full 167-wine pool
 
-  rules.push({ type: "region", pick: WINES.filter(w => w.region.includes("Napa")),
-    exclude: WINES.filter(w => !w.region.includes("Napa")),
-    why: "The other three are all from Napa Valley." });
+  // Region: data-driven, any region shared by 3+ wines (was hardcoded to Napa only)
+  const regionCounts = {};
+  allWines.forEach(w => { regionCounts[w.region] = (regionCounts[w.region] || 0) + 1; });
+  Object.keys(regionCounts).filter(r => regionCounts[r] >= 3).forEach(region => {
+    rules.push({ type: "region", pick: allWines.filter(w => w.region === region),
+      exclude: allWines.filter(w => w.region !== region),
+      why: `The other three are all from ${region}.` });
+  });
+
+  // Grape: single-varietal wines (grape field starts "100% X"), 3+ sharing the same grape
+  const singleGrape = allWines.filter(w => /^100% /.test(w.grape));
+  const grapeCounts = {};
+  singleGrape.forEach(w => { grapeCounts[w.grape] = (grapeCounts[w.grape] || 0) + 1; });
+  Object.keys(grapeCounts).filter(g => grapeCounts[g] >= 3).forEach(grape => {
+    rules.push({ type: "grape", pick: allWines.filter(w => w.grape === grape),
+      exclude: allWines.filter(w => w.grape !== grape),
+      why: `The other three are all ${grape.replace("100% ", "")} &mdash; the imposter is a different grape or a blend.` });
+  });
+
+  // Style: sparkling / white / red / dessert / sake
+  STYLE_ORDER.forEach(style => {
+    const has = allWines.filter(w => w.style === style);
+    const notHave = allWines.filter(w => w.style !== style);
+    if (has.length >= 3 && notHave.length >= 1) {
+      rules.push({ type: "style", pick: has, exclude: notHave,
+        why: `The other three are all ${STYLE_LABELS[style].toLowerCase()} &mdash; the imposter is a different style entirely.` });
+    }
+  });
 
   if (difficulty === "hard") {
-    rules.push({ type: "tannin", pick: WINES.filter(w => w.structure.tannin === 3), exclude: WINES.filter(w => w.structure.tannin === 2),
+    rules.push({ type: "tannin", pick: allWines.filter(w => w.structure.tannin === 3), exclude: allWines.filter(w => w.structure.tannin === 2),
       why: "The other three all sit right at medium(+) tannin &mdash; the imposter is a notch softer, at medium." });
-    rules.push({ type: "acidity", pick: WINES.filter(w => w.structure.acidity === 3), exclude: WINES.filter(w => w.structure.acidity === 2),
+    rules.push({ type: "acidity", pick: allWines.filter(w => w.structure.acidity === 3), exclude: allWines.filter(w => w.structure.acidity === 2),
       why: "The other three all sit right at medium acidity &mdash; the imposter is a notch softer." });
-    rules.push({ type: "body", pick: WINES.filter(w => w.structure.body === 3), exclude: WINES.filter(w => w.structure.body === 2),
+    rules.push({ type: "body", pick: allWines.filter(w => w.structure.body === 3), exclude: allWines.filter(w => w.structure.body === 2),
       why: "The other three are all medium body &mdash; the imposter is a notch lighter." });
   } else {
-    rules.push({ type: "tannin", pick: WINES.filter(w => w.structure.tannin >= 3), exclude: WINES.filter(w => w.structure.tannin <= 1),
+    rules.push({ type: "tannin", pick: allWines.filter(w => w.structure.tannin >= 3), exclude: allWines.filter(w => w.structure.tannin <= 1),
       why: "The other three are structured, tannic reds &mdash; the imposter barely has any grip." });
-    rules.push({ type: "acidity", pick: WINES.filter(w => w.structure.acidity >= 4), exclude: WINES.filter(w => w.structure.acidity <= 2),
+    rules.push({ type: "acidity", pick: allWines.filter(w => w.structure.acidity >= 4), exclude: allWines.filter(w => w.structure.acidity <= 2),
       why: "The other three are all high-acid, fresh-style pours &mdash; the imposter is soft and round." });
-    rules.push({ type: "body", pick: WINES.filter(w => w.structure.body >= 4), exclude: WINES.filter(w => w.structure.body <= 2),
+    rules.push({ type: "body", pick: allWines.filter(w => w.structure.body >= 4), exclude: allWines.filter(w => w.structure.body <= 2),
       why: "The other three are all full-bodied &mdash; the imposter is noticeably lighter on the palate." });
-    rules.push({ type: "body", pick: WINES.filter(w => w.structure.body <= 2), exclude: WINES.filter(w => w.structure.body >= 4),
+    rules.push({ type: "body", pick: allWines.filter(w => w.structure.body <= 2), exclude: allWines.filter(w => w.structure.body >= 4),
       why: "The other three are all light-bodied &mdash; the imposter is much fuller and richer." });
   }
 
@@ -4011,21 +4037,15 @@ function buildImposterRules(difficulty) {
     }
   });
 
-  const glassFamily = (g) => g.includes("Martini") ? "Martini" : g.includes("Rocks") ? "Rocks" : g.includes("Coupe") ? "Coupe" : null;
-  ["Shake & Strain", "Stir & Strain"].forEach(method => {
-    const has = COCKTAILS.filter(c => c.method === method);
-    const notHave = COCKTAILS.filter(c => c.method !== method);
-    if (has.length >= 3 && notHave.length >= 1) {
-      rules.push({ type: "cocktail-method", pick: has, exclude: notHave, itemType: "cocktail",
-        why: `The other three are all ${method === "Shake & Strain" ? "shaken" : "stirred"} cocktails &mdash; the imposter is built the other way.` });
-    }
-  });
-  ["Martini", "Rocks", "Coupe"].forEach(fam => {
-    const has = COCKTAILS.filter(c => glassFamily(c.glassware) === fam);
-    const notHave = COCKTAILS.filter(c => glassFamily(c.glassware) !== fam);
-    if (has.length >= 3 && notHave.length >= 1) {
-      rules.push({ type: "cocktail-glass", pick: has, exclude: notHave, itemType: "cocktail",
-        why: `The other three are all served in a ${fam.toLowerCase()} glass &mdash; the imposter comes in something different.` });
+  // Food section: 3+ dishes sharing a menu section (Starters, Sushi, Steaks, etc.)
+  const sectionCounts = {};
+  foodPool.forEach(d => { sectionCounts[d.section] = (sectionCounts[d.section] || 0) + 1; });
+  Object.keys(sectionCounts).filter(s => sectionCounts[s] >= 3).forEach(section => {
+    const has = foodPool.filter(d => d.section === section);
+    const notHave = foodPool.filter(d => d.section !== section);
+    if (notHave.length >= 1) {
+      rules.push({ type: "food-section", pick: has, exclude: notHave, itemType: "food",
+        why: `The other three are all from ${section} &mdash; the imposter comes from a different part of the menu.` });
     }
   });
 
@@ -4113,7 +4133,7 @@ function renderImposter() {
   tiles.forEach(item => {
     const tile = document.createElement("button");
     tile.className = "match-tile imposter-tile";
-    const displayName = (round.itemType === "food" || round.itemType === "cocktail") ? item.name : item.producer;
+    const displayName = round.itemType === "food" ? item.name : item.producer;
     tile.innerHTML = `<b>${displayName}</b>`;
     tile.onclick = () => {
       if (done) return;
@@ -4124,7 +4144,7 @@ function renderImposter() {
       grid.querySelectorAll(".imposter-tile").forEach((t, i) => {
         t.classList.add("revealed");
         const full = tiles[i];
-        t.innerHTML = (round.itemType === "food" || round.itemType === "cocktail")
+        t.innerHTML = round.itemType === "food"
           ? `<b>${full.name}</b>`
           : `<b>${full.producer}</b><br><span class="imposter-sub">${full.name}</span>`;
       });

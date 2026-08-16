@@ -281,6 +281,7 @@ function render() {
   else if (current.view === "wine-bottle-list") renderByTheBottleList();
   else if (current.view === "bottle-card") renderBottleCard(current.params.wineId);
   else if (current.view === "liquor-list") renderLiquorList();
+  else if (current.view === "liquor-card") renderLiquorCard(current.params.liquorId);
   else if (current.view === "learning-hub") renderLearningHub();
   else if (current.view === "learning-intro") renderLearningIntro(current.params.moduleId);
   else if (current.view === "learning-chapter") renderLearningChapter(current.params.moduleId, current.params.chapterIndex, current.params.sectionIndex);
@@ -1109,6 +1110,12 @@ function renderCocktailTypeChooser() {
   app.appendChild(options);
 }
 
+function liquorPriceLabel(l) {
+  if (typeof l.price === "number") return `$${l.price}`;
+  if (l.priceRange) return `$${l.priceRange}`;
+  return "";
+}
+
 function renderLiquorList() {
   header("Liquor");
   const wrap = document.createElement("div");
@@ -1120,6 +1127,16 @@ function renderLiquorList() {
   wrap.appendChild(listWrap);
 
   const manualExpanded = new Set();
+
+  function appendLiquorRow(l, category) {
+    const row = document.createElement("div");
+    row.className = "list-row";
+    const priceHtml = liquorPriceLabel(l) ? `<span class="list-row-price">${liquorPriceLabel(l)}</span>` : "";
+    const allocFlag = l.allocation ? `<span class="dish-icon" title="Rotating supplier allocation — ask your server">*</span>` : "";
+    row.innerHTML = `<span class="list-row-main"><span class="dish-icon">${SPIRIT_ICON_MAP[category] || "\u{1F943}"}</span>${l.name}${allocFlag}</span>${priceHtml}`;
+    row.onclick = () => go("liquor-card", { liquorId: l.id });
+    listWrap.appendChild(row);
+  }
 
   function draw(filter) {
     listWrap.innerHTML = "";
@@ -1134,7 +1151,7 @@ function renderLiquorList() {
 
       const label = document.createElement("button");
       label.className = "section-label section-toggle";
-      label.innerHTML = `<span>${category}</span><span class="section-chevron">${isExpanded ? "\u25BE" : "\u25B8"}</span>`;
+      label.innerHTML = `<span>${category}${items.length ? " &middot; " + items.length : ""}</span><span class="section-chevron">${isExpanded ? "\u25BE" : "\u25B8"}</span>`;
       label.onclick = () => {
         if (hasActiveFilter) return;
         if (manualExpanded.has(category)) manualExpanded.delete(category);
@@ -1155,17 +1172,122 @@ function renderLiquorList() {
         return;
       }
 
-      items.forEach(l => {
-        const row = document.createElement("div");
-        row.className = "list-row";
-        row.innerHTML = `<span class="list-row-main"><span class="dish-icon">${SPIRIT_ICON_MAP[category] || "\u{1F943}"}</span>${l.name}</span>`;
-        listWrap.appendChild(row);
-      });
+      const subOrder = LIQUOR_SUBCATEGORY_ORDER[category];
+      if (subOrder) {
+        subOrder.forEach(sub => {
+          const subItems = items.filter(l => l.subcategory === sub);
+          if (!subItems.length) return;
+          const subLabel = document.createElement("p");
+          subLabel.className = "section-label";
+          subLabel.textContent = sub;
+          listWrap.appendChild(subLabel);
+          subItems.forEach(l => appendLiquorRow(l, category));
+        });
+        items.filter(l => !subOrder.includes(l.subcategory)).forEach(l => appendLiquorRow(l, category));
+      } else {
+        items.forEach(l => appendLiquorRow(l, category));
+      }
     });
+
+    if (!listWrap.children.length) {
+      listWrap.innerHTML = `<p class="empty-note">No bottles match that search.</p>`;
+    }
   }
   draw("");
   input.oninput = () => draw(input.value);
   app.appendChild(wrap);
+}
+
+function renderLiquorCard(liquorId) {
+  const l = LIQUOR.find(item => item.id === liquorId) || LIQUOR[0];
+  const idx = LIQUOR.findIndex(item => item.id === l.id);
+
+  header("Liquor");
+
+  const container = document.createElement("div");
+
+  const heroName = document.createElement("p");
+  heroName.className = "hero-name";
+  heroName.textContent = l.name;
+  container.appendChild(heroName);
+
+  if (l.subcategory) {
+    const meta1 = document.createElement("p");
+    meta1.className = "hero-meta";
+    meta1.textContent = l.subcategory;
+    container.appendChild(meta1);
+  }
+
+  if (l.region) {
+    const meta2 = document.createElement("p");
+    meta2.className = "hero-meta";
+    meta2.textContent = l.region;
+    container.appendChild(meta2);
+  }
+
+  if (l.allocation) {
+    const meta3 = document.createElement("p");
+    meta3.className = "hero-meta strong";
+    meta3.textContent = "Rotating supplier allocation — ask your server for today's availability.";
+    container.appendChild(meta3);
+  }
+
+  const priceLabel = liquorPriceLabel(l);
+  if (priceLabel) {
+    const priceTag = document.createElement("p");
+    priceTag.className = "hero-price";
+    priceTag.innerHTML = `<span class="hero-price-amount">${priceLabel}</span>`;
+    container.appendChild(priceTag);
+  }
+
+  // Phase A: only menu-verified facts exist yet. Tasting profile, producer,
+  // and story content are a separately-sourced pass, same discipline as
+  // Dessert Wines elsewhere in the app -- no invented content in the meantime.
+  const empty = document.createElement("p");
+  empty.className = "empty-note";
+  empty.style.textAlign = "left";
+  empty.style.fontStyle = "italic";
+  empty.style.marginTop = "24px";
+  empty.textContent = "Tasting profile and full details coming soon.";
+  container.appendChild(empty);
+
+  app.appendChild(container);
+
+  const footerNav = document.createElement("div");
+  footerNav.className = "card-footer-nav";
+
+  const backBtn = document.createElement("button");
+  backBtn.className = "footer-btn";
+  backBtn.textContent = "\u2190 Back";
+  backBtn.disabled = idx === 0;
+  backBtn.onclick = () => go("liquor-card", { liquorId: LIQUOR[idx - 1].id }, false);
+
+  const homeBtn = document.createElement("button");
+  homeBtn.className = "footer-btn footer-btn-home";
+  homeBtn.textContent = "Home";
+  homeBtn.onclick = () => go("home", {});
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "footer-btn";
+  nextBtn.textContent = "Next \u2192";
+  nextBtn.disabled = idx === LIQUOR.length - 1;
+  nextBtn.onclick = () => go("liquor-card", { liquorId: LIQUOR[idx + 1].id }, false);
+
+  footerNav.appendChild(backBtn);
+  footerNav.appendChild(homeBtn);
+  footerNav.appendChild(nextBtn);
+  app.appendChild(footerNav);
+
+  let touchStartX = null;
+  app.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; }, { once: true });
+  app.addEventListener("touchend", (e) => {
+    if (touchStartX === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 60) {
+      const nextIdx = dx < 0 ? Math.min(idx + 1, LIQUOR.length - 1) : Math.max(idx - 1, 0);
+      go("liquor-card", { liquorId: LIQUOR[nextIdx].id }, false);
+    }
+  }, { once: true });
 }
 
 // SPIRIT_ORDER and SPIRIT_ICON_MAP now live in config.js (per-restaurant configuration)

@@ -3429,9 +3429,104 @@ const BOTTLE_WINES = [
   }
 ];
 
-// Liquor / back bar list -- empty until real bottle data is provided.
-// Each item will follow: { id: "l1", name: "...", category: "Whiskey" | "Gin" | "Rum" | "Tequila" | "Vodka" | "Brandy/Cognac", ... }
-const LIQUOR = [];
+// Liquor / back bar list. PHASE A (current): only menu-verified fields are
+// populated -- id, name, price/priceRange, category, subcategory, region
+// (only where the physical menu states it), allocation (the "*" rotating-
+// supplier-allocation flag). Richer content (producer, distiller, mash
+// bill, ABV, age statement, flavor tags, structure ratings, guest
+// description, stories) is intentionally left absent, not guessed -- same
+// discipline as the Dessert Wines entries elsewhere in this file. Those
+// fields get filled in a later, separately-sourced pass (Phase B).
+// Category values match SPIRIT_ORDER in config.js.
+const LIQUOR_SUBCATEGORY_ORDER = {
+  "Whiskey": ["Bourbon — Kentucky", "American Whiskey — Other States", "Rye", "Scotch — Single Malt", "Scotch — Blends", "Irish/Other"]
+};
+
+const LIQUOR = [
+  // ---- American Whiskey — Other States ----
+  { id: "lq1", name: "Blackland Texas Pecan Brown Sugar", price: 14, category: "Whiskey", subcategory: "American Whiskey — Other States" },
+  { id: "lq2", name: "Bulleit Bourbon", price: 14, category: "Whiskey", subcategory: "American Whiskey — Other States" },
+  { id: "lq3", name: "Garrison Brothers Small Batch", price: 22, category: "Whiskey", subcategory: "American Whiskey — Other States" },
+  { id: "lq4", name: "High West", price: 14, category: "Whiskey", subcategory: "American Whiskey — Other States", allocation: true },
+  { id: "lq5", name: "Noble Oak", price: 14, category: "Whiskey", subcategory: "American Whiskey — Other States", allocation: true },
+  { id: "lq6", name: "TX Blended Whiskey", price: 12, category: "Whiskey", subcategory: "American Whiskey — Other States" },
+  { id: "lq7", name: "WhistlePig Piggyback 6yr Bourbon", price: 16, category: "Whiskey", subcategory: "American Whiskey — Other States" },
+  { id: "lq8", name: "WhistlePig Snout to Tail 10yr Bourbon", price: 28, category: "Whiskey", subcategory: "American Whiskey — Other States" },
+
+  // ---- Rye ----
+  { id: "lq9", name: "Blackland", price: 14, category: "Whiskey", subcategory: "Rye", allocation: true },
+  { id: "lq10", name: "Bulleit Rye", price: 14, category: "Whiskey", subcategory: "Rye" },
+  { id: "lq11", name: "George Dickel", price: 14, category: "Whiskey", subcategory: "Rye", allocation: true },
+  { id: "lq12", name: "High West Double Rye", price: 16, category: "Whiskey", subcategory: "Rye" },
+  { id: "lq13", name: "SirDavis", price: 22, category: "Whiskey", subcategory: "Rye", allocation: true },
+  { id: "lq14", name: "Thomas H. Handy Sazerac", price: 60, category: "Whiskey", subcategory: "Rye", allocation: true },
+  { id: "lq15", name: "WhistlePig Piggyback 6yr Rye", price: 16, category: "Whiskey", subcategory: "Rye" },
+  { id: "lq16", name: "WhistlePig Small Batch Rye 10yr", price: 28, category: "Whiskey", subcategory: "Rye" },
+  { id: "lq17", name: "Woodford Reserve", price: 16, category: "Whiskey", subcategory: "Rye" },
+
+  // ---- Bourbon — Kentucky ----
+  { id: "lq18", name: "Angel's Envy", price: 18, category: "Whiskey", subcategory: "Bourbon — Kentucky", region: "Kentucky, USA" },
+  { id: "lq19", name: "Angel's Envy Triple Oak", price: 30, category: "Whiskey", subcategory: "Bourbon — Kentucky", region: "Kentucky, USA" },
+  { id: "lq20", name: "Basil Hayden", price: 16, category: "Whiskey", subcategory: "Bourbon — Kentucky", region: "Kentucky, USA" },
+  { id: "lq21", name: "Blanton's", price: 22, category: "Whiskey", subcategory: "Bourbon — Kentucky", region: "Kentucky, USA" },
+  { id: "lq22", name: "Blanton's Gold", price: 55, category: "Whiskey", subcategory: "Bourbon — Kentucky", region: "Kentucky, USA", allocation: true },
+  { id: "lq23", name: "Eagle Rare 17yr", price: 75, category: "Whiskey", subcategory: "Bourbon — Kentucky", region: "Kentucky, USA", allocation: true },
+  { id: "lq24", name: "Elijah Craig Small Batch", price: 14, category: "Whiskey", subcategory: "Bourbon — Kentucky", region: "Kentucky, USA" },
+  { id: "lq25", name: "Four Roses Small Batch", price: 18, category: "Whiskey", subcategory: "Bourbon — Kentucky", region: "Kentucky, USA", allocation: true },
+  { id: "lq26", name: "George T. Stagg", price: 95, category: "Whiskey", subcategory: "Bourbon — Kentucky", region: "Kentucky, USA", allocation: true },
+  { id: "lq27", name: "Jefferson's Ocean Voyage (24)", price: 20, category: "Whiskey", subcategory: "Bourbon — Kentucky", region: "Kentucky, USA", allocation: true },
+  { id: "lq28", name: "Knob Creek", price: 16, category: "Whiskey", subcategory: "Bourbon — Kentucky", region: "Kentucky, USA" },
+  { id: "lq29", name: "Maker's Mark", price: 16, category: "Whiskey", subcategory: "Bourbon — Kentucky", region: "Kentucky, USA" },
+  { id: "lq30", name: "Russell's Reserve 10yr", price: 15, category: "Whiskey", subcategory: "Bourbon — Kentucky", region: "Kentucky, USA" },
+  { id: "lq31", name: "Van Winkle 10yr", price: 65, category: "Whiskey", subcategory: "Bourbon — Kentucky", region: "Kentucky, USA", allocation: true },
+  { id: "lq32", name: "Van Winkle 12yr", price: 75, category: "Whiskey", subcategory: "Bourbon — Kentucky", region: "Kentucky, USA", allocation: true },
+  { id: "lq33", name: "Weller C.Y.P.B.", price: 95, category: "Whiskey", subcategory: "Bourbon — Kentucky", region: "Kentucky, USA", allocation: true },
+  { id: "lq34", name: "Weller Special Reserve", price: 15, category: "Whiskey", subcategory: "Bourbon — Kentucky", region: "Kentucky, USA" },
+  { id: "lq35", name: "Wild Turkey 101", price: 12, category: "Whiskey", subcategory: "Bourbon — Kentucky", region: "Kentucky, USA" },
+  { id: "lq36", name: "William Larue Weller", price: 50, category: "Whiskey", subcategory: "Bourbon — Kentucky", region: "Kentucky, USA", allocation: true },
+  { id: "lq37", name: "Woodford Reserve", price: 16, category: "Whiskey", subcategory: "Bourbon — Kentucky", region: "Kentucky, USA" },
+
+  // ---- Scotch — Single Malt (region as printed per item on the menu) ----
+  { id: "lq38", name: "Aberfeldy 12yr", price: 16, category: "Whiskey", subcategory: "Scotch — Single Malt", region: "Highland, Scotland", allocation: true },
+  { id: "lq39", name: "Bowmore 12yr", price: 18, category: "Whiskey", subcategory: "Scotch — Single Malt", region: "Islay, Scotland", allocation: true },
+  { id: "lq40", name: "Bruichladdich The Classic", price: 16, category: "Whiskey", subcategory: "Scotch — Single Malt", region: "Islay, Scotland", allocation: true },
+  { id: "lq41", name: "Cragganmore 12yr", price: 22, category: "Whiskey", subcategory: "Scotch — Single Malt", region: "Speyside, Scotland", allocation: true },
+  { id: "lq42", name: "Dalmore 15yr", price: 32, category: "Whiskey", subcategory: "Scotch — Single Malt", region: "Highland, Scotland", allocation: true },
+  { id: "lq43", name: "Glenfiddich 12yr", price: 20, category: "Whiskey", subcategory: "Scotch — Single Malt", region: "Speyside, Scotland", allocation: true },
+  { id: "lq44", name: "Glenfiddich 15yr", price: 26, category: "Whiskey", subcategory: "Scotch — Single Malt", region: "Speyside, Scotland", allocation: true },
+  { id: "lq45", name: "Glenfiddich 16yr", price: 28, category: "Whiskey", subcategory: "Scotch — Single Malt", region: "Speyside, Scotland", allocation: true },
+  { id: "lq46", name: "Glenlivet 12yr", price: 18, category: "Whiskey", subcategory: "Scotch — Single Malt", region: "Speyside, Scotland" },
+  { id: "lq47", name: "Highland Park 18yr", price: 45, category: "Whiskey", subcategory: "Scotch — Single Malt", region: "Islands, Scotland", allocation: true },
+  { id: "lq48", name: "Lagavulin 16yr", price: 35, category: "Whiskey", subcategory: "Scotch — Single Malt", region: "Islay, Scotland", allocation: true },
+  { id: "lq49", name: "Macallan 12yr Sherry Oak", price: 24, category: "Whiskey", subcategory: "Scotch — Single Malt", region: "Speyside, Scotland" },
+  { id: "lq50", name: "Macallan 18yr", price: 75, category: "Whiskey", subcategory: "Scotch — Single Malt", region: "Speyside, Scotland", allocation: true },
+  { id: "lq51", name: "Macallan Rare Cask", price: 90, category: "Whiskey", subcategory: "Scotch — Single Malt", region: "Speyside, Scotland", allocation: true },
+  { id: "lq52", name: "Talisker 10yr", price: 20, category: "Whiskey", subcategory: "Scotch — Single Malt", region: "Islands, Scotland", allocation: true },
+
+  // ---- Scotch — Blends ----
+  { id: "lq53", name: "Buchanan's 12yr", price: 14, category: "Whiskey", subcategory: "Scotch — Blends" },
+  { id: "lq54", name: "Chivas Regal 12yr", price: 16, category: "Whiskey", subcategory: "Scotch — Blends" },
+  { id: "lq55", name: "Chivas Regal 15yr", price: 20, category: "Whiskey", subcategory: "Scotch — Blends", allocation: true },
+  { id: "lq56", name: "Dewar's White Label", price: 12, category: "Whiskey", subcategory: "Scotch — Blends" },
+  { id: "lq57", name: "Johnnie Walker Black", price: 16, category: "Whiskey", subcategory: "Scotch — Blends" },
+  { id: "lq58", name: "Johnnie Walker Blue", price: 60, category: "Whiskey", subcategory: "Scotch — Blends", allocation: true },
+  { id: "lq59", name: "Monkey Shoulder", price: 14, category: "Whiskey", subcategory: "Scotch — Blends", allocation: true },
+
+  // ---- Irish / Other ----
+  { id: "lq60", name: "Crown Royal", price: 14, category: "Whiskey", subcategory: "Irish/Other" },
+  { id: "lq61", name: "Crown Royal 18yr", price: 35, category: "Whiskey", subcategory: "Irish/Other", allocation: true },
+  { id: "lq62", name: "Jameson", price: 14, category: "Whiskey", subcategory: "Irish/Other" },
+  { id: "lq63", name: "Redbreast 12yr", price: 22, category: "Whiskey", subcategory: "Irish/Other", allocation: true },
+  { id: "lq64", name: "Suntory Toki", price: 16, category: "Whiskey", subcategory: "Irish/Other" },
+  { id: "lq65", name: "Tullamore D.E.W.", price: 14, category: "Whiskey", subcategory: "Irish/Other" },
+
+  // ---- Cognac ----
+  { id: "lq66", name: "Hennessy Paradis", price: 240, category: "Brandy/Cognac", subcategory: "Cognac", region: "Cognac, France", allocation: true },
+  { id: "lq67", name: "Louis XIII", priceRange: "140–560", category: "Brandy/Cognac", subcategory: "Cognac", region: "Cognac, France" },
+  { id: "lq68", name: "Martell Cordon Bleu", price: 50, category: "Brandy/Cognac", subcategory: "Cognac", region: "Cognac, France" },
+  { id: "lq69", name: "Remy Martin 1738", price: 18, category: "Brandy/Cognac", subcategory: "Cognac", region: "Cognac, France" },
+  { id: "lq70", name: "Remy Martin XO", price: 35, category: "Brandy/Cognac", subcategory: "Cognac", region: "Cognac, France", allocation: true }
+];
 
 // ============================================================
 // LEARNING MODULES -- standard schema, same shape for every

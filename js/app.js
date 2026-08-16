@@ -1110,6 +1110,84 @@ function renderCocktailTypeChooser() {
   app.appendChild(options);
 }
 
+const LIQUOR_STRUCTURE_BANDS = {
+  sweetness: ["Bone Dry", "Dry", "Medium", "Sweet", "Very Sweet"],
+  smoke: ["None", "Faint", "Light", "Noticeable", "Heavy"],
+  spice: ["Mellow", "Light", "Medium", "Peppery", "Fiery"],
+  body: ["Light", "Medium(-)", "Medium", "Medium(+)", "Full"],
+  finish: ["Short", "Medium(-)", "Medium", "Medium(+)", "Long"]
+};
+
+function liquorStructureBars(structure) {
+  const order = ["sweetness", "smoke", "spice", "body", "finish"];
+  return order.map((key) => {
+    const val = structure[key];
+    if (!val) return "";
+    const band = LIQUOR_STRUCTURE_BANDS[key][val - 1] || LIQUOR_STRUCTURE_BANDS[key][0];
+    const width = val * 20;
+    return `<div class="bar-block"><div class="bar-track"><div class="bar-fill" style="width:${width}%;"></div></div><p>${band} ${key.charAt(0).toUpperCase() + key.slice(1)}</p></div>`;
+  }).join("");
+}
+
+function buildLiquorFaceHTML(l, idx) {
+  const hasSellContent = l.guestDescription || (l.sellingPoints && l.sellingPoints.length) || l.arsenal;
+  const hasUnderstandContent = l.distillingNote || (l.flavorTags && l.flavorTags.length) || l.structure;
+  const hasKnowledgeContent = l.funFact || l.funFact2 || l.shortStory || l.moment || l.memory;
+
+  if (idx === 0) {
+    if (!hasSellContent) return `<p class="flip-label">1/3</p><p class="face-title">Sell it</p><p class="empty-note" style="text-align:left;font-style:italic;">Details coming soon.</p>`;
+    return `
+      <p class="flip-label">1/3</p>
+      <p class="face-title">Sell it</p>
+      ${l.guestDescription ? `<p class="face-h3"><span class="ic">&#128172;</span> Guest description</p><p class="face-desc">${l.guestDescription}</p>` : ""}
+      ${l.sellingPoints && l.sellingPoints.length ? `<p class="face-h3"><span class="ic">&#10003;</span> Selling points</p>${l.sellingPoints.map(p => `<div class="point-row"><span class="ic">&#10003;</span><span>${p}</span></div>`).join("")}` : ""}
+      ${l.arsenal ? `<div class="arsenal-block"><p class="arsenal-label">Table-side line</p><p class="arsenal-text">${l.arsenal}</p></div>` : ""}
+    `;
+  } else if (idx === 1) {
+    if (!hasUnderstandContent) return `<p class="flip-label">2/3</p><p class="face-title">Understand it</p><p class="empty-note" style="text-align:left;font-style:italic;">Details coming soon.</p>`;
+    return `
+      <p class="flip-label">2/3</p>
+      <p class="face-title">Understand it</p>
+      ${l.mashBill ? `<p class="face-h3"><span class="ic">&#127806;</span> Mash bill</p><p class="face-desc" style="margin-bottom:14px;">${l.mashBill}</p>` : ""}
+      ${l.distillingNote ? `<p class="face-h3"><span class="ic">&#127866;</span> Distilling note</p><p class="face-desc" style="margin-bottom:14px;">${l.distillingNote}</p>` : ""}
+      ${l.flavorTags && l.flavorTags.length ? `<p class="face-h3"><span class="ic">&#127815;</span> Flavor profile</p><div class="flavor-grid">${l.flavorTags.map(t => `<div class="flavor-item"><div class="icon">${getFlavorIcon(t)}</div><p>${t}</p></div>`).join("")}</div>` : ""}
+      ${l.structure ? `<p class="face-h3"><span class="ic">&#128202;</span> Structure</p>${liquorStructureBars(l.structure)}` : ""}
+    `;
+  } else {
+    if (!hasKnowledgeContent) return `<p class="flip-label">3/3</p><p class="face-title">Sommelier knowledge</p><p class="empty-note" style="text-align:left;font-style:italic;">Details coming soon.</p>`;
+    return `
+      <p class="flip-label">3/3</p>
+      <p class="face-title">Sommelier knowledge</p>
+      ${l.funFact || l.funFact2 ? `<p class="face-h3"><span class="ic">&#10024;</span> Fun facts</p>${l.funFact ? `<div class="fact-block"><p>${l.funFact}</p></div>` : ""}${l.funFact2 ? `<div class="fact-block"><p>${l.funFact2}</p></div>` : ""}` : ""}
+      ${l.shortStory ? `<p class="face-h3"><span class="ic">&#128214;</span> Short story</p><p class="face-desc" style="margin-bottom:14px;">${l.shortStory}</p>` : ""}
+      ${l.moment ? `<p class="face-h3"><span class="ic">&#128278;</span> The moment</p><p class="face-desc">${l.moment}</p>` : ""}
+      ${l.memory ? `<p class="face-h3"><span class="ic">&#128142;</span> The memory</p><p class="face-desc">${l.memory}</p>` : ""}
+    `;
+  }
+}
+
+function renderLiquorFlipCard(l) {
+  const flipcard = document.createElement("div");
+  flipcard.className = "flipcard";
+  const inner = document.createElement("div");
+  inner.className = "flip-inner face-0";
+  inner.innerHTML = buildLiquorFaceHTML(l, 0);
+  flipcard.appendChild(inner);
+
+  let faceIndex = 0;
+  flipcard.onclick = () => {
+    flipcard.classList.add("flipping");
+    setTimeout(() => {
+      faceIndex = (faceIndex + 1) % 3;
+      inner.className = "flip-inner face-" + faceIndex;
+      inner.innerHTML = buildLiquorFaceHTML(l, faceIndex);
+      flipcard.classList.remove("flipping");
+    }, 200);
+  };
+
+  return flipcard;
+}
+
 function liquorPriceLabel(l) {
   if (typeof l.price === "number") return `$${l.price}`;
   if (l.priceRange) return `$${l.priceRange}`;
@@ -1232,6 +1310,13 @@ function renderLiquorCard(liquorId) {
     container.appendChild(meta3);
   }
 
+  if (l.producer) {
+    const meta4 = document.createElement("p");
+    meta4.className = "hero-meta strong";
+    meta4.textContent = "Producer: " + l.producer;
+    container.appendChild(meta4);
+  }
+
   const priceLabel = liquorPriceLabel(l);
   if (priceLabel) {
     const priceTag = document.createElement("p");
@@ -1240,16 +1325,10 @@ function renderLiquorCard(liquorId) {
     container.appendChild(priceTag);
   }
 
-  // Phase A: only menu-verified facts exist yet. Tasting profile, producer,
-  // and story content are a separately-sourced pass, same discipline as
-  // Dessert Wines elsewhere in the app -- no invented content in the meantime.
-  const empty = document.createElement("p");
-  empty.className = "empty-note";
-  empty.style.textAlign = "left";
-  empty.style.fontStyle = "italic";
-  empty.style.marginTop = "24px";
-  empty.textContent = "Tasting profile and full details coming soon.";
-  container.appendChild(empty);
+  // Phase B: sourced content (facts, flavor, structure, story). Items not
+  // yet enriched fall back to an honest empty state per face, same
+  // discipline as Dessert Wines elsewhere in the app -- nothing invented.
+  container.appendChild(renderLiquorFlipCard(l));
 
   app.appendChild(container);
 

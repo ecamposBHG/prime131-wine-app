@@ -1222,7 +1222,8 @@ function renderLiquorList() {
     const hasActiveFilter = filterLower.trim().length > 0;
 
     SPIRIT_ORDER.forEach(category => {
-      const items = LIQUOR.filter(l => l.category === category && l.name.toLowerCase().includes(filterLower));
+      const items = LIQUOR.filter(l => l.category === category && l.name.toLowerCase().includes(filterLower))
+        .sort((a, b) => a.name.localeCompare(b.name));
       if (hasActiveFilter && !items.length) return;
 
       const isExpanded = hasActiveFilter || manualExpanded.has(category);

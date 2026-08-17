@@ -4543,6 +4543,61 @@ const LIQUOR = [
     memory: "Remy Martin XO — over 400 eaux-de-vie, some aged 37+ years, roughly 85% from the prestigious Grande Champagne cru.",
     arsenal: "This sits directly below Louis XIII in Rémy Martin's own range — genuinely serious cognac, not just a mid-tier bottle."
   },
+
+  // ---- Vodka ----
+  // Price intentionally left blank -- no menu source yet for this category
+  // (per Elias, 08.16.2026). Everything else below is real, sourced content.
+  {
+    id: "lq71", name: "Haku", category: "Vodka", subcategory: "Vodka",
+    producer: "The House of Suntory (Suntory Global Spirits)", region: "Kagoshima (distillation) & Osaka (blending/filtration), Japan",
+    mashBill: "100% Japanese white rice, fermented with rice koji",
+    abv: 40,
+    flavorTags: ["Delicate Rice Sweetness", "Soft Floral", "Silky Minerality", "Clean Grain"],
+    structure: { sweetness: 3, smoke: 1, spice: 1, body: 2, finish: 2 },
+    guestDescription: "A genuinely rice-forward vodka in a category where most competitors compete on pure neutrality — distilled entirely from Japanese white rice, then filtered through bamboo charcoal for a soft, silky texture most grain or potato vodkas can't replicate.",
+    sellingPoints: ["Distilled from 100% Japanese white rice — a real point of difference from the wheat- and potato-based vodkas that dominate the category", "Bamboo charcoal filtration is unique among major vodka producers, a technique with roots in traditional Japanese tea-water purification", "From the House of Suntory, the same company behind Yamazaki and Hibiki — real distilling pedigree behind the bottle"],
+    distillingNote: "White rice is fermented with traditional rice koji at Suntory's Osumi Distillery in Kagoshima, Kyushu, then distilled through copper pot stills. A second distillation splits across two different processes to balance flavor and volume, before the spirit is blended and filtered through bamboo charcoal at Suntory's Liqueur Atelier in Osaka — a technique the brand traces to the historical Japanese practice of using charcoal to 'sweeten' water for tea.",
+    funFact: "The name 'Haku' carries a double meaning in Japanese — it references 'hakumai' (white rice, the spirit's actual ingredient) while also evoking 'junpaku,' meaning pure, untainted brilliance.",
+    funFact2: "Suntory has made vodka since 1956, when founder Shinjiro Torii launched Hermes Vodka — Haku is a modern continuation of that lineage, not a new category entry for the company.",
+    shortStory: "Haku extends the House of Suntory's 'monozukuri' philosophy — meticulous, ingredient-driven craftsmanship — from whisky into vodka, using 100% Japanese white rice and a bamboo charcoal filtration process unique among major producers to make a case that vodka can carry real regional character rather than pure neutrality.",
+    moment: "A guest who assumes all vodka tastes the same and is curious to be proven wrong.",
+    memory: "Haku — 100% Japanese white rice vodka, bamboo-charcoal filtered, from the House of Suntory.",
+    arsenal: "Most vodka is built to taste like nothing — this one is built specifically to taste like rice. Worth pointing out to a skeptic."
+  },
+  {
+    id: "lq72", name: "Grey Goose", category: "Vodka", subcategory: "Vodka",
+    producer: "Grey Goose (Bacardi Limited)", region: "Picardy (wheat) & Cognac region (water), France",
+    mashBill: "Single-origin soft winter wheat from Picardy, blended with limestone-filtered spring water from Gensac-la-Pallue",
+    abv: 40,
+    flavorTags: ["Delicate Floral", "Sweet Grain", "Toffee", "Almond"],
+    structure: { sweetness: 3, smoke: 1, spice: 1, body: 2, finish: 2 },
+    guestDescription: "Built on a genuinely counterintuitive philosophy for premium vodka — while most competitors chase smoothness through repeated distillation, Grey Goose distills only once, trusting its French wheat and Cognac-region spring water to carry the character instead.",
+    sellingPoints: ["Distilled only once — the opposite approach from vodkas that market three, five, or ten distillations as a mark of quality", "Uses the same limestone-filtered spring water source, Gensac-la-Pallue, that historically defines the Cognac region's spirits", "Only the 'heart' of each distillation run — about 12% of total output — makes it into the bottle, the rest is discarded"],
+    distillingNote: "Grey Goose starts with single-origin soft winter wheat grown in Picardy — the same wheat classification used in fine French pastry-making — milled and fermented, then run through a five-step column distillation designed by cellar master François Thibault. Only the 'heart' of the distillate, roughly 12% of total output, is kept; the rest is discarded. The resulting spirit is blended at the brand's Cognac-region facility with limestone-filtered spring water from its own well in Gensac-la-Pallue.",
+    funFact: "Grey Goose keeps only about 12% of each distillation run — the 'heart' of the batch — discarding the rest, a deliberately selective approach rather than distilling repeatedly to smooth out a larger yield.",
+    funFact2: "The brand's water source, Gensac-la-Pallue in the Cognac region, draws from an aquifer roughly 500 feet underground — the same limestone geology historically credited with defining fine French cognac.",
+    shortStory: "Created in 1997 by Sidney Frank and cellar master François Thibault, Grey Goose built its premium positioning on ingredient sourcing rather than distillation count — single-origin Picardy wheat and Cognac-region spring water, distilled once and selectively cut to just the purest 'heart' of the run.",
+    moment: "A guest who assumes more distillations always means a smoother vodka.",
+    memory: "Grey Goose — French wheat and Cognac-region spring water, distilled only once, keeping just the 'heart' of the batch.",
+    arsenal: "Most premium vodkas brag about distilling many times — this one deliberately distills just once and leans on ingredient quality instead. Worth mentioning to a guest who assumes more passes always means smoother."
+  },
+  {
+    id: "lq73", name: "Absolut", category: "Vodka", subcategory: "Vodka",
+    producer: "Absolut (Pernod Ricard / V&S Group)", region: "Åhus, Skåne, Sweden",
+    mashBill: "Swedish winter wheat, grown exclusively around Åhus, blended with local well water",
+    abv: 40,
+    flavorTags: ["Grain", "Dried Fruit", "Soft Sweetness", "Clean Finish"],
+    structure: { sweetness: 2, smoke: 1, spice: 1, body: 3, finish: 2 },
+    guestDescription: "Made entirely in one Swedish village using a continuous-distillation method pioneered there in 1879 — every bottle, everywhere in the world, traces back to the same wheat fields and the same wells under the brand's 'One Source' philosophy.",
+    sellingPoints: ["Every bottle of Absolut, sold anywhere in the world, is produced in the single Swedish village of Åhus — genuinely one-source production, not a marketing claim", "Uses continuous distillation, a technique pioneered at this exact location in 1879 by founder Lars Olsson Smith, rather than traditional batch pot-still distillation", "Local Skåne winter wheat yields roughly double the global average, a genuine agricultural point of pride the brand ties to quality"],
+    distillingNote: "Absolut sources both its winter wheat and its well water exclusively from the area immediately around Åhus, Sweden — the brand's 'One Source' philosophy — and distills continuously, a method introduced at this location in 1879 by founder Lars Olsson Smith that replaced the traditional batch pot-still process with a more consistent, purer continuous run.",
+    funFact: "Founder Lars Olsson Smith was nicknamed 'the King of Vodka' in 19th-century Sweden after he began selling his continuously distilled vodka directly to Stockholm consumers from a boat on Lake Mälaren — a deliberate move to bypass the city's liquor tax monopoly.",
+    funFact2: "Absolut's local wheat fields around Åhus yield roughly twice the global average for wheat production, a fact the brand credits to the specific soil and climate of that part of southern Sweden.",
+    shortStory: "Absolut's story starts with Lars Olsson Smith, who introduced continuous distillation to Sweden in 1879 and sold his purer, more consistent vodka directly to Stockholm drinkers from a boat to sidestep the era's liquor monopoly. Revived commercially a century later, the modern Absolut brand still distills exclusively in Smith's home village of Åhus, using only local wheat and well water.",
+    moment: "A guest who wants a straightforward, reliable vodka with a genuinely interesting founding story behind it.",
+    memory: "Absolut — every bottle worldwide made in one Swedish village, continuously distilled since a method pioneered there in 1879.",
+    arsenal: "The founder originally sold this vodka off a boat on a lake to dodge Stockholm's liquor tax monopoly — a genuinely rebellious origin story for a bottle that now sits on nearly every back bar in the world."
+  },
 ];
 
 // ============================================================

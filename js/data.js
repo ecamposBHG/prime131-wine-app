@@ -4548,7 +4548,7 @@ const LIQUOR = [
   // Price intentionally left blank -- no menu source yet for this category
   // (per Elias, 08.16.2026). Everything else below is real, sourced content.
   {
-    id: "lq71", name: "Haku", category: "Vodka", subcategory: "Vodka",
+    id: "lq71", name: "Haku", price: 15, category: "Vodka", subcategory: "Vodka",
     producer: "The House of Suntory (Suntory Global Spirits)", region: "Kagoshima (distillation) & Osaka (blending/filtration), Japan",
     mashBill: "100% Japanese white rice, fermented with rice koji",
     abv: 40,
@@ -4565,7 +4565,7 @@ const LIQUOR = [
     arsenal: "Most vodka is built to taste like nothing — this one is built specifically to taste like rice. Worth pointing out to a skeptic."
   },
   {
-    id: "lq72", name: "Grey Goose", category: "Vodka", subcategory: "Vodka",
+    id: "lq72", name: "Grey Goose", price: 14, category: "Vodka", subcategory: "Vodka",
     producer: "Grey Goose (Bacardi Limited)", region: "Picardy (wheat) & Cognac region (water), France",
     mashBill: "Single-origin soft winter wheat from Picardy, blended with limestone-filtered spring water from Gensac-la-Pallue",
     abv: 40,
@@ -4582,7 +4582,7 @@ const LIQUOR = [
     arsenal: "Most premium vodkas brag about distilling many times — this one deliberately distills just once and leans on ingredient quality instead. Worth mentioning to a guest who assumes more passes always means smoother."
   },
   {
-    id: "lq73", name: "Absolut", category: "Vodka", subcategory: "Vodka",
+    id: "lq73", name: "Absolut", price: 12, category: "Vodka", subcategory: "Vodka",
     producer: "Absolut (Pernod Ricard / V&S Group)", region: "Åhus, Skåne, Sweden",
     mashBill: "Swedish winter wheat, grown exclusively around Åhus, blended with local well water",
     abv: 40,
@@ -4599,7 +4599,7 @@ const LIQUOR = [
     arsenal: "The founder originally sold this vodka off a boat on a lake to dodge Stockholm's liquor tax monopoly — a genuinely rebellious origin story for a bottle that now sits on nearly every back bar in the world."
   },
   {
-    id: "lq74", name: "Tito's", category: "Vodka", subcategory: "Vodka",
+    id: "lq74", name: "Tito's", price: 14, category: "Vodka", subcategory: "Vodka",
     producer: "Fifth Generation Inc. (Mockingbird Distillery)", region: "Austin, Texas, USA",
     mashBill: "100% yellow corn",
     abv: 40,
@@ -4616,7 +4616,7 @@ const LIQUOR = [
     arsenal: "Most big commercial vodkas use column stills for speed — Tito's still does the labor-intensive pot-still method, the same style used for fine Scotch and Cognac."
   },
   {
-    id: "lq75", name: "Belvedere", category: "Vodka", subcategory: "Vodka",
+    id: "lq75", name: "Belvedere", price: 14, category: "Vodka", subcategory: "Vodka",
     producer: "Polmos Żyrardów (LVMH)", region: "Żyrardów, Mazovia, Poland",
     mashBill: "100% Dankowskie Gold rye, a single heritage Polish grain variety",
     abv: 40,
@@ -4633,7 +4633,7 @@ const LIQUOR = [
     arsenal: "This is legally certified, not just marketed, as 100% Polish grain and water with no additives — a real regulatory designation most premium vodkas don't have."
   },
   {
-    id: "lq76", name: "Ketel One", category: "Vodka", subcategory: "Vodka",
+    id: "lq76", name: "Ketel One", price: 13, category: "Vodka", subcategory: "Vodka",
     producer: "Nolet Distillery", region: "Schiedam, Netherlands",
     mashBill: "100% European winter wheat",
     abv: 40,
@@ -4650,7 +4650,7 @@ const LIQUOR = [
     arsenal: "The name isn't a brand invention — 'ketel' really is Dutch for pot still, and this really is redistilled on the family's original one."
   },
   {
-    id: "lq77", name: "Absolut Citron", category: "Vodka", subcategory: "Vodka",
+    id: "lq77", name: "Absolut Citron", price: 12, category: "Vodka", subcategory: "Vodka",
     producer: "Absolut (Pernod Ricard / V&S Group)", region: "Åhus, Skåne, Sweden",
     mashBill: "Swedish winter wheat base, continuously distilled, flavored with natural lemon and lime",
     abv: 40,
@@ -4666,7 +4666,7 @@ const LIQUOR = [
     arsenal: "No added sugar here — the citrus tartness is entirely natural, unlike a lot of flavored vodkas that lean on sweetener to round things out."
   },
   {
-    id: "lq78", name: "Reyka", category: "Vodka", subcategory: "Vodka",
+    id: "lq78", name: "Reyka", price: 12, category: "Vodka", subcategory: "Vodka",
     producer: "Reyka Distillery (William Grant & Sons)", region: "Borgarnes, Iceland",
     mashBill: "Wheat and barley grain spirit",
     abv: 40,

@@ -5852,8 +5852,8 @@ const LEARNING_MODULES = [
     test: []
   },
   {
-    id: "75-percent-rule-drink-exchanges",
-    title: "The 75% Rule: Handling Drink Exchange Requests",
+    id: "two-sip-rule-drink-exchanges",
+    title: "The Two-Sip Rule: Handling Drink Exchange Requests",
     category: "Service",
     unlockAfter: null,
     chapters: [
@@ -5863,72 +5863,60 @@ const LEARNING_MODULES = [
           {
             type: "text",
             title: "The Situation",
-            body: "A guest orders a drink, drinks most of it, then tells you they don't like it and would like something else instead. What do you do?",
+            body: "A guest finishes most of a drink, then says they didn't like it and want something else. Nine times out of ten this has nothing to do with taste \u2014 it's a guest who changed their mind late, or is testing what they can get. Either way, your goal is the same: keep the table calm and protect the house.",
             note: null
           },
           {
             type: "text",
-            title: "The Core Idea",
-            body: "Once a drink is mostly consumed, \u201cI didn't like it\u201d isn't really a complaint anymore \u2014 it's a request. Both are okay to say yes to. But that's a decision for a manager to make, not something to decide on the spot under pressure.",
-            note: "Your job in the moment isn't to make the financial call. Your job is to make the guest feel taken care of."
-          },
-          {
-            type: "text",
-            title: "The Rule",
-            body: "Drink is less than half gone \u2192 use your judgment, handle it yourself. Drink is more than half gone \u2192 empathize with the guest, then get a manager before promising anything.",
+            title: "Catch It Early",
+            body: "Check in on a specialty drink within the first couple minutes, before it's half gone. Something as simple as \u201cHow's the Golden B treating you?\u201d gives a guest with a real problem the chance to say so while a remake actually makes sense. If they flag it now, take care of it \u2014 no questions asked.",
             note: null
           },
           {
             type: "text",
-            title: "What to Say",
-            body: "Use this line, said warmly: \u201cI'm so sorry it's not what you expected \u2014 let me grab my manager so we can make this right for you.\u201d",
-            note: "Said with genuine warmth, this never comes across as a brush-off. Guests respond well to it because it signals you're taking their experience seriously, not just rushing to make the problem go away."
+            title: "If the Glass Is Already Empty",
+            body: "This is where servers get themselves in trouble \u2014 the instinct to smooth things over kicks in and you end up promising something you shouldn't. Clear the glass, ask what they'd like instead, and ring it in like any other order. Don't tell them it's off the bill. That's not yours to decide in the moment.",
+            note: "\u201cI'm sorry that one didn't land \u2014 let me get that out of your way. What sounds better?\u201d works fine here."
           },
           {
             type: "text",
-            title: "Why This Matters",
-            body: "Saying yes too quickly does two things wrong: it costs the house money without anyone weighing in, and it puts you in a position to make a call that isn't yours to make \u2014 which isn't fair to you either.",
-            note: "Looping in a manager protects you and usually gets the guest a better outcome than you could deliver alone."
-          },
-          {
-            type: "text",
-            title: "Quick Reference",
-            body: "Drink barely touched, guest doesn't like it \u2192 handle it yourself, offer to replace. Drink mostly or fully consumed, guest wants something else \u2192 empathize, then get a manager. Not sure which bucket it's in \u2192 get a manager.",
-            note: "Practice saying the script above out loud a few times until it feels natural and warm \u2014 not scripted or defensive. Tone matters as much as the words."
+            title: "Let the Manager Handle the Money",
+            body: "Once the new drink's in, flag a manager quietly. They'll swing by, read the table, and decide what makes sense \u2014 comp it, discount it, leave it alone. You're not dodging the guest by doing this. You're just staying in your lane so the manager can do theirs.",
+            note: null
           }
         ]
       }
     ],
     test: [
       {
-        question: "A guest has finished about 80% of a cocktail and says they don't like it and want something else. What's the right move?",
+        question: "When should a server check in on a specialty drink?",
         options: [
-          "Immediately remake the drink for free",
-          "Empathize with the guest, then get a manager before promising anything",
-          "Tell the guest the drink can't be exchanged once it's mostly gone",
-          "Charge them for the first drink and let them order a second"
+          "Only if the guest flags a problem first",
+          "Within the first couple minutes, before it's half gone",
+          "At the end of the meal, with the check",
+          "Only during Restaurant Week"
         ],
         correctIndex: 1
       },
       {
-        question: "A guest takes one sip of a drink and says it's not for them. What should you do?",
+        question: "A guest's glass is empty and they say they didn't like it. What does the server do?",
         options: [
-          "Get a manager before doing anything",
-          "Use your judgment and handle it yourself",
-          "Tell them to finish it before offering an exchange",
-          "Explain that all sales are final"
-        ],
-        correctIndex: 1
-      },
-      {
-        question: "Why does the 75% Rule ask you to loop in a manager for mostly-consumed drinks, instead of deciding yourself?",
-        options: [
-          "Because guests prefer talking to a manager",
-          "Because it's against restaurant policy for staff to talk to guests about complaints",
-          "Because the financial call isn't yours to make, and looping in a manager protects you and usually gets the guest a better outcome",
-          "Because managers get a commission on drink remakes"
+          "Tell them the drink can't be exchanged at this point",
+          "Comp it immediately to avoid a scene",
+          "Clear the glass, take a new order, and ring it in \u2014 no promises about the bill",
+          "Ask them to finish it before offering a replacement"
         ],
         correctIndex: 2
+      },
+      {
+        question: "Why shouldn't a server promise to comp a drink at the table?",
+        options: [
+          "Comps aren't allowed under any circumstances",
+          "It isn't the server's call \u2014 that decision belongs to the manager",
+          "Guests never actually want a comp",
+          "It slows down the kitchen"
+        ],
+        correctIndex: 1
       }
     ]
   }

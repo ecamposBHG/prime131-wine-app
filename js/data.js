@@ -5850,6 +5850,87 @@ const LEARNING_MODULES = [
       }
     ],
     test: []
+  },
+  {
+    id: "75-percent-rule-drink-exchanges",
+    title: "The 75% Rule: Handling Drink Exchange Requests",
+    category: "Service",
+    unlockAfter: null,
+    chapters: [
+      {
+        title: "When a Guest Wants a Different Drink",
+        sections: [
+          {
+            type: "text",
+            title: "The Situation",
+            body: "A guest orders a drink, drinks most of it, then tells you they don't like it and would like something else instead. What do you do?",
+            note: null
+          },
+          {
+            type: "text",
+            title: "The Core Idea",
+            body: "Once a drink is mostly consumed, \u201cI didn't like it\u201d isn't really a complaint anymore \u2014 it's a request. Both are okay to say yes to. But that's a decision for a manager to make, not something to decide on the spot under pressure.",
+            note: "Your job in the moment isn't to make the financial call. Your job is to make the guest feel taken care of."
+          },
+          {
+            type: "text",
+            title: "The Rule",
+            body: "Drink is less than half gone \u2192 use your judgment, handle it yourself. Drink is more than half gone \u2192 empathize with the guest, then get a manager before promising anything.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "What to Say",
+            body: "Use this line, said warmly: \u201cI'm so sorry it's not what you expected \u2014 let me grab my manager so we can make this right for you.\u201d",
+            note: "Said with genuine warmth, this never comes across as a brush-off. Guests respond well to it because it signals you're taking their experience seriously, not just rushing to make the problem go away."
+          },
+          {
+            type: "text",
+            title: "Why This Matters",
+            body: "Saying yes too quickly does two things wrong: it costs the house money without anyone weighing in, and it puts you in a position to make a call that isn't yours to make \u2014 which isn't fair to you either.",
+            note: "Looping in a manager protects you and usually gets the guest a better outcome than you could deliver alone."
+          },
+          {
+            type: "text",
+            title: "Quick Reference",
+            body: "Drink barely touched, guest doesn't like it \u2192 handle it yourself, offer to replace. Drink mostly or fully consumed, guest wants something else \u2192 empathize, then get a manager. Not sure which bucket it's in \u2192 get a manager.",
+            note: "Practice saying the script above out loud a few times until it feels natural and warm \u2014 not scripted or defensive. Tone matters as much as the words."
+          }
+        ]
+      }
+    ],
+    test: [
+      {
+        question: "A guest has finished about 80% of a cocktail and says they don't like it and want something else. What's the right move?",
+        options: [
+          "Immediately remake the drink for free",
+          "Empathize with the guest, then get a manager before promising anything",
+          "Tell the guest the drink can't be exchanged once it's mostly gone",
+          "Charge them for the first drink and let them order a second"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "A guest takes one sip of a drink and says it's not for them. What should you do?",
+        options: [
+          "Get a manager before doing anything",
+          "Use your judgment and handle it yourself",
+          "Tell them to finish it before offering an exchange",
+          "Explain that all sales are final"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Why does the 75% Rule ask you to loop in a manager for mostly-consumed drinks, instead of deciding yourself?",
+        options: [
+          "Because guests prefer talking to a manager",
+          "Because it's against restaurant policy for staff to talk to guests about complaints",
+          "Because the financial call isn't yours to make, and looping in a manager protects you and usually gets the guest a better outcome",
+          "Because managers get a commission on drink remakes"
+        ],
+        correctIndex: 2
+      }
+    ]
   }
 ];
 

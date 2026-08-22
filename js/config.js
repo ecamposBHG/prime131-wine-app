@@ -26,7 +26,7 @@ const AUTH_CONFIG = {
 // stamp on the home screen so we can confirm, at a glance, whether a
 // given device is actually serving the latest build -- useful while
 // GitHub Pages' CDN edge cache may lag behind the reported build status.
-const APP_VERSION = "v128";
+const APP_VERSION = "v129";
 
 // Which home cards this restaurant's deployment shows, and in what order.
 // (Currently informational — app.js still renders all five directly.
@@ -67,7 +67,7 @@ const SECTION_ICON_MAP = {
 //                "Streak Extinguished" animation once, then it's cleared
 //                back to null until the next reset.
 const REVIEW_STREAK_RECORD = {
-  start: "2026-04-16T00:00:00",
-  best: 100,
-  lastEndedDays: null
+  start: "2026-08-22T00:00:00",
+  best: 128,
+  lastEndedDays: 128
 };

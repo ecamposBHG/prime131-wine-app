@@ -5919,6 +5919,163 @@ const LEARNING_MODULES = [
         correctIndex: 1
       }
     ]
+  },
+  {
+    id: "whiskey-101-bourbon-rye",
+    title: "Whiskey 101: Bourbon & Rye",
+    category: "Bar",
+    unlockAfter: null,
+    chapters: [
+      {
+        title: "Whiskey Fundamentals",
+        sections: [
+          {
+            type: "text",
+            title: "What Makes Whiskey, Whiskey",
+            body: "Every whiskey follows the same chain: grain \u2192 fermentation \u2192 distillation \u2192 barrel aging \u2192 bottling. Every category \u2014 bourbon, rye, scotch, Irish \u2014 is a variation on this one process. Once you know the chain, every other fact just slots into a step.",
+            note: null
+          },
+          {
+            type: "image",
+            title: "The Chain",
+            imageUrl: "images/learning/whiskey-chain.svg",
+            caption: "Grain, fermentation, distillation, barrel aging, bottling \u2014 the same five stops for every whiskey on the list. What changes between categories is the grain recipe and what happens at the barrel step."
+          },
+          {
+            type: "text",
+            title: "Mash Bill",
+            body: "The mash bill is the recipe of grains used: corn, rye, wheat, and malted barley in different proportions. This is the single biggest driver of flavor. Bourbon vs. rye isn't a different process \u2014 it's a different mash bill.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Proof, Simplified",
+            body: "Proof shows up three times: distillation proof, barrel entry proof, and bottled proof. You don't need the math \u2014 just the guest-facing takeaway: higher proof isn't \"better,\" it's more intense.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Age Statements",
+            body: "A number on the label (e.g., \"10 Year\") guarantees the youngest whiskey in the bottle is at least that old. No age statement doesn't mean lower quality \u2014 it just means the distiller isn't leading with age as the selling point.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "The Barrel's Job",
+            body: "New vs. used oak, and how deeply it's charred, shapes flavor as much as the grain does. The barrel is where whiskey gets its vanilla, caramel, and baking spice \u2014 those notes aren't from the grain, they're from the wood.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Whiskey Categories at a Glance",
+            body: "Bourbon, rye, wheat whiskey, corn whiskey, Tennessee whiskey \u2014 all American whiskey, all built on the same chain, all separated mainly by mash bill and a few production rules. Bourbon and rye are the two we're zooming in on.",
+            note: "Quick Check: what single ingredient decision has the biggest impact on a whiskey's flavor? \u2014 the mash bill (grain recipe)."
+          }
+        ]
+      },
+      {
+        title: "Bourbon",
+        sections: [
+          {
+            type: "text",
+            title: "The Rule",
+            body: "Bourbon must be at least 51% corn, aged in new charred oak barrels, and distilled under 160 proof. That's it \u2014 no Kentucky requirement, despite the association.",
+            note: null
+          },
+          {
+            type: "image",
+            title: "Mash Bill: Bourbon vs. Rye",
+            imageUrl: "images/learning/mash-bill-compare.svg",
+            caption: "Bourbon leans corn-forward for sweetness and roundness. Rye flips the ratio toward rye grain for spice and dryness. Same production rules, different dominant grain."
+          },
+          {
+            type: "text",
+            title: "Why Bourbon Tastes Like Bourbon",
+            body: "Corn brings natural sweetness. New charred oak adds vanilla, caramel, brown sugar, and baking spice. Combine them and you get bourbon's signature round, sweet profile.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "\u201cStraight Bourbon\u201d",
+            body: "If a guest sees \"straight bourbon\" on a menu or label, it means the bourbon was aged at least 2 years with no coloring or flavoring added. Worth knowing \u2014 guests ask.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "The Kentucky Myth",
+            body: "Kentucky is bourbon's cultural home, not a legal requirement. Good talking point for the floor: bourbon can legally be made anywhere in the U.S.",
+            note: "Quick Check: does bourbon have to be made in Kentucky? \u2014 No, it's tradition, not law."
+          }
+        ]
+      },
+      {
+        title: "Rye",
+        sections: [
+          {
+            type: "text",
+            title: "The Rule",
+            body: "Same framework as bourbon, one swap: rye must be at least 51% rye grain instead of corn. Same barrel and proof rules apply.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Why Rye Tastes Different",
+            body: "Rye grain brings spice, black pepper, and herbal/dill notes instead of corn's sweetness. That's the answer to the guest question \u201cwhy does this taste drier than bourbon?\u201d",
+            note: null
+          },
+          {
+            type: "image",
+            title: "The Rye Spectrum",
+            imageUrl: "images/learning/rye-spectrum.svg",
+            caption: "Not all ryes are the same intensity. Low-rye (just past the 51% minimum) leans spicy-but-balanced. High-rye / near-100% rye leans aggressively peppery and dry. This spectrum matters \u2014 the WhistlePig lineup spans nearly the whole range."
+          },
+          {
+            type: "text",
+            title: "A Little History",
+            body: "Rye is actually the older American whiskey \u2014 it dominated pre-Prohibition. Bourbon's popularity is the more modern story. Good line to drop with curious guests.",
+            note: "Quick Check: what flavor do you expect from a high-rye whiskey vs. a bourbon? \u2014 spicier, peppery, drier vs. bourbon's sweeter, rounder profile."
+          },
+          {
+            type: "text",
+            title: "Up Next",
+            body: "WhistlePig's entire lineup lives on the rye spectrum \u2014 from a lighter rye blend to a near-100% rye. Next module, we go bottle by bottle.",
+            note: null
+          }
+        ]
+      }
+    ],
+    test: [
+      {
+        question: "What single ingredient decision has the biggest impact on a whiskey's flavor?",
+        options: [
+          "The proof it's bottled at",
+          "The mash bill (grain recipe)",
+          "The age statement on the label",
+          "The shape of the still"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Does bourbon have to be made in Kentucky?",
+        options: [
+          "Yes, it's a legal requirement",
+          "Only if it's labeled \"straight bourbon\"",
+          "No \u2014 it's tradition, not law",
+          "Only for exports"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Compared to bourbon, what should you expect from a high-rye whiskey?",
+        options: [
+          "Sweeter and rounder",
+          "Spicier, peppery, and drier",
+          "No real flavor difference",
+          "Always higher proof"
+        ],
+        correctIndex: 1
+      }
+    ]
   }
 ];
 

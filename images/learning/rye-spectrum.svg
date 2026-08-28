@@ -1,0 +1,33 @@
+<svg viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="900" height="300" fill="#17130E"/>
+
+  <g font-family="Inter, sans-serif">
+    <text x="450" y="45" fill="#EDE6D8" font-size="18" text-anchor="middle" font-family="Oswald, sans-serif" letter-spacing="1">THE RYE SPECTRUM</text>
+
+    <!-- gradient bar -->
+    <defs>
+      <linearGradient id="ryeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#8A4E2A"/>
+        <stop offset="100%" stop-color="#A8531E"/>
+      </linearGradient>
+    </defs>
+    <rect x="80" y="100" width="740" height="18" fill="url(#ryeGrad)"/>
+    <line x1="80" y1="90" x2="80" y2="128" stroke="#5A5246" stroke-width="2"/>
+    <line x1="450" y1="90" x2="450" y2="128" stroke="#5A5246" stroke-width="2"/>
+    <line x1="820" y1="90" x2="820" y2="128" stroke="#5A5246" stroke-width="2"/>
+
+    <text x="80" y="155" fill="#B7AD9A" font-size="13" text-anchor="middle">LOW-RYE</text>
+    <text x="80" y="173" fill="#7A7266" font-size="11" text-anchor="middle">~51% rye</text>
+    <text x="80" y="191" fill="#7A7266" font-size="11" text-anchor="middle">spicy, balanced</text>
+
+    <text x="450" y="155" fill="#B7AD9A" font-size="13" text-anchor="middle">MID-RYE</text>
+    <text x="450" y="173" fill="#7A7266" font-size="11" text-anchor="middle">blended stock</text>
+
+    <text x="820" y="155" fill="#C97A42" font-size="13" text-anchor="middle">HIGH-RYE / 100%</text>
+    <text x="820" y="173" fill="#7A7266" font-size="11" text-anchor="middle">aggressively peppery</text>
+    <text x="820" y="191" fill="#7A7266" font-size="11" text-anchor="middle">dry</text>
+
+    <text x="450" y="245" fill="#5A5246" font-size="12" text-anchor="middle" font-family="JetBrains Mono, monospace">WHISTLEPIG'S LINEUP SPANS NEARLY THE WHOLE RANGE</text>
+    <text x="450" y="268" fill="#5A5246" font-size="11" text-anchor="middle">next module: bottle by bottle</text>
+  </g>
+</svg>

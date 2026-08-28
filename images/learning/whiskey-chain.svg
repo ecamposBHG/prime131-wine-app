@@ -1,0 +1,74 @@
+<svg viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="900" height="380" fill="#17130E"/>
+  <line x1="60" y1="190" x2="840" y2="190" stroke="#2A2118" stroke-width="2"/>
+
+  <!-- 5 stations -->
+  <g font-family="Inter, sans-serif">
+    <!-- 1 Grain -->
+    <g transform="translate(60,120)">
+      <rect x="0" y="0" width="120" height="140" fill="#0B0A08" stroke="#2A2118" stroke-width="2"/>
+      <circle cx="30" cy="40" r="6" fill="#A8531E"/>
+      <circle cx="55" cy="55" r="6" fill="#A8531E"/>
+      <circle cx="80" cy="38" r="6" fill="#A8531E"/>
+      <circle cx="45" cy="70" r="6" fill="#C97A42"/>
+      <circle cx="70" cy="75" r="6" fill="#C97A42"/>
+      <circle cx="95" cy="65" r="6" fill="#A8531E"/>
+      <circle cx="25" cy="85" r="6" fill="#C97A42"/>
+      <circle cx="60" cy="95" r="6" fill="#A8531E"/>
+      <text x="60" y="125" fill="#B7AD9A" font-size="13" text-anchor="middle" letter-spacing="0.5">GRAIN</text>
+    </g>
+
+    <!-- 2 Fermentation -->
+    <g transform="translate(230,110)">
+      <rect x="0" y="0" width="120" height="150" fill="#0B0A08" stroke="#2A2118" stroke-width="2"/>
+      <rect x="20" y="60" width="80" height="70" fill="none" stroke="#8A4E2A" stroke-width="2"/>
+      <circle cx="40" cy="55" r="3" fill="#C97A42"/>
+      <circle cx="55" cy="45" r="3" fill="#C97A42"/>
+      <circle cx="70" cy="58" r="3" fill="#C97A42"/>
+      <circle cx="85" cy="48" r="3" fill="#C97A42"/>
+      <circle cx="48" cy="35" r="2.5" fill="#A8531E"/>
+      <circle cx="65" cy="32" r="2.5" fill="#A8531E"/>
+      <text x="60" y="145" fill="#B7AD9A" font-size="13" text-anchor="middle" letter-spacing="0.5">FERMENT</text>
+    </g>
+
+    <!-- 3 Distillation -->
+    <g transform="translate(400,90)">
+      <rect x="0" y="90" width="120" height="70" fill="#0B0A08" stroke="#2A2118" stroke-width="2"/>
+      <path d="M 40 90 L 40 40 Q 40 20 60 20 Q 80 20 80 40 L 80 90 Z" fill="#0B0A08" stroke="#A8531E" stroke-width="2.5"/>
+      <path d="M 78 45 L 110 45 L 110 65" fill="none" stroke="#A8531E" stroke-width="2.5"/>
+      <circle cx="110" cy="70" r="4" fill="#C97A42"/>
+      <text x="60" y="180" fill="#B7AD9A" font-size="13" text-anchor="middle" letter-spacing="0.5">DISTILL</text>
+    </g>
+
+    <!-- 4 Barrel aging -->
+    <g transform="translate(570,100)">
+      <ellipse cx="60" cy="35" rx="45" ry="14" fill="none" stroke="#8A4E2A" stroke-width="3"/>
+      <path d="M 15 35 Q 5 90 25 140 Q 60 155 95 140 Q 115 90 105 35" fill="#241A12" stroke="#8A4E2A" stroke-width="3"/>
+      <ellipse cx="60" cy="140" rx="35" ry="12" fill="none" stroke="#8A4E2A" stroke-width="3"/>
+      <line x1="16" y1="70" x2="104" y2="70" stroke="#2A2118" stroke-width="2"/>
+      <line x1="12" y1="105" x2="108" y2="105" stroke="#2A2118" stroke-width="2"/>
+      <text x="60" y="180" fill="#B7AD9A" font-size="13" text-anchor="middle" letter-spacing="0.5">BARREL</text>
+    </g>
+
+    <!-- 5 Bottle -->
+    <g transform="translate(760,80)">
+      <path d="M 25 20 L 25 45 L 12 70 L 12 150 Q 12 160 22 160 L 58 160 Q 68 160 68 150 L 68 70 L 55 45 L 55 20 Z" fill="#0B0A08" stroke="#C97A42" stroke-width="2.5"/>
+      <rect x="20" y="10" width="40" height="14" fill="#0B0A08" stroke="#C97A42" stroke-width="2.5"/>
+      <rect x="12" y="95" width="56" height="45" fill="#A8531E" opacity="0.85"/>
+      <text x="40" y="180" fill="#B7AD9A" font-size="13" text-anchor="middle" letter-spacing="0.5">BOTTLE</text>
+    </g>
+  </g>
+
+  <!-- arrows between stations -->
+  <g stroke="#5A5246" stroke-width="2" fill="none" marker-end="url(#arrow)">
+    <path d="M 185 190 L 220 190"/>
+    <path d="M 355 190 L 390 190"/>
+    <path d="M 525 190 L 560 190"/>
+    <path d="M 695 190 L 730 190"/>
+  </g>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#5A5246"/>
+    </marker>
+  </defs>
+</svg>

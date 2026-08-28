@@ -286,6 +286,7 @@ function render() {
   else if (current.view === "learning-intro") renderLearningIntro(current.params.moduleId);
   else if (current.view === "learning-chapter") renderLearningChapter(current.params.moduleId, current.params.chapterIndex, current.params.sectionIndex);
   else if (current.view === "learning-chapter-quiz") renderChapterQuiz(current.params.moduleId, current.params.chapterIndex, current.params.quizIndex);
+  else if (current.view === "learning-pretest-video") renderLearningPreTestVideo(current.params.moduleId);
   else if (current.view === "learning-test-intro") renderLearningTestIntro(current.params.moduleId);
   else if (current.view === "learning-test") renderLearningTest(current.params.moduleId, current.params.index);
   else if (current.view === "learning-test-result") renderLearningTestResult(current.params.moduleId, current.params.correctCount, current.params.total, current.params.passed);
@@ -3543,6 +3544,9 @@ function renderLearningChapter(moduleId, chapterIndex, sectionIndex) {
     if (!isLastChapter) {
       ChiriusAnalytics.track('learning_chapter_complete', { module_id: moduleId, chapter_index: chapterIndex });
       go("learning-chapter", { moduleId, chapterIndex: chapterIndex + 1, sectionIndex: 0 }, false);
+    } else if (hasTest && mod.preTestVideo) {
+      ChiriusAnalytics.track('learning_chapter_complete', { module_id: moduleId, chapter_index: chapterIndex });
+      go("learning-pretest-video", { moduleId }, false);
     } else if (hasTest) {
       ChiriusAnalytics.track('learning_chapter_complete', { module_id: moduleId, chapter_index: chapterIndex });
       go("learning-test-intro", { moduleId }, false);
@@ -3573,6 +3577,8 @@ function advanceAfterChapterQuiz(moduleId, chapterIndex) {
   ChiriusAnalytics.track('learning_chapter_complete', { module_id: moduleId, chapter_index: chapterIndex });
   if (!isLastChapter) {
     go("learning-chapter", { moduleId, chapterIndex: chapterIndex + 1, sectionIndex: 0 }, false);
+  } else if (hasTest && mod.preTestVideo) {
+    go("learning-pretest-video", { moduleId }, false);
   } else if (hasTest) {
     go("learning-test-intro", { moduleId }, false);
   } else {
@@ -3832,6 +3838,33 @@ function renderChapterQuizSort(item, onPass) {
   }
 
   spawnCard();
+}
+
+function renderLearningPreTestVideo(moduleId) {
+  header("Learning");
+  const mod = findLearningModule(moduleId);
+  if (!mod || !mod.preTestVideo) { go("learning-test-intro", { moduleId }, false); return; }
+  const video = mod.preTestVideo;
+
+  const wrap = document.createElement("div");
+  wrap.className = "intro-wrap";
+  wrap.innerHTML = `
+    <p class="intro-eyebrow">${mod.category} \u00b7 Before the Test</p>
+    <h1 class="intro-title">${video.title}</h1>
+    <div class="video-embed-wrap">
+      <iframe
+        src="https://www.youtube.com/embed/${video.youtubeId}"
+        title="${video.title}"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+        loading="lazy"
+      ></iframe>
+    </div>
+    <button class="btn-start" data-role="video-continue-btn">Continue to Final Test</button>
+  `;
+  wrap.querySelector('[data-role="video-continue-btn"]').onclick = () => go("learning-test-intro", { moduleId }, false);
+  app.appendChild(wrap);
 }
 
 function renderLearningTestIntro(moduleId) {

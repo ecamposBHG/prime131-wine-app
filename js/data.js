@@ -5925,6 +5925,7 @@ const LEARNING_MODULES = [
     title: "Whiskey 101: Bourbon & Rye",
     category: "Bar",
     unlockAfter: null,
+    preTestVideo: { youtubeId: "Yyp-u-Q8z4Q", title: "Bourbon vs Rye" },
     chapters: [
       {
         title: "Whiskey Fundamentals",

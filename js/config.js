@@ -26,7 +26,7 @@ const AUTH_CONFIG = {
 // stamp on the home screen so we can confirm, at a glance, whether a
 // given device is actually serving the latest build -- useful while
 // GitHub Pages' CDN edge cache may lag behind the reported build status.
-const APP_VERSION = "v85";
+const APP_VERSION = "v130";
 
 // Which home cards this restaurant's deployment shows, and in what order.
 // (Currently informational — app.js still renders all five directly.
@@ -40,10 +40,11 @@ const FEATURES = {
 };
 
 // Base-spirit categories for the Classic Cocktails library.
-const SPIRIT_ORDER = ["Whiskey", "Gin", "Rum", "Tequila", "Vodka", "Brandy/Cognac"];
+const SPIRIT_ORDER = ["Whiskey", "Gin", "Rum", "Tequila", "Vodka", "Brandy/Cognac", "Mezcal", "Amaro, Bitters & Aperitifs", "Liqueurs & Cordials"];
 const SPIRIT_ICON_MAP = {
   "Whiskey": "\u{1F943}", "Gin": "\u{1F378}", "Rum": "\u{1F379}",
-  "Tequila": "\u{1FAD1}", "Vodka": "\u2744\uFE0F", "Brandy/Cognac": "\u{1F942}"
+  "Tequila": "\u{1FAD1}", "Vodka": "\u2744\uFE0F", "Brandy/Cognac": "\u{1F942}",
+  "Mezcal": "\u{1F335}", "Amaro, Bitters & Aperitifs": "\u{1F33F}", "Liqueurs & Cordials": "\u{1F36F}"
 };
 
 // Icon shown next to each food menu section (must match data.js's SECTION_ORDER).
@@ -66,7 +67,7 @@ const SECTION_ICON_MAP = {
 //                "Streak Extinguished" animation once, then it's cleared
 //                back to null until the next reset.
 const REVIEW_STREAK_RECORD = {
-  start: "2026-04-16T00:00:00",
-  best: 100,
-  lastEndedDays: null
+  start: "2026-08-22T00:00:00",
+  best: 128,
+  lastEndedDays: 128
 };

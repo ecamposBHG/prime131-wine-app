@@ -34,7 +34,7 @@ history.replaceState({ view: "home", params: {} }, "", "");
 // subtitle, flip-card faces, etc). Give them button semantics and
 // keyboard support once per render rather than repeating this in every
 // render function.
-const KEYBOARD_TAPPABLE_SELECTOR = ".home-option, .home-card, .list-row, .speed-toggle, .wotd-main, .flipcard, .dish-flipcard, .testme-card, .video-frame";
+const KEYBOARD_TAPPABLE_SELECTOR = ".home-option, .home-card, .list-row, .speed-toggle, .wotd-main, .flipcard, .dish-flipcard, .testme-card, .video-frame, .wcard, .asort-placed";
 
 function makeDivsKeyboardAccessible() {
   app.querySelectorAll(KEYBOARD_TAPPABLE_SELECTOR).forEach((el) => {
@@ -142,7 +142,7 @@ function buildFaceHTML(wine, similar, idx) {
 }
 
 function renderFlipCard(wine) {
-  const similar = wine.id.startsWith("hrw") ? similarHrwPour(wine) : similarPour(wine);
+  const similar = wine.id.startsWith("hrw") ? similarHrwPour(wine) : wine.id.startsWith("bw") ? similarBottlePour(wine) : similarPour(wine);
   const flipcard = document.createElement("div");
   flipcard.className = "flipcard";
   const inner = document.createElement("div");
@@ -172,6 +172,18 @@ function similarPour(wine) {
 
 function similarHrwPour(wine) {
   const sameStyle = HRW_WINES.filter(w => w.style === wine.style && w.id !== wine.id);
+  if (!sameStyle.length) return null;
+  return sameStyle[0];
+}
+
+function similarBottlePour(wine) {
+  if (wine.subcategory) {
+    const sameSubcategory = BOTTLE_WINES.filter(w => w.category === wine.category && w.subcategory === wine.subcategory && w.id !== wine.id);
+    if (sameSubcategory.length) return sameSubcategory[0];
+  }
+  const sameCategory = BOTTLE_WINES.filter(w => w.category === wine.category && w.id !== wine.id);
+  if (sameCategory.length) return sameCategory[0];
+  const sameStyle = BOTTLE_WINES.filter(w => w.style === wine.style && w.id !== wine.id);
   if (!sameStyle.length) return null;
   return sameStyle[0];
 }
@@ -257,13 +269,19 @@ function render() {
   else if (current.view === "somm-says-run") renderSommSaysRun(current.params.seconds);
   else if (current.view === "match-it") renderMatchIt(current.params.matchType);
   else if (current.view === "match-it-picker") renderMatchItPicker();
+  else if (current.view === "knockout") renderKnockout();
+  else if (current.view === "knockout-run") renderKnockoutRun();
+  else if (current.view === "allergy-sort") renderAllergyIntro();
+  else if (current.view === "allergy-sort-run") renderAllergySortRun();
   else if (current.view === "cocktail-type") renderCocktailTypeChooser();
   else if (current.view === "cocktail-list") renderCocktailList();
   else if (current.view === "classic-cocktail-list") renderClassicCocktailList();
   else if (current.view === "cocktail-detail") renderCocktailDetail(current.params.cocktailId);
   else if (current.view === "wine-type") renderWineTypeChooser();
   else if (current.view === "wine-bottle-list") renderByTheBottleList();
+  else if (current.view === "bottle-card") renderBottleCard(current.params.wineId);
   else if (current.view === "liquor-list") renderLiquorList();
+  else if (current.view === "liquor-card") renderLiquorCard(current.params.liquorId);
   else if (current.view === "learning-hub") renderLearningHub();
   else if (current.view === "learning-intro") renderLearningIntro(current.params.moduleId);
   else if (current.view === "learning-chapter") renderLearningChapter(current.params.moduleId, current.params.chapterIndex, current.params.sectionIndex);
@@ -274,14 +292,14 @@ function render() {
   window.scrollTo(0, 0);
 }
 
-function header(title, showBack = true) {
+function header(title, showBack = true, onBack = goBack) {
   const div = document.createElement("div");
   div.className = "app-header";
   div.innerHTML = `
     ${showBack ? `<button class="back-btn" aria-label="Back">&#8592;</button>` : ""}
     <p class="header-title">${title}</p>
   `;
-  if (showBack) div.querySelector(".back-btn").onclick = goBack;
+  if (showBack) div.querySelector(".back-btn").onclick = onBack;
   app.appendChild(div);
 }
 
@@ -319,6 +337,56 @@ function setWineProgress(wineId, status) {
 }
 function resetProgress() {
   try { localStorage.removeItem(PROGRESS_KEY); } catch (e) {}
+}
+
+/* Confidence-Based Repetition (CBR) store for Test Me.
+   Shape: { [itemId]: { rating: 1-5, lastSeen: <epoch ms> } }
+   rating is the player's own 1-5 self-assessment after active recall,
+   matching Brainscape's confidence scale (1 = "Not at all", 5 = "Totally
+   confident"). lastSeen drives the staleness component of scheduling so
+   a well-rated card still resurfaces occasionally instead of vanishing
+   forever. This replaces the old learning/known binary in PROGRESS_KEY;
+   see migrateProgressToConfidence() below for the one-time upgrade path. */
+const CONFIDENCE_KEY = "p131-confidence";
+const CONFIDENCE_MIGRATED_KEY = "p131-confidence-migrated";
+
+function getConfidenceMap() {
+  try { return JSON.parse(localStorage.getItem(CONFIDENCE_KEY)) || {}; } catch (e) { return {}; }
+}
+function getConfidence(itemId) {
+  const map = getConfidenceMap();
+  return map[itemId] || null;
+}
+function setConfidence(itemId, rating) {
+  rating = Math.max(1, Math.min(5, Math.round(rating)));
+  const map = getConfidenceMap();
+  map[itemId] = { rating, lastSeen: Date.now() };
+  try { localStorage.setItem(CONFIDENCE_KEY, JSON.stringify(map)); } catch (e) {}
+  return map[itemId];
+}
+function resetConfidence() {
+  try { localStorage.removeItem(CONFIDENCE_KEY); } catch (e) {}
+}
+
+/* One-time migration: old known/learning items become a sane starting
+   confidence instead of reverting to "unseen." Runs once (guarded by
+   CONFIDENCE_MIGRATED_KEY) so it never clobbers real CBR ratings entered
+   after rollout. Old PROGRESS_KEY data is left in place, untouched --
+   harmless, and lets a rollback still see the old known/learning state. */
+function migrateProgressToConfidence() {
+  try {
+    if (localStorage.getItem(CONFIDENCE_MIGRATED_KEY)) return;
+    const old = getProgress();
+    const map = getConfidenceMap();
+    Object.keys(old).forEach(itemId => {
+      if (map[itemId]) return; // don't override anything already rated
+      const status = old[itemId];
+      if (status === "known") map[itemId] = { rating: 4, lastSeen: Date.now() };
+      else if (status === "learning") map[itemId] = { rating: 2, lastSeen: Date.now() };
+    });
+    localStorage.setItem(CONFIDENCE_KEY, JSON.stringify(map));
+    localStorage.setItem(CONFIDENCE_MIGRATED_KEY, "1");
+  } catch (e) {}
 }
 
 /* Learning modules: dedicated progress store, keyed by module id.
@@ -443,15 +511,26 @@ function playStreakExtinguish(stripEl, onDone) {
   }, 650);
 }
 
+function wotdPool() {
+  return WINES.concat(BOTTLE_WINES);
+}
+
 function wineOfTheDay() {
+  const pool = wotdPool();
   const now = new Date();
   const start = new Date(now.getFullYear(), 0, 0);
   const dayOfYear = Math.floor((now - start) / 86400000);
-  return WINES[dayOfYear % WINES.length];
+  return pool[dayOfYear % pool.length];
 }
 
-function randomWine() {
-  return WINES[Math.floor(Math.random() * WINES.length)];
+function randomWine(excludeId) {
+  const pool = wotdPool();
+  if (pool.length <= 1) return pool[0];
+  let pick;
+  do {
+    pick = pool[Math.floor(Math.random() * pool.length)];
+  } while (pick.id === excludeId);
+  return pick;
 }
 
 
@@ -517,6 +596,8 @@ function renderHome() {
   }
 
   const wotd = wineOfTheDay();
+  let currentWotd = wotd;
+  let wotdSpinning = false;
   const wotdStrip = document.createElement("div");
   wotdStrip.className = "wotd-strip";
   wotdStrip.innerHTML = `
@@ -524,12 +605,64 @@ function renderHome() {
       <p class="wotd-label">Wine of the day</p>
       <p class="wotd-name">${wotd.name}</p>
     </div>
-    <button class="wotd-shuffle" aria-label="Surprise me with a random wine">Shuffle</button>
+    <button class="wotd-shuffle" aria-label="Shuffle to a random wine">Shuffle</button>
   `;
-  wotdStrip.querySelector(".wotd-main").onclick = () => go("study-card", { wineId: wotd.id });
-  wotdStrip.querySelector(".wotd-shuffle").onclick = (e) => {
+  const wotdNameEl = wotdStrip.querySelector(".wotd-name");
+  const wotdMainEl = wotdStrip.querySelector(".wotd-main");
+  const wotdShuffleBtn = wotdStrip.querySelector(".wotd-shuffle");
+
+  wotdMainEl.onclick = () => {
+    if (wotdSpinning) return;
+    const route = currentWotd.id.startsWith("bw") ? "bottle-card" : "study-card";
+    go(route, { wineId: currentWotd.id });
+  };
+
+  wotdShuffleBtn.onclick = (e) => {
     e.stopPropagation();
-    go("study-card", { wineId: randomWine().id });
+    if (wotdSpinning) return;
+
+    const next = randomWine(currentWotd.id);
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion) {
+      currentWotd = next;
+      wotdNameEl.textContent = currentWotd.name;
+      return;
+    }
+
+    wotdSpinning = true;
+    wotdShuffleBtn.disabled = true;
+    const pool = wotdPool();
+    const totalDuration = 2000;
+    const startTime = performance.now();
+    let lastTick = -Infinity;
+
+    function playReelTick(durationMs) {
+      wotdNameEl.classList.remove("reel-tick");
+      void wotdNameEl.offsetWidth; // force reflow so the animation restarts on every tick
+      wotdNameEl.style.animationDuration = durationMs + "ms";
+      wotdNameEl.classList.add("reel-tick");
+    }
+
+    function tick(now) {
+      const elapsed = now - startTime;
+      if (elapsed >= totalDuration) {
+        currentWotd = next;
+        wotdNameEl.textContent = currentWotd.name;
+        playReelTick(220);
+        wotdShuffleBtn.disabled = false;
+        wotdSpinning = false;
+        return;
+      }
+      const progress = elapsed / totalDuration;
+      const interval = 90 + Math.pow(progress, 2.4) * 340;
+      if (now - lastTick >= interval) {
+        lastTick = now;
+        wotdNameEl.textContent = pool[Math.floor(Math.random() * pool.length)].name;
+        playReelTick(Math.min(interval, 260));
+      }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
   };
   app.appendChild(wotdStrip);
 
@@ -601,7 +734,8 @@ function renderSearchableWineList(onSelect, placeholder, wineSource) {
       wines.forEach(w => {
         const row = document.createElement("div");
         row.className = "list-row";
-        row.innerHTML = `<span class="list-row-main"><span class="style-dot ${w.style}"></span>${w.name}</span>`;
+        const priceHtml = typeof w.price === "number" ? `<span class="list-row-price">$${w.price}</span>` : "";
+        row.innerHTML = `<span class="list-row-main"><span class="style-dot ${w.style}"></span>${w.name}</span>${priceHtml}`;
         row.onclick = () => onSelect(w.id);
         listWrap.appendChild(row);
       });
@@ -650,13 +784,138 @@ function renderWineTypeChooser() {
   app.appendChild(options);
 }
 
+function groupByBottleCategory(wines) {
+  const groups = {};
+  BOTTLE_CATEGORY_ORDER.forEach(c => groups[c] = []);
+  wines.forEach(w => { if (groups[w.category]) groups[w.category].push(w); });
+  return groups;
+}
+
 function renderByTheBottleList() {
   header("By The Bottle");
-  const empty = document.createElement("p");
-  empty.className = "empty-note";
-  empty.style.padding = "40px 0";
-  empty.textContent = "The bottle list hasn't been added yet.";
-  app.appendChild(empty);
+  if (!BOTTLE_WINES.length) {
+    const empty = document.createElement("p");
+    empty.className = "empty-note";
+    empty.style.padding = "40px 0";
+    empty.textContent = "The bottle list hasn't been added yet.";
+    app.appendChild(empty);
+    return;
+  }
+
+  const wrap = document.createElement("div");
+  const input = document.createElement("input");
+  input.className = "search-input";
+  input.placeholder = "Search the bottle list";
+  wrap.appendChild(input);
+
+  const listWrap = document.createElement("div");
+  wrap.appendChild(listWrap);
+
+  const manualExpanded = new Set();
+
+  function draw(filter) {
+    listWrap.innerHTML = "";
+    const filtered = BOTTLE_WINES.filter(w => w.name.toLowerCase().includes(filter.toLowerCase()));
+    const hasActiveFilter = filter.trim().length > 0;
+    const groups = groupByBottleCategory(filtered);
+
+    function appendWineRow(w) {
+      const row = document.createElement("div");
+      row.className = "list-row";
+      const priceHtml = typeof w.price === "number" ? `<span class="list-row-price">$${w.price}</span>` : "";
+      row.innerHTML = `<span class="list-row-main">${w.name}</span>${priceHtml}`;
+      row.onclick = () => go("bottle-card", { wineId: w.id });
+      listWrap.appendChild(row);
+    }
+
+    BOTTLE_CATEGORY_ORDER.forEach(category => {
+      const wines = groups[category];
+      if (!wines.length) return;
+
+      const isExpanded = hasActiveFilter || manualExpanded.has(category);
+
+      const label = document.createElement("button");
+      label.className = "section-label section-toggle";
+      label.innerHTML = `<span>${category} &middot; ${wines.length}</span><span class="section-chevron">${isExpanded ? "\u25BE" : "\u25B8"}</span>`;
+      label.onclick = () => {
+        if (hasActiveFilter) return;
+        if (manualExpanded.has(category)) manualExpanded.delete(category);
+        else manualExpanded.add(category);
+        draw(input.value);
+      };
+      listWrap.appendChild(label);
+
+      if (!isExpanded) return;
+
+      const subOrder = BOTTLE_SUBCATEGORY_ORDER[category];
+      if (subOrder) {
+        subOrder.forEach(sub => {
+          const subWines = wines.filter(w => w.subcategory === sub);
+          if (!subWines.length) return;
+          const subLabel = document.createElement("p");
+          subLabel.className = "section-label";
+          subLabel.textContent = sub;
+          listWrap.appendChild(subLabel);
+          subWines.forEach(appendWineRow);
+        });
+        wines.filter(w => !subOrder.includes(w.subcategory)).forEach(appendWineRow);
+      } else {
+        wines.forEach(appendWineRow);
+      }
+    });
+
+    if (!filtered.length) {
+      listWrap.innerHTML = `<p class="empty-note">No wines match that search.</p>`;
+    }
+  }
+  draw("");
+  input.oninput = () => draw(input.value);
+  app.appendChild(wrap);
+}
+
+function renderBottleCard(wineId) {
+  const wine = BOTTLE_WINES.find(w => w.id === wineId) || BOTTLE_WINES[0];
+  const idx = BOTTLE_WINES.findIndex(w => w.id === wine.id);
+
+  header("By The Bottle");
+  app.appendChild(renderNavChips(wine.id, (id) => go("bottle-card", { wineId: id }, false), BOTTLE_WINES));
+  app.appendChild(renderWineCardBody(wine));
+
+  const footerNav = document.createElement("div");
+  footerNav.className = "card-footer-nav";
+
+  const backBtn = document.createElement("button");
+  backBtn.className = "footer-btn";
+  backBtn.textContent = "\u2190 Back";
+  backBtn.disabled = idx === 0;
+  backBtn.onclick = () => go("bottle-card", { wineId: BOTTLE_WINES[idx - 1].id }, false);
+
+  const homeBtn = document.createElement("button");
+  homeBtn.className = "footer-btn footer-btn-home";
+  homeBtn.textContent = "Home";
+  homeBtn.onclick = () => go("home", {});
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "footer-btn";
+  nextBtn.textContent = "Next \u2192";
+  nextBtn.disabled = idx === BOTTLE_WINES.length - 1;
+  nextBtn.onclick = () => go("bottle-card", { wineId: BOTTLE_WINES[idx + 1].id }, false);
+
+  footerNav.appendChild(backBtn);
+  footerNav.appendChild(homeBtn);
+  footerNav.appendChild(nextBtn);
+  app.appendChild(footerNav);
+
+  let touchStartX = null;
+  app.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; }, { once: true });
+  app.addEventListener("touchend", (e) => {
+    if (touchStartX === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 60) {
+      const nextIdx = dx < 0 ? Math.min(idx + 1, BOTTLE_WINES.length - 1) : Math.max(idx - 1, 0);
+      go("bottle-card", { wineId: BOTTLE_WINES[nextIdx].id }, false);
+    }
+  }, { once: true });
 }
 
 function renderStudyList() {
@@ -851,6 +1110,90 @@ function renderCocktailTypeChooser() {
   app.appendChild(options);
 }
 
+const LIQUOR_STRUCTURE_BANDS = {
+  sweetness: ["Bone Dry", "Dry", "Medium", "Sweet", "Very Sweet"],
+  smoke: ["None", "Faint", "Light", "Noticeable", "Heavy"],
+  spice: ["Mellow", "Light", "Medium", "Peppery", "Fiery"],
+  body: ["Light", "Medium(-)", "Medium", "Medium(+)", "Full"],
+  finish: ["Short", "Medium(-)", "Medium", "Medium(+)", "Long"]
+};
+
+function liquorStructureBars(structure) {
+  const order = ["sweetness", "smoke", "spice", "body", "finish"];
+  return order.map((key) => {
+    const val = structure[key];
+    if (!val) return "";
+    const band = LIQUOR_STRUCTURE_BANDS[key][val - 1] || LIQUOR_STRUCTURE_BANDS[key][0];
+    const width = val * 20;
+    return `<div class="bar-block"><div class="bar-track"><div class="bar-fill" style="width:${width}%;"></div></div><p>${band} ${key.charAt(0).toUpperCase() + key.slice(1)}</p></div>`;
+  }).join("");
+}
+
+function buildLiquorFaceHTML(l, idx) {
+  const hasSellContent = l.guestDescription || (l.sellingPoints && l.sellingPoints.length) || l.arsenal;
+  const hasUnderstandContent = l.distillingNote || (l.flavorTags && l.flavorTags.length) || l.structure;
+  const hasKnowledgeContent = l.funFact || l.funFact2 || l.shortStory || l.moment || l.memory;
+
+  if (idx === 0) {
+    if (!hasSellContent) return `<p class="flip-label">1/3</p><p class="face-title">Sell it</p><p class="empty-note" style="text-align:left;font-style:italic;">Details coming soon.</p>`;
+    return `
+      <p class="flip-label">1/3</p>
+      <p class="face-title">Sell it</p>
+      ${l.guestDescription ? `<p class="face-h3"><span class="ic">&#128172;</span> Guest description</p><p class="face-desc">${l.guestDescription}</p>` : ""}
+      ${l.sellingPoints && l.sellingPoints.length ? `<p class="face-h3"><span class="ic">&#10003;</span> Selling points</p>${l.sellingPoints.map(p => `<div class="point-row"><span class="ic">&#10003;</span><span>${p}</span></div>`).join("")}` : ""}
+      ${l.arsenal ? `<div class="arsenal-block"><p class="arsenal-label">Table-side line</p><p class="arsenal-text">${l.arsenal}</p></div>` : ""}
+    `;
+  } else if (idx === 1) {
+    if (!hasUnderstandContent) return `<p class="flip-label">2/3</p><p class="face-title">Understand it</p><p class="empty-note" style="text-align:left;font-style:italic;">Details coming soon.</p>`;
+    return `
+      <p class="flip-label">2/3</p>
+      <p class="face-title">Understand it</p>
+      ${l.mashBill ? `<p class="face-h3"><span class="ic">&#127806;</span> Mash bill</p><p class="face-desc" style="margin-bottom:14px;">${l.mashBill}</p>` : ""}
+      ${l.distillingNote ? `<p class="face-h3"><span class="ic">&#127866;</span> Distilling note</p><p class="face-desc" style="margin-bottom:14px;">${l.distillingNote}</p>` : ""}
+      ${l.flavorTags && l.flavorTags.length ? `<p class="face-h3"><span class="ic">&#127815;</span> Flavor profile</p><div class="flavor-grid">${l.flavorTags.map(t => `<div class="flavor-item"><div class="icon">${getFlavorIcon(t)}</div><p>${t}</p></div>`).join("")}</div>` : ""}
+      ${l.structure ? `<p class="face-h3"><span class="ic">&#128202;</span> Structure</p>${liquorStructureBars(l.structure)}` : ""}
+    `;
+  } else {
+    if (!hasKnowledgeContent) return `<p class="flip-label">3/3</p><p class="face-title">Sommelier knowledge</p><p class="empty-note" style="text-align:left;font-style:italic;">Details coming soon.</p>`;
+    return `
+      <p class="flip-label">3/3</p>
+      <p class="face-title">Sommelier knowledge</p>
+      ${l.funFact || l.funFact2 ? `<p class="face-h3"><span class="ic">&#10024;</span> Fun facts</p>${l.funFact ? `<div class="fact-block"><p>${l.funFact}</p></div>` : ""}${l.funFact2 ? `<div class="fact-block"><p>${l.funFact2}</p></div>` : ""}` : ""}
+      ${l.shortStory ? `<p class="face-h3"><span class="ic">&#128214;</span> Short story</p><p class="face-desc" style="margin-bottom:14px;">${l.shortStory}</p>` : ""}
+      ${l.moment ? `<p class="face-h3"><span class="ic">&#128278;</span> The moment</p><p class="face-desc">${l.moment}</p>` : ""}
+      ${l.memory ? `<p class="face-h3"><span class="ic">&#128142;</span> The memory</p><p class="face-desc">${l.memory}</p>` : ""}
+    `;
+  }
+}
+
+function renderLiquorFlipCard(l) {
+  const flipcard = document.createElement("div");
+  flipcard.className = "flipcard";
+  const inner = document.createElement("div");
+  inner.className = "flip-inner face-0";
+  inner.innerHTML = buildLiquorFaceHTML(l, 0);
+  flipcard.appendChild(inner);
+
+  let faceIndex = 0;
+  flipcard.onclick = () => {
+    flipcard.classList.add("flipping");
+    setTimeout(() => {
+      faceIndex = (faceIndex + 1) % 3;
+      inner.className = "flip-inner face-" + faceIndex;
+      inner.innerHTML = buildLiquorFaceHTML(l, faceIndex);
+      flipcard.classList.remove("flipping");
+    }, 200);
+  };
+
+  return flipcard;
+}
+
+function liquorPriceLabel(l) {
+  if (typeof l.price === "number") return `$${l.price}`;
+  if (l.priceRange) return `$${l.priceRange}`;
+  return "";
+}
+
 function renderLiquorList() {
   header("Liquor");
   const wrap = document.createElement("div");
@@ -863,20 +1206,31 @@ function renderLiquorList() {
 
   const manualExpanded = new Set();
 
+  function appendLiquorRow(l, category) {
+    const row = document.createElement("div");
+    row.className = "list-row";
+    const priceHtml = liquorPriceLabel(l) ? `<span class="list-row-price">${liquorPriceLabel(l)}</span>` : "";
+    const allocFlag = l.allocation ? `<span class="dish-icon" title="Rotating supplier allocation — ask your server">*</span>` : "";
+    row.innerHTML = `<span class="list-row-main"><span class="dish-icon">${SPIRIT_ICON_MAP[category] || "\u{1F943}"}</span>${l.name}${allocFlag}</span>${priceHtml}`;
+    row.onclick = () => go("liquor-card", { liquorId: l.id });
+    listWrap.appendChild(row);
+  }
+
   function draw(filter) {
     listWrap.innerHTML = "";
     const filterLower = filter.toLowerCase();
     const hasActiveFilter = filterLower.trim().length > 0;
 
     SPIRIT_ORDER.forEach(category => {
-      const items = LIQUOR.filter(l => l.category === category && l.name.toLowerCase().includes(filterLower));
+      const items = LIQUOR.filter(l => l.category === category && l.name.toLowerCase().includes(filterLower))
+        .sort((a, b) => a.name.localeCompare(b.name));
       if (hasActiveFilter && !items.length) return;
 
       const isExpanded = hasActiveFilter || manualExpanded.has(category);
 
       const label = document.createElement("button");
       label.className = "section-label section-toggle";
-      label.innerHTML = `<span>${category}</span><span class="section-chevron">${isExpanded ? "\u25BE" : "\u25B8"}</span>`;
+      label.innerHTML = `<span>${category}${items.length ? " &middot; " + items.length : ""}</span><span class="section-chevron">${isExpanded ? "\u25BE" : "\u25B8"}</span>`;
       label.onclick = () => {
         if (hasActiveFilter) return;
         if (manualExpanded.has(category)) manualExpanded.delete(category);
@@ -897,17 +1251,123 @@ function renderLiquorList() {
         return;
       }
 
-      items.forEach(l => {
-        const row = document.createElement("div");
-        row.className = "list-row";
-        row.innerHTML = `<span class="list-row-main"><span class="dish-icon">${SPIRIT_ICON_MAP[category] || "\u{1F943}"}</span>${l.name}</span>`;
-        listWrap.appendChild(row);
-      });
+      const subOrder = LIQUOR_SUBCATEGORY_ORDER[category];
+      if (subOrder) {
+        subOrder.forEach(sub => {
+          const subItems = items.filter(l => l.subcategory === sub);
+          if (!subItems.length) return;
+          const subLabel = document.createElement("p");
+          subLabel.className = "section-label";
+          subLabel.textContent = sub;
+          listWrap.appendChild(subLabel);
+          subItems.forEach(l => appendLiquorRow(l, category));
+        });
+        items.filter(l => !subOrder.includes(l.subcategory)).forEach(l => appendLiquorRow(l, category));
+      } else {
+        items.forEach(l => appendLiquorRow(l, category));
+      }
     });
+
+    if (!listWrap.children.length) {
+      listWrap.innerHTML = `<p class="empty-note">No bottles match that search.</p>`;
+    }
   }
   draw("");
   input.oninput = () => draw(input.value);
   app.appendChild(wrap);
+}
+
+function renderLiquorCard(liquorId) {
+  const l = LIQUOR.find(item => item.id === liquorId) || LIQUOR[0];
+  const idx = LIQUOR.findIndex(item => item.id === l.id);
+
+  header("Liquor");
+
+  const container = document.createElement("div");
+
+  const heroName = document.createElement("p");
+  heroName.className = "hero-name";
+  heroName.textContent = l.name;
+  container.appendChild(heroName);
+
+  if (l.subcategory) {
+    const meta1 = document.createElement("p");
+    meta1.className = "hero-meta";
+    meta1.textContent = l.subcategory;
+    container.appendChild(meta1);
+  }
+
+  if (l.region) {
+    const meta2 = document.createElement("p");
+    meta2.className = "hero-meta";
+    meta2.textContent = l.region;
+    container.appendChild(meta2);
+  }
+
+  if (l.allocation) {
+    const meta3 = document.createElement("p");
+    meta3.className = "hero-meta strong";
+    meta3.textContent = "Rotating supplier allocation — ask your server for today's availability.";
+    container.appendChild(meta3);
+  }
+
+  if (l.producer) {
+    const meta4 = document.createElement("p");
+    meta4.className = "hero-meta strong";
+    meta4.textContent = "Producer: " + l.producer;
+    container.appendChild(meta4);
+  }
+
+  const priceLabel = liquorPriceLabel(l);
+  if (priceLabel) {
+    const priceTag = document.createElement("p");
+    priceTag.className = "hero-price";
+    priceTag.innerHTML = `<span class="hero-price-amount">${priceLabel}</span>`;
+    container.appendChild(priceTag);
+  }
+
+  // Phase B: sourced content (facts, flavor, structure, story). Items not
+  // yet enriched fall back to an honest empty state per face, same
+  // discipline as Dessert Wines elsewhere in the app -- nothing invented.
+  container.appendChild(renderLiquorFlipCard(l));
+
+  app.appendChild(container);
+
+  const footerNav = document.createElement("div");
+  footerNav.className = "card-footer-nav";
+
+  const backBtn = document.createElement("button");
+  backBtn.className = "footer-btn";
+  backBtn.textContent = "\u2190 Back";
+  backBtn.disabled = idx === 0;
+  backBtn.onclick = () => go("liquor-card", { liquorId: LIQUOR[idx - 1].id }, false);
+
+  const homeBtn = document.createElement("button");
+  homeBtn.className = "footer-btn footer-btn-home";
+  homeBtn.textContent = "Home";
+  homeBtn.onclick = () => go("home", {});
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "footer-btn";
+  nextBtn.textContent = "Next \u2192";
+  nextBtn.disabled = idx === LIQUOR.length - 1;
+  nextBtn.onclick = () => go("liquor-card", { liquorId: LIQUOR[idx + 1].id }, false);
+
+  footerNav.appendChild(backBtn);
+  footerNav.appendChild(homeBtn);
+  footerNav.appendChild(nextBtn);
+  app.appendChild(footerNav);
+
+  let touchStartX = null;
+  app.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; }, { once: true });
+  app.addEventListener("touchend", (e) => {
+    if (touchStartX === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 60) {
+      const nextIdx = dx < 0 ? Math.min(idx + 1, LIQUOR.length - 1) : Math.max(idx - 1, 0);
+      go("liquor-card", { liquorId: LIQUOR[nextIdx].id }, false);
+    }
+  }, { once: true });
 }
 
 // SPIRIT_ORDER and SPIRIT_ICON_MAP now live in config.js (per-restaurant configuration)
@@ -1100,6 +1560,14 @@ function renderHeroHeader(wine) {
   meta4.className = "hero-meta strong";
   meta4.textContent = "Winemaker: " + wine.winemaker;
   frag.appendChild(meta4);
+
+  if (typeof wine.price === "number") {
+    const priceTag = document.createElement("p");
+    priceTag.className = "hero-price";
+    const priceUnit = wine.id.startsWith("bw") ? "bottle" : "glass";
+    priceTag.innerHTML = `<span class="hero-price-amount">$${wine.price}</span><span class="hero-price-label">${priceUnit}</span>`;
+    frag.appendChild(priceTag);
+  }
 
   return frag;
 }
@@ -1593,7 +2061,14 @@ function renderPairingExplain(wineId, dishId) {
   app.appendChild(linksRow);
 }
 
-/* Test Me — flashcard drill with device-local progress */
+/* Test Me — Confidence-Based Repetition (CBR), modeled on Brainscape's
+   publicly documented algorithm: active recall (see the clue, try to
+   answer in your head, reveal), then a 1-5 self-rated confidence that
+   determines how soon the card resurfaces. Low ratings come back soon;
+   high ratings hardly ever, but never disappear entirely (staleness).
+   Speed Round is a separate, verified multiple-choice timed mode --
+   self-rated confidence can't be trusted for a competitive score, so it
+   intentionally does not read from or write to the CBR store below. */
 function quizPool(mode, focus) {
   if (mode === "food") {
     let pool = DISHES.filter(d => d.quizClue);
@@ -1614,26 +2089,86 @@ function quizPool(mode, focus) {
 function isWineItem(item) { return item.id.charAt(0) === "w" && /^\d+$/.test(item.id.slice(1)); }
 function isCocktailItem(item) { return item.id.charAt(0) === "c" && /^\d+$/.test(item.id.slice(1)); }
 
-let testQueues = {};
 function queueKey(mode, focus) { return mode === "mixed" ? "mixed" : mode + ":" + (focus || "all"); }
 
-function buildTestQueue(mode, focus) {
-  const progress = getProgress();
-  const learning = [], unseen = [], known = [];
-  quizPool(mode, focus).forEach(item => {
-    const status = progress[item.id];
-    if (status === "learning") learning.push(item.id);
-    else if (status === "known") known.push(item.id);
-    else unseen.push(item.id);
-  });
-  const shuffle = (arr) => {
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
-  };
-  return [...shuffle(learning), ...shuffle(unseen), ...shuffle(known)];
+function shuffleArr(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ---- CBR scheduling ---- */
+
+// Base "due weight" per confidence rating. Directly reflects Brainscape's
+// own description of the system: 1s come up most frequently, 5s hardly
+// ever. Exact numbers are ours (their formula is proprietary/undisclosed)
+// but the ordering and steepness match their stated behavior.
+const CBR_RATING_WEIGHT = { 1: 100, 2: 60, 3: 30, 4: 12, 5: 4 };
+const CBR_UNSEEN_WEIGHT = 50;
+
+function cbrBatchSize(poolLength) {
+  return Math.max(4, Math.min(10, Math.ceil(poolLength * 0.15)));
+}
+
+// Throttles new material: only the front slice of never-rated items is
+// eligible to appear at once, so a new user isn't shown the whole deck
+// as "new" simultaneously. As those items get any rating they leave the
+// unseen bucket and the next slice opens up on its own.
+function cbrEligibleUnseen(pool, confidenceMap) {
+  const unseen = pool.filter(item => !confidenceMap[item.id]);
+  return unseen.slice(0, cbrBatchSize(pool.length)).map(i => i.id);
+}
+
+function cbrDueWeight(itemId, confidenceMap) {
+  const rec = confidenceMap[itemId];
+  if (!rec) return CBR_UNSEEN_WEIGHT;
+  const base = CBR_RATING_WEIGHT[rec.rating] || 30;
+  const hoursSince = (Date.now() - rec.lastSeen) / 3600000;
+  // Staleness: a well-rated card slowly becomes more likely to resurface
+  // the longer it's gone unreviewed, capped so it can never outweigh a
+  // genuinely weak card that was just seen.
+  const stalenessMultiplier = 1 + Math.min(hoursSince / 24, 3);
+  return base * stalenessMultiplier;
+}
+
+let cbrLastShown = {}; // qKey -> itemId, avoids showing the same card twice in a row
+
+function pickCBRItem(mode, focus) {
+  const pool = quizPool(mode, focus);
+  if (!pool.length) return null;
+  const confidenceMap = getConfidenceMap();
+  const eligibleUnseenIds = new Set(cbrEligibleUnseen(pool, confidenceMap));
+  const candidates = pool.filter(item => confidenceMap[item.id] || eligibleUnseenIds.has(item.id));
+  const usable = candidates.length ? candidates : pool;
+  const qKey = queueKey(mode, focus);
+  const lastId = cbrLastShown[qKey];
+  let weighted = usable.map(item => ({ id: item.id, weight: cbrDueWeight(item.id, confidenceMap) }));
+  if (weighted.length > 1) weighted = weighted.filter(w => w.id !== lastId);
+  const total = weighted.reduce((sum, w) => sum + w.weight, 0);
+  let roll = Math.random() * total;
+  for (const w of weighted) {
+    roll -= w.weight;
+    if (roll <= 0) return w.id;
+  }
+  return weighted[weighted.length - 1].id;
+}
+
+/* Mastery %: weighted average confidence across the pool, unseen items
+   counting as 0 -- mirrors Brainscape's Deck/Class Mastery score, which
+   they describe as a weighted average of confidence across all cards. */
+function cbrMastery(pool) {
+  if (!pool.length) return 0;
+  const confidenceMap = getConfidenceMap();
+  const sum = pool.reduce((s, item) => s + ((confidenceMap[item.id] && confidenceMap[item.id].rating) || 0), 0);
+  return Math.round((sum / (pool.length * 5)) * 100);
+}
+function cbrMasteredCount(pool, threshold) {
+  threshold = threshold || 4;
+  const confidenceMap = getConfidenceMap();
+  return pool.filter(item => confidenceMap[item.id] && confidenceMap[item.id].rating >= threshold).length;
 }
 
 let speedPref = { testme: false, match: false };
@@ -1731,66 +2266,62 @@ function renderTestMeRun(mode) {
   const focus = current.params.focus || "all";
   header("Quiz tool");
 
-  const isSpeed = speedPref.testme;
-  const qKey = queueKey(mode, focus);
+  const pool = quizPool(mode, focus);
+  if (!pool.length) { go("test-me", {}, false); return; }
 
-  if (!testQueues[qKey] || !testQueues[qKey].length) testQueues[qKey] = buildTestQueue(mode, focus);
-  const itemId = testQueues[qKey][0];
+  if (speedPref.testme) {
+    renderSpeedRound(mode, focus, pool);
+  } else {
+    renderCBRCard(mode, focus, pool);
+  }
+}
+
+/* ---- Practice mode: Brainscape-style confidence study loop ---- */
+function renderCBRCard(mode, focus, pool) {
+  const qKey = queueKey(mode, focus);
+  const itemId = pickCBRItem(mode, focus);
+  if (!itemId) { go("test-me", {}, false); return; }
+  cbrLastShown[qKey] = itemId;
+
   let itemKind;
   if (mode === "mixed") itemKind = itemId.startsWith("d-") ? "food" : "wine";
   else itemKind = mode === "food" ? "food" : mode === "cocktail" ? "cocktail" : "wine";
   const isFood = itemKind === "food";
   const isCocktail = itemKind === "cocktail";
   const item = isFood ? findDish(itemId) : isCocktail ? findCocktail(itemId) : findWine(itemId);
-  if (!item) { testQueues[qKey] = []; go("test-me", {}, false); return; }
-  const pool = quizPool(mode, focus);
-  const progress = getProgress();
-  const knownCount = pool.filter(x => progress[x.id] === "known").length;
+  if (!item) { render(); return; }
 
-  if (isSpeed) {
-    if (typeof current.params.score !== "number") {
-      current.params.score = 0;
-      current.params.endsAt = Date.now() + 60000;
-    }
-    const remaining = Math.max(0, current.params.endsAt - Date.now());
-    if (remaining <= 0) {
-      renderSpeedEnd(mode, current.params.score);
-      return;
-    }
-    const timerWrap = document.createElement("div");
-    timerWrap.className = "timer-wrap";
-    timerWrap.innerHTML = `
-      <div class="timer-row"><span class="timer-score">&#9889; Score: ${current.params.score}</span><span class="timer-count">${Math.ceil(remaining / 1000)}s</span></div>
-      <div class="timer-track"><div class="timer-fill" style="width:${(remaining / 60000) * 100}%;"></div></div>
-    `;
-    app.appendChild(timerWrap);
-    activeTimer = setInterval(() => {
-      const left = Math.max(0, current.params.endsAt - Date.now());
-      const countEl = timerWrap.querySelector(".timer-count");
-      const fillEl = timerWrap.querySelector(".timer-fill");
-      if (countEl) countEl.textContent = Math.ceil(left / 1000) + "s";
-      if (fillEl) fillEl.style.width = (left / 60000) * 100 + "%";
-      if (left <= 0) {
-        clearInterval(activeTimer); activeTimer = null;
-        renderSpeedEnd(mode, current.params.score);
-      }
-    }, 250);
-  } else {
-    const counter = document.createElement("p");
-    counter.className = "testme-counter";
-    counter.textContent = `${knownCount} of ${pool.length} marked as known`;
-    app.appendChild(counter);
+  const mastery = cbrMastery(pool);
+  const masteredCount = cbrMasteredCount(pool);
+  const remaining = pool.length - masteredCount;
+
+  const counter = document.createElement("p");
+  counter.className = "testme-counter";
+  counter.textContent = `${mastery}% mastery \u00b7 ${masteredCount} of ${pool.length} confident`;
+  app.appendChild(counter);
+
+  const masteryTrack = document.createElement("div");
+  masteryTrack.className = "mastery-track";
+  masteryTrack.innerHTML = `<div class="mastery-fill" style="width:${mastery}%;"></div>`;
+  app.appendChild(masteryTrack);
+
+  if (masteredCount > 0 && remaining > 0 && remaining <= 5) {
+    const nudge = document.createElement("p");
+    nudge.className = "testme-nudge";
+    nudge.textContent = remaining === 1
+      ? "1 card away from mastering this deck."
+      : `${remaining} cards away from mastering this deck.`;
+    app.appendChild(nudge);
   }
 
   const card = document.createElement("div");
   card.className = "testme-card";
-  let phase = "clue"; // clue -> predicting -> revealed (predicting skipped in speed mode)
-  let predicted = null;
+  let phase = "clue"; // clue -> revealed
 
   function clueBlockHTML() {
     if (isFood) {
       return `
-        <p class="dish-flip-tag">Guess the dish &middot; tap to ${isSpeed ? "reveal" : "continue"}</p>
+        <p class="dish-flip-tag">Guess the dish &middot; tap to reveal</p>
         <p class="face-h3" style="margin-top:8px;"><span class="ic">&#128269;</span> Clues</p>
         <p class="face-desc" style="margin-bottom:10px;">${getSectionIcon(item.section)} ${item.section}</p>
         <p class="chefprep-text">${item.quizClue}</p>
@@ -1798,14 +2329,14 @@ function renderTestMeRun(mode) {
     }
     if (isCocktail) {
       return `
-        <p class="dish-flip-tag">Guess the cocktail &middot; tap to ${isSpeed ? "reveal" : "continue"}</p>
+        <p class="dish-flip-tag">Guess the cocktail &middot; tap to reveal</p>
         <p class="face-h3" style="margin-top:8px;"><span class="ic">&#128269;</span> Clues</p>
         <p class="face-desc" style="margin-bottom:10px;">${item.glassware} &middot; ${item.method}</p>
         <div class="flavor-grid">${item.flavorTags.map(t => `<div class="flavor-item"><div class="icon">${getFlavorIcon(t)}</div><p>${t}</p></div>`).join("")}</div>
       `;
     }
     return `
-      <p class="dish-flip-tag">Guess the wine &middot; tap to ${isSpeed ? "reveal" : "continue"}</p>
+      <p class="dish-flip-tag">Guess the wine &middot; tap to reveal</p>
       <p class="face-h3" style="margin-top:8px;"><span class="ic">&#128269;</span> Clues</p>
       <p class="face-desc" style="margin-bottom:10px;">${STYLE_LABELS[item.style]} &middot; ${item.region}</p>
       <div class="flavor-grid">${item.flavorTags.map(t => `<div class="flavor-item"><div class="icon">${getFlavorIcon(t)}</div><p>${t}</p></div>`).join("")}</div>
@@ -1821,7 +2352,7 @@ function renderTestMeRun(mode) {
         <p class="dish-flip-tag">That's&hellip;</p>
         <p class="testme-answer-name">${item.name}</p>
         <p class="face-desc">${item.section}</p>
-        <p class="face-desc" style="margin-top:12px; color:var(--bronze-500);">Swipe right if you knew it, left if you're still learning &mdash; or use the buttons below.</p>
+        <p class="face-desc" style="margin-top:12px; color:var(--bronze-500);">How well did you know it? Rate yourself below.</p>
       `;
     }
     if (isCocktail) {
@@ -1830,7 +2361,7 @@ function renderTestMeRun(mode) {
         <p class="dish-flip-tag">That's&hellip;</p>
         <p class="testme-answer-name">${item.name}</p>
         <p class="face-desc">Garnish: ${item.garnish}</p>
-        <p class="face-desc" style="margin-top:12px; color:var(--bronze-500);">Swipe right if you knew it, left if you're still learning &mdash; or use the buttons below.</p>
+        <p class="face-desc" style="margin-top:12px; color:var(--bronze-500);">How well did you know it? Rate yourself below.</p>
       `;
     }
     return `
@@ -1839,7 +2370,7 @@ function renderTestMeRun(mode) {
       <p class="testme-answer-name">${item.name}</p>
       <p class="face-desc">${item.grape}</p>
       <p class="face-desc">Producer: ${item.producer}</p>
-      <p class="face-desc" style="margin-top:12px; color:var(--bronze-500);">Swipe right if you knew it, left if you're still learning &mdash; or use the buttons below.</p>
+      <p class="face-desc" style="margin-top:12px; color:var(--bronze-500);">How well did you know it? Rate yourself below.</p>
     `;
   }
 
@@ -1859,70 +2390,46 @@ function renderTestMeRun(mode) {
     phase = "revealed";
     answerBlock.innerHTML = answerBlockHTML();
     answerBlock.style.display = "block";
-    btnRow.style.display = "flex";
+    confidenceWrap.style.display = "block";
   }
 
-  const predictRow = document.createElement("div");
-  predictRow.className = "predict-row";
-  predictRow.style.display = "none";
-  predictRow.innerHTML = `
-    <button class="predict-btn predict-unsure">Not sure</button>
-    <button class="predict-btn predict-know">I know this</button>
-  `;
-  predictRow.querySelector(".predict-unsure").onclick = (e) => { e.stopPropagation(); predicted = false; predictRow.style.display = "none"; reveal(); };
-  predictRow.querySelector(".predict-know").onclick = (e) => { e.stopPropagation(); predicted = true; predictRow.style.display = "none"; reveal(); };
+  card.onclick = () => { if (phase === "clue") reveal(); };
 
-  card.onclick = () => {
-    if (phase === "clue") {
-      if (isSpeed) { reveal(); return; }
-      phase = "predicting";
-      predictRow.style.display = "flex";
+  /* Confidence rating: Brainscape's own 1-5 scale, asked only after
+     reveal (active recall first, self-assessment second -- no
+     pre-reveal prediction step, matching their documented flow). */
+  const confidenceWrap = document.createElement("div");
+  confidenceWrap.className = "confidence-wrap";
+  confidenceWrap.style.display = "none";
+  confidenceWrap.innerHTML = `
+    <div class="confidence-labels"><span>Not at all</span><span>Totally confident</span></div>
+    <div class="confidence-row">
+      <button class="confidence-btn" data-rating="1">1</button>
+      <button class="confidence-btn" data-rating="2">2</button>
+      <button class="confidence-btn" data-rating="3">3</button>
+      <button class="confidence-btn" data-rating="4">4</button>
+      <button class="confidence-btn" data-rating="5">5</button>
+    </div>
+  `;
+  confidenceWrap.querySelectorAll(".confidence-btn").forEach(btn => {
+    btn.onclick = (e) => { e.stopPropagation(); rate(parseInt(btn.dataset.rating, 10)); };
+  });
+
+  function rate(rating) {
+    const wasFullyMastered = cbrMasteredCount(pool) === pool.length;
+    setConfidence(item.id, rating);
+    const isFullyMasteredNow = cbrMasteredCount(pool) === pool.length;
+    if (isFullyMasteredNow && !wasFullyMastered && markMilestone("testme-cbr-" + mode + "-" + focus + "-mastered")) {
+      celebrate();
+      setTimeout(() => render(), 1200);
       return;
     }
-  };
-
-  function calibrationMessage(pred, status) {
-    if (pred === true && status === "known") return { cls: "cal-good", text: "&#10003; Nailed it \u2014 you called that." };
-    if (pred === true && status === "learning") return { cls: "cal-warn", text: "Worth another look \u2014 you were more sure than it turned out." };
-    if (pred === false && status === "known") return { cls: "cal-good", text: "You knew more than you gave yourself credit for." };
-    return { cls: "cal-neutral", text: "Fair call \u2014 flagged for review." };
+    render();
   }
 
-  function advance(status) {
-    setWineProgress(item.id, status);
-    const doFinalize = () => {
-      testQueues[qKey].shift();
-      if (status === "learning") testQueues[qKey].push(item.id);
-      if (!testQueues[qKey].length) testQueues[qKey] = buildTestQueue(mode, focus);
-      if (isSpeed) {
-        if (status === "known") current.params.score++;
-        render();
-        return;
-      }
-      const updated = getProgress();
-      const allKnown = pool.every(x => updated[x.id] === "known");
-      if (allKnown && markMilestone("testme-" + mode + "-" + focus + "-complete")) {
-        celebrate();
-        setTimeout(() => render(), 1200);
-        return;
-      }
-      render();
-    };
-    if (!isSpeed && predicted !== null) {
-      const msg = calibrationMessage(predicted, status);
-      const toast = document.createElement("div");
-      toast.className = "calibration-toast " + msg.cls;
-      toast.textContent = msg.text;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 1400);
-      setTimeout(doFinalize, 500);
-    } else {
-      doFinalize();
-    }
-  }
-
-  /* Swipe with live drag feedback: card follows the finger, tilts, and hints
-     the direction; snaps back if released before the threshold. */
+  /* Swipe stays as a fast shortcut for the two ends of the same scale --
+     right = 5 (nailed it), left = 1 (not at all) -- the button row still
+     gives full 1-5 granularity for anything in between. */
   let touchStartX = null;
   let dragging = false;
   card.addEventListener("touchstart", (e) => {
@@ -1946,11 +2453,11 @@ function renderTestMeRun(mode) {
     if (dx > 60) {
       inner.style.transition = "transform 0.25s ease";
       inner.style.transform = `translateX(120%) rotate(12deg)`;
-      setTimeout(() => advance("known"), 220);
+      setTimeout(() => rate(5), 220);
     } else if (dx < -60) {
       inner.style.transition = "transform 0.25s ease";
       inner.style.transform = `translateX(-120%) rotate(-12deg)`;
-      setTimeout(() => advance("learning"), 220);
+      setTimeout(() => rate(1), 220);
     } else {
       inner.style.transition = "transform 0.25s ease";
       inner.style.transform = "translateX(0) rotate(0)";
@@ -1959,32 +2466,124 @@ function renderTestMeRun(mode) {
   });
 
   app.appendChild(card);
-  app.appendChild(predictRow);
-
-  const btnRow = document.createElement("div");
-  btnRow.className = "card-footer-nav";
-  btnRow.style.display = "none";
-  const learningBtn = document.createElement("button");
-  learningBtn.className = "footer-btn";
-  learningBtn.textContent = "\u2190 Still learning";
-  learningBtn.onclick = () => advance("learning");
-  const knownBtn = document.createElement("button");
-  knownBtn.className = "footer-btn footer-btn-home";
-  knownBtn.textContent = "Got it \u2192";
-  knownBtn.onclick = () => advance("known");
-  btnRow.appendChild(learningBtn);
-  btnRow.appendChild(knownBtn);
-  app.appendChild(btnRow);
+  app.appendChild(confidenceWrap);
 
   const resetLink = document.createElement("p");
   resetLink.className = "testme-reset";
   resetLink.textContent = "Reset my progress";
   resetLink.onclick = () => {
+    resetConfidence();
     resetProgress();
-    testQueues = {};
+    cbrLastShown = {};
     render();
   };
   app.appendChild(resetLink);
+}
+
+/* ---- Speed Round: separate, verified, timed multiple-choice ---- */
+function renderSpeedRound(mode, focus, pool) {
+  if (typeof current.params.score !== "number") {
+    current.params.score = 0;
+    current.params.endsAt = Date.now() + 60000;
+  }
+  const remaining = Math.max(0, current.params.endsAt - Date.now());
+  if (remaining <= 0) {
+    renderSpeedEnd(mode, current.params.score);
+    return;
+  }
+
+  const timerWrap = document.createElement("div");
+  timerWrap.className = "timer-wrap";
+  timerWrap.innerHTML = `
+    <div class="timer-row"><span class="timer-score">&#9889; Score: ${current.params.score}</span><span class="timer-count">${Math.ceil(remaining / 1000)}s</span></div>
+    <div class="timer-track"><div class="timer-fill" style="width:${(remaining / 60000) * 100}%;"></div></div>
+  `;
+  app.appendChild(timerWrap);
+  activeTimer = setInterval(() => {
+    const left = Math.max(0, current.params.endsAt - Date.now());
+    const countEl = timerWrap.querySelector(".timer-count");
+    const fillEl = timerWrap.querySelector(".timer-fill");
+    if (countEl) countEl.textContent = Math.ceil(left / 1000) + "s";
+    if (fillEl) fillEl.style.width = (left / 60000) * 100 + "%";
+    if (left <= 0) {
+      clearInterval(activeTimer); activeTimer = null;
+      renderSpeedEnd(mode, current.params.score);
+    }
+  }, 250);
+
+  // Draws uniformly from the whole pool each question -- independent of
+  // the CBR confidence store, since Speed Round scores need to stay
+  // trustworthy for a future leaderboard.
+  const item = pool[Math.floor(Math.random() * pool.length)];
+  const itemKind = mode === "mixed" ? (item.id.startsWith("d-") ? "food" : "wine") : (mode === "food" ? "food" : mode === "cocktail" ? "cocktail" : "wine");
+  const isFood = itemKind === "food";
+  const isCocktail = itemKind === "cocktail";
+
+  const card = document.createElement("div");
+  card.className = "testme-card no-flip";
+  const inner = document.createElement("div");
+  inner.className = "dish-flip-inner";
+  const clueBlock = document.createElement("div");
+  clueBlock.className = "clue-block";
+  clueBlock.innerHTML = speedClueHTML(item, isFood, isCocktail);
+  inner.appendChild(clueBlock);
+  card.appendChild(inner);
+  app.appendChild(card);
+
+  // Distractors from the same focused pool where possible; widens to the
+  // mode's full pool if the focus is too small to supply four distinct names.
+  const widePool = quizPool(mode, "all");
+  const namePool = pool.length >= 4 ? pool : widePool;
+  const distractSource = namePool.filter(x => x.id !== item.id && x.name !== item.name);
+  const distractors = shuffleArr(distractSource).slice(0, 3);
+  const options = shuffleArr([item, ...distractors]);
+
+  const mcRow = document.createElement("div");
+  mcRow.className = "mc-row";
+  options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.className = "mc-btn";
+    btn.textContent = opt.name;
+    btn.onclick = () => {
+      Array.from(mcRow.children).forEach(b => b.disabled = true);
+      const isCorrect = opt.id === item.id;
+      btn.classList.add(isCorrect ? "mc-correct" : "mc-incorrect");
+      if (!isCorrect) {
+        const correctBtn = Array.from(mcRow.children).find(b => b.textContent === item.name);
+        if (correctBtn) correctBtn.classList.add("mc-reveal-correct");
+      }
+      if (isCorrect) current.params.score++;
+      setTimeout(() => render(), 450);
+    };
+    mcRow.appendChild(btn);
+  });
+  app.appendChild(mcRow);
+}
+
+function speedClueHTML(item, isFood, isCocktail) {
+  if (isFood) {
+    return `
+      <p class="dish-flip-tag">Guess the dish</p>
+      <p class="face-h3" style="margin-top:8px;"><span class="ic">&#128269;</span> Clues</p>
+      <p class="face-desc" style="margin-bottom:10px;">${getSectionIcon(item.section)} ${item.section}</p>
+      <p class="chefprep-text">${item.quizClue}</p>
+    `;
+  }
+  if (isCocktail) {
+    return `
+      <p class="dish-flip-tag">Guess the cocktail</p>
+      <p class="face-h3" style="margin-top:8px;"><span class="ic">&#128269;</span> Clues</p>
+      <p class="face-desc" style="margin-bottom:10px;">${item.glassware} &middot; ${item.method}</p>
+      <div class="flavor-grid">${item.flavorTags.map(t => `<div class="flavor-item"><div class="icon">${getFlavorIcon(t)}</div><p>${t}</p></div>`).join("")}</div>
+    `;
+  }
+  return `
+    <p class="dish-flip-tag">Guess the wine</p>
+    <p class="face-h3" style="margin-top:8px;"><span class="ic">&#128269;</span> Clues</p>
+    <p class="face-desc" style="margin-bottom:10px;">${STYLE_LABELS[item.style]} &middot; ${item.region}</p>
+    <div class="flavor-grid">${item.flavorTags.map(t => `<div class="flavor-item"><div class="icon">${getFlavorIcon(t)}</div><p>${t}</p></div>`).join("")}</div>
+    ${structureBars(item.structure)}
+  `;
 }
 
 /* ---------- Game Room ---------- */
@@ -2020,15 +2619,14 @@ function celebrate() {
 function renderGameRoom() {
   header("Game Room");
 
-  const progress = getProgress();
-  const wineKnown = WINES.filter(w => progress[w.id] === "known").length;
+  const wineMastered = cbrMasteredCount(WINES);
   const foodPool = quizPool("food");
-  const foodKnown = foodPool.filter(d => progress[d.id] === "known").length;
+  const foodMastered = cbrMasteredCount(foodPool);
 
   const status = document.createElement("div");
   status.className = "milestone-strip";
   status.innerHTML = `
-    <p class="milestone-line">&#127942; Wines known: ${wineKnown}/${WINES.length} &middot; Dishes known: ${foodKnown}/${foodPool.length}</p>
+    <p class="milestone-line">&#127942; Wines confident: ${wineMastered}/${WINES.length} &middot; Dishes confident: ${foodMastered}/${foodPool.length}</p>
   `;
   app.appendChild(status);
 
@@ -2055,13 +2653,603 @@ function renderGameRoom() {
       <div class="home-icon-circle">&#9889;</div>
       <div class="home-option-text"><p>Sommelier Says</p><span>Rapid-fire true or false, against the clock</span></div>
     </div>
+    <div class="home-option" data-go="knockout">
+      <div class="home-icon-circle">&#128081;</div>
+      <div class="home-option-text"><p>Knockout</p><span>One structure axis, one champion &mdash; defend the title or dethrone it</span></div>
+    </div>
+    <div class="home-option" data-go="allergy-sort">
+      <div class="home-icon-circle">&#9888;</div>
+      <div class="home-option-text"><p>Allergy Sort</p><span>Drag real dishes into the right bin &mdash; contains it, or doesn't</span></div>
+    </div>
   `;
   options.querySelector('[data-go="testme"]').onclick = () => go("test-me");
   options.querySelector('[data-go="thisorthat"]').onclick = () => go("this-or-that");
   options.querySelector('[data-go="matchit"]').onclick = () => go("match-it-picker");
   options.querySelector('[data-go="imposter"]').onclick = () => go("imposter");
   options.querySelector('[data-go="sommsays"]').onclick = () => go("somm-says");
+  options.querySelector('[data-go="knockout"]').onclick = () => go("knockout");
+  options.querySelector('[data-go="allergy-sort"]').onclick = () => go("allergy-sort");
   app.appendChild(options);
+}
+
+/* ---------- Knockout: fixed-axis structure duel with a persistent champion.
+   Matchup generation, delta-weighted difficulty, and anti-repeat logic all
+   live in knockout-engine.js (window.ChiriusKnockout) -- this section is
+   render/state only. A block's outcomes (who wins each round) are fully
+   determined by real structure data the moment the block is built; only
+   the player's guesses and accuracy are decided at render time. */
+
+const KNOCKOUT_BEST_PREFIX = "p131-best-knockout-";
+function getKnockoutBest(axisKey) {
+  try { return parseInt(localStorage.getItem(KNOCKOUT_BEST_PREFIX + axisKey)) || 0; } catch (e) { return 0; }
+}
+function setKnockoutBest(axisKey, val) {
+  try { localStorage.setItem(KNOCKOUT_BEST_PREFIX + axisKey, String(val)); } catch (e) {}
+}
+
+const KNOCKOUT_LAST_CHAMP_PREFIX = "p131-last-champ-knockout-";
+function getKnockoutLastChampion(axisKey) {
+  try { return localStorage.getItem(KNOCKOUT_LAST_CHAMP_PREFIX + axisKey) || null; } catch (e) { return null; }
+}
+function setKnockoutLastChampion(axisKey, wineId) {
+  try { localStorage.setItem(KNOCKOUT_LAST_CHAMP_PREFIX + axisKey, wineId); } catch (e) {}
+}
+
+function knockoutWineIcon(wine) {
+  return wine.style === "sake" ? "\u{1F376}" : wine.style === "sparkling" ? "\u{1F942}" : "\u{1F377}";
+}
+
+/* Longest run of consecutive wins by the same wine, and the length of the
+   run still active at the end of the block (0 if not needed). */
+function knockoutStreaks(rounds) {
+  const winners = rounds.map(r => r.winnerId);
+  let maxStreak = 1, curLen = 1;
+  for (let i = 1; i < winners.length; i++) {
+    curLen = winners[i] === winners[i - 1] ? curLen + 1 : 1;
+    if (curLen > maxStreak) maxStreak = curLen;
+  }
+  let finalStreak = 1;
+  for (let i = winners.length - 1; i > 0; i--) {
+    if (winners[i] === winners[i - 1]) finalStreak++; else break;
+  }
+  return { maxStreak, finalStreak };
+}
+
+function renderKnockout() {
+  header("Knockout", true, () => go("game-room"));
+
+  const intro = document.createElement("p");
+  intro.className = "testme-counter";
+  intro.textContent = "Pick a structure axis. One wine defends its title until something knocks it out.";
+  app.appendChild(intro);
+
+  const options = document.createElement("div");
+  options.className = "home-options";
+  Object.keys(ChiriusKnockout.KNOCKOUT_AXES).forEach((axisKey) => {
+    let pairCount = 0;
+    try {
+      const pool = ChiriusKnockout.buildAxisPool(WINES, axisKey);
+      pairCount = Object.values(pool.buckets).reduce((n, b) => n + b.length, 0);
+    } catch (e) { pairCount = 0; }
+    if (pairCount === 0) return; // axis has no valid pairs at all -- don't offer it
+    const best = getKnockoutBest(axisKey);
+    const label = axisKey.charAt(0).toUpperCase() + axisKey.slice(1);
+    const opt = document.createElement("div");
+    opt.className = "home-option";
+    opt.innerHTML = `
+      <div class="home-option-text">
+        <p>${label}</p>
+        <span>${pairCount} matchups${best ? ` \u00b7 Best streak: ${best}` : ""}</span>
+      </div>
+    `;
+    opt.onclick = () => go("knockout-run", { axis: axisKey });
+    options.appendChild(opt);
+  });
+  app.appendChild(options);
+}
+
+function renderKnockoutRun() {
+  const axisKey = current.params.axis;
+  const axisDef = ChiriusKnockout.KNOCKOUT_AXES[axisKey];
+  header("Knockout", true, () => go("knockout"));
+
+  if (!axisDef) { go("knockout", {}, false); return; }
+
+  if (!current.params.block) {
+    let block;
+    try {
+      const lastChamp = getKnockoutLastChampion(axisKey);
+      block = ChiriusKnockout.buildKnockoutBlock(WINES, axisKey, 6, null, lastChamp);
+    } catch (e) {
+      go("knockout", {}, false);
+      return;
+    }
+    current.params.block = block;
+    current.params.roundIndex = 0;
+    current.params.playerCorrect = 0;
+    current.params.hintsLeft = 2;
+    current.params.guessId = null;
+  }
+
+  const block = current.params.block;
+  const roundIndex = current.params.roundIndex;
+
+  if (roundIndex >= block.rounds.length) {
+    renderKnockoutEnd(axisKey, block, current.params.playerCorrect);
+    return;
+  }
+
+  const round = block.rounds[roundIndex];
+  const champion = findWine(round.championId);
+  const challenger = findWine(round.challengerId);
+  if (!champion || !challenger) { go("knockout", {}, false); return; }
+
+  if (current.params.cardOrderRound !== roundIndex) {
+    current.params.cardOrder = Math.random() < 0.5 ? ["champion", "challenger"] : ["challenger", "champion"];
+    current.params.cardOrderRound = roundIndex;
+    current.params.hintPeek = false;
+  }
+
+  let streak = 1;
+  for (let i = roundIndex - 1; i >= 0; i--) {
+    if (block.rounds[i].winnerId === round.championId) streak++;
+    else break;
+  }
+
+  const progressLine = document.createElement("p");
+  progressLine.className = "testme-counter";
+  progressLine.textContent = `Round ${roundIndex + 1} of ${block.rounds.length} \u00b7 ${current.params.playerCorrect} correct so far`;
+  app.appendChild(progressLine);
+
+  const prompt = document.createElement("p");
+  prompt.className = "hero-name";
+  prompt.style.textAlign = "center";
+  prompt.style.marginBottom = "4px";
+  prompt.textContent = axisDef.label;
+  app.appendChild(prompt);
+
+  const streakLine = document.createElement("p");
+  streakLine.className = "knockout-streak";
+  streakLine.innerHTML = `${champion.name}'s streak: <b>${streak}</b> round${streak === 1 ? "" : "s"}`;
+  app.appendChild(streakLine);
+
+  const matchup = document.createElement("div");
+  matchup.className = "matchup";
+  const revealed = !!current.params.guessId;
+  const roles = { champion, challenger };
+
+  current.params.cardOrder.forEach((role) => {
+    const wine = roles[role];
+    const card = document.createElement("div");
+    card.className = "wcard";
+    const isWinner = wine.id === round.winnerId;
+    let badge = "";
+    if (revealed) {
+      if (isWinner) { card.classList.add("correct"); badge = `<div class="wcard-badge">&#10003;</div>`; }
+      else if (wine.id === current.params.guessId) { card.classList.add("wrong"); badge = `<div class="wcard-badge">&#10005;</div>`; }
+    }
+    const val = wine.structure[axisKey];
+    const showBand = revealed || current.params.hintPeek;
+    const bandLine = showBand ? `<div class="wcard-meta" style="color:var(--bronze-200); margin-top:4px;">${WSET_BANDS[axisKey][val - 1]}</div>` : "";
+    card.innerHTML = `
+      ${badge}
+      <div class="wcard-crown">${role === "champion" ? "\u2605 Champion" : "&nbsp;"}</div>
+      <div class="wcard-icon">${knockoutWineIcon(wine)}</div>
+      <p class="wcard-name">${wine.name}</p>
+      <div class="wcard-meta">${wine.grape}<br>${wine.region}</div>
+      ${bandLine}
+    `;
+    if (!revealed) {
+      card.onclick = () => {
+        current.params.guessId = wine.id;
+        if (isWinner) current.params.playerCorrect++;
+        render();
+      };
+    }
+    matchup.appendChild(card);
+  });
+  app.appendChild(matchup);
+
+  if (!revealed && current.params.hintsLeft > 0 && !current.params.hintPeek) {
+    const hintRow = document.createElement("div");
+    hintRow.className = "knockout-hint-row";
+    hintRow.innerHTML = `<button class="knockout-hint-btn">Hint &middot; ${current.params.hintsLeft} left</button>`;
+    hintRow.querySelector("button").onclick = () => {
+      current.params.hintsLeft--;
+      current.params.hintPeek = true;
+      render();
+    };
+    app.appendChild(hintRow);
+  }
+
+  if (revealed) {
+    const winner = findWine(round.winnerId);
+    const loser = winner.id === champion.id ? challenger : champion;
+    const winnerBand = WSET_BANDS[axisKey][winner.structure[axisKey] - 1];
+    const loserBand = WSET_BANDS[axisKey][loser.structure[axisKey] - 1];
+    const guessedRight = current.params.guessId === round.winnerId;
+    const explain = document.createElement("div");
+    explain.className = "tot-explain knockout-explain";
+    explain.innerHTML = `
+      <p class="tot-verdict">${guessedRight ? "&#9989; That's right." : "&#10060; Not quite."}</p>
+      <p class="pairing-reason">${winner.name} shows ${winnerBand} ${axisKey}, ahead of ${loser.name}'s ${loserBand}.</p>
+      <button class="footer-btn footer-btn-home">Next round &rarr;</button>
+    `;
+    explain.querySelector("button").onclick = () => {
+      current.params.roundIndex++;
+      current.params.guessId = null;
+      render();
+    };
+    app.appendChild(explain);
+  }
+}
+
+function renderKnockoutEnd(axisKey, block, playerCorrect) {
+  app.innerHTML = "";
+  header("Knockout", true, () => go("knockout"));
+
+  const { maxStreak, finalStreak } = knockoutStreaks(block.rounds);
+  const finalChampion = findWine(block.finalChampionId);
+  const best = getKnockoutBest(axisKey);
+  const isRecord = maxStreak > best;
+  if (isRecord) { setKnockoutBest(axisKey, maxStreak); celebrate(); }
+  setKnockoutLastChampion(axisKey, block.finalChampionId);
+
+  const wrap = document.createElement("div");
+  wrap.className = "speed-end";
+  wrap.innerHTML = `
+    <p class="speed-end-icon">&#128081;</p>
+    <p class="speed-end-score">${playerCorrect}<span class="speed-end-total">/${block.rounds.length}</span></p>
+    <p class="speed-end-label">correct calls \u00b7 ${axisKey}</p>
+    <p class="speed-end-best">${isRecord ? "&#127942; New personal best streak!" : `Best streak so far: ${best}`}</p>
+    <p class="knockout-streak" style="margin-top:14px;">Reigning champion: <b>${finalChampion ? finalChampion.name : "\u2014"}</b> (${finalStreak} round${finalStreak === 1 ? "" : "s"} running)</p>
+    <p class="knockout-streak" style="margin-top:2px; text-transform:none; font-size:9px;">${finalChampion ? finalChampion.name : "This wine"} sits out the next ${axisKey} session</p>
+  `;
+  app.appendChild(wrap);
+
+  const btnRow = document.createElement("div");
+  btnRow.className = "card-footer-nav";
+  const backBtn = document.createElement("button");
+  backBtn.className = "footer-btn";
+  backBtn.textContent = "Game Room";
+  backBtn.onclick = () => go("game-room");
+  const againBtn = document.createElement("button");
+  againBtn.className = "footer-btn footer-btn-home";
+  againBtn.textContent = "Play Again \u{1F451}";
+  againBtn.onclick = () => go("knockout-run", { axis: axisKey });
+  btnRow.appendChild(backBtn);
+  btnRow.appendChild(againBtn);
+  app.appendChild(btnRow);
+}
+
+/* ---------- Allergy Sort: survival streak, drag real dishes into "contains X" /
+   "X-free" bins. A random allergen each round (never the same as the round
+   just played); one wrong card on the guess ends the run. Round data comes
+   from allergy-sort-engine.js (window.ChiriusAllergySort), built from DISHES'
+   real allergensInRecipe field -- dishes with no allergen data are never
+   shown, never assumed allergen-free. Session progress (streak, previous
+   allergen) lives in current.params so it survives the go() call between
+   rounds; everything within a single round is managed by direct DOM
+   mutation, not repeated calls to the global render() -- a mid-drag
+   render() would tear down the very card being dragged, same reasoning as
+   the existing Test Me swipe screen. */
+
+function renderAllergyIntro() {
+  header("Allergy Sort", true, () => go("game-room"));
+
+  const eyebrow = document.createElement("p");
+  eyebrow.className = "hero-meta strong";
+  eyebrow.style.textAlign = "center";
+  eyebrow.textContent = "Survival Streak";
+  app.appendChild(eyebrow);
+
+  const title = document.createElement("p");
+  title.className = "hero-name";
+  title.style.textAlign = "center";
+  title.textContent = "Sort by allergen.";
+  app.appendChild(title);
+
+  const sub = document.createElement("p");
+  sub.className = "testme-counter";
+  sub.style.textTransform = "none";
+  sub.style.letterSpacing = "normal";
+  sub.style.fontFamily = "var(--font-body)";
+  sub.style.fontSize = "13px";
+  sub.style.lineHeight = "1.5";
+  sub.style.margin = "0 0 18px";
+  sub.textContent = "Six real dishes, one allergen. Drag each into the right bin. Clear all six and the streak continues with a new allergen \u2014 one miss ends it.";
+  app.appendChild(sub);
+
+  const best = getAllergyBestStreak();
+  if (best > 0) {
+    const bestLine = document.createElement("p");
+    bestLine.className = "testme-counter";
+    bestLine.textContent = "Best streak: " + best;
+    app.appendChild(bestLine);
+  }
+
+  const playBtn = document.createElement("button");
+  playBtn.className = "btn-start";
+  playBtn.style.width = "100%";
+  playBtn.style.marginTop = "8px";
+  playBtn.textContent = "Play";
+  playBtn.onclick = () => go("allergy-sort-run", { streak: 0, prevAllergen: null });
+  app.appendChild(playBtn);
+}
+
+const ALLERGY_BEST_STREAK_KEY = "p131-best-allergy-streak";
+function getAllergyBestStreak() {
+  try { return parseInt(localStorage.getItem(ALLERGY_BEST_STREAK_KEY)) || 0; } catch (e) { return 0; }
+}
+function setAllergyBestStreak(val) {
+  try { localStorage.setItem(ALLERGY_BEST_STREAK_KEY, String(val)); } catch (e) {}
+}
+
+function pickRandomAllergen(excludeAllergen) {
+  const pool = ChiriusAllergySort.ALLERGY_SORT_PLAYABLE.filter((a) => {
+    if (a === excludeAllergen) return false;
+    const p = ChiriusAllergySort.buildAllergenPool(DISHES, a);
+    return p.has.length >= 3 && p.without.length >= 3;
+  });
+  const finalPool = pool.length > 0 ? pool : ChiriusAllergySort.ALLERGY_SORT_PLAYABLE;
+  return finalPool[Math.floor(Math.random() * finalPool.length)];
+}
+
+function renderAllergySortRun() {
+  const streak = current.params.streak || 0;
+  const prevAllergen = current.params.prevAllergen || null;
+  const allergen = pickRandomAllergen(prevAllergen);
+  const label = ChiriusAllergySort.ALLERGY_SORT_LABELS[allergen];
+  header("Allergy Sort", true, () => go("allergy-sort"));
+
+  let round;
+  try {
+    round = ChiriusAllergySort.buildSortRound(DISHES, allergen, 6);
+  } catch (e) {
+    go("game-room", {}, false);
+    return;
+  }
+
+  const streakLine = document.createElement("p");
+  streakLine.className = "testme-counter";
+  streakLine.textContent = "Round " + (streak + 1) + " \u00b7 streak: " + streak;
+  app.appendChild(streakLine);
+
+  const prompt = document.createElement("p");
+  prompt.className = "hero-name";
+  prompt.style.textAlign = "center";
+  prompt.style.marginBottom = "2px";
+  prompt.textContent = "Contains " + label + "?";
+  app.appendChild(prompt);
+
+  const deckCountLine = document.createElement("p");
+  deckCountLine.className = "testme-counter";
+  app.appendChild(deckCountLine);
+
+  const bins = document.createElement("div");
+  bins.className = "asort-bins";
+  bins.innerHTML = `
+    <div class="asort-bin">
+      <p class="asort-bin-header">Contains ${label}</p>
+      <div class="asort-well" data-bin="has"><div class="asort-count">0</div></div>
+    </div>
+    <div class="asort-bin">
+      <p class="asort-bin-header">${label}-Free</p>
+      <div class="asort-well" data-bin="without"><div class="asort-count">0</div></div>
+    </div>
+  `;
+  app.appendChild(bins);
+  const binHas = bins.querySelector('[data-bin="has"]');
+  const binWithout = bins.querySelector('[data-bin="without"]');
+  const countHas = binHas.querySelector(".asort-count");
+  const countWithout = binWithout.querySelector(".asort-count");
+
+  const deckZone = document.createElement("div");
+  deckZone.className = "asort-deck-zone";
+  app.appendChild(deckZone);
+
+  const guessBtn = document.createElement("button");
+  guessBtn.className = "footer-btn footer-btn-home";
+  guessBtn.style.width = "100%";
+  guessBtn.style.marginTop = "14px";
+  guessBtn.disabled = true;
+  guessBtn.textContent = "Sort all 6 to guess";
+  app.appendChild(guessBtn);
+
+  const verdictArea = document.createElement("div");
+  app.appendChild(verdictArea);
+
+  // ---- state local to this round (intentionally not in current.params --
+  // only streak/prevAllergen need to survive the jump to the next round) ----
+  let deckIndex = 0;
+  const placements = {};
+
+  function allCorrect() {
+    return round.cards.every((c) => placements[c.id] === c.truth);
+  }
+
+  function renderCounts() {
+    countHas.textContent = Object.values(placements).filter((v) => v === "has").length;
+    countWithout.textContent = Object.values(placements).filter((v) => v === "without").length;
+    deckCountLine.textContent = (round.cards.length - deckIndex) + " of " + round.cards.length + " left to sort";
+    guessBtn.disabled = deckIndex < round.cards.length;
+    guessBtn.textContent = deckIndex < round.cards.length ? "Sort all 6 to guess" : "Guess";
+  }
+
+  function placedCardEl(dish, revealed) {
+    const el = document.createElement("div");
+    el.className = "asort-placed";
+    if (revealed) {
+      const isCorrect = placements[dish.id] === dish.truth;
+      el.classList.add(isCorrect ? "correct" : "wrong");
+      el.innerHTML = `<span class="asort-badge">${isCorrect ? "&#10003;" : "&#10005;"}</span>${dish.name}`;
+      el.classList.add("learn");
+      el.onclick = () => {
+        learnPanelFor(dish);
+      };
+    } else {
+      el.textContent = dish.name;
+    }
+    return el;
+  }
+
+  let learnPanel = null;
+  function learnPanelFor(dish) {
+    if (learnPanel) learnPanel.remove();
+    learnPanel = document.createElement("div");
+    learnPanel.className = "asort-learn-panel show";
+    learnPanel.innerHTML = `<b>${dish.name}</b> (${dish.section}) contains: ${dish.allergens.join(", ")}.`;
+    verdictArea.appendChild(learnPanel);
+  }
+
+  function renderBins(revealed) {
+    binHas.querySelectorAll(".asort-placed").forEach((e) => e.remove());
+    binWithout.querySelectorAll(".asort-placed").forEach((e) => e.remove());
+    round.cards.forEach((dish) => {
+      if (!(dish.id in placements)) return;
+      const target = placements[dish.id] === "has" ? binHas : binWithout;
+      target.appendChild(placedCardEl(dish, revealed));
+    });
+  }
+
+  function commitPlacement(dish, bin) {
+    placements[dish.id] = bin;
+    deckIndex++;
+    renderBins(false);
+    renderCounts();
+    spawnActiveCard();
+  }
+
+  function spawnActiveCard() {
+    deckZone.querySelectorAll(".asort-active, .asort-fallback-row").forEach((e) => e.remove());
+    if (deckIndex >= round.cards.length) return;
+    const dish = round.cards[deckIndex];
+    const card = document.createElement("div");
+    card.className = "asort-active";
+    card.innerHTML = `
+      <p class="asort-active-section">${dish.section}</p>
+      <p class="asort-active-name">${dish.name}</p>
+      <p class="asort-active-desc">${dish.desc}</p>
+    `;
+    const fallbackRow = document.createElement("div");
+    fallbackRow.className = "asort-fallback-row";
+    const hasBtn = document.createElement("button");
+    hasBtn.className = "asort-fallback-btn";
+    hasBtn.textContent = "\u2190 Contains it";
+    hasBtn.onclick = () => commitPlacement(dish, "has");
+    const withoutBtn = document.createElement("button");
+    withoutBtn.className = "asort-fallback-btn";
+    withoutBtn.textContent = "Free of it \u2192";
+    withoutBtn.onclick = () => commitPlacement(dish, "without");
+    fallbackRow.appendChild(hasBtn);
+    fallbackRow.appendChild(withoutBtn);
+
+    deckZone.appendChild(card);
+    deckZone.appendChild(fallbackRow);
+    attachDrag(card, dish);
+  }
+
+  function attachDrag(card, dish) {
+    let startX = 0, startY = 0, dragging = false;
+    const threshold = 55;
+
+    function onDown(e) {
+      const p = e.touches ? e.touches[0] : e;
+      startX = p.clientX; startY = p.clientY; dragging = true;
+      card.style.transition = "none";
+    }
+    function onMove(e) {
+      if (!dragging) return;
+      const p = e.touches ? e.touches[0] : e;
+      const dx = p.clientX - startX, dy = p.clientY - startY;
+      card.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx / 20}deg)`;
+      binHas.classList.toggle("drag-over", dx < -threshold);
+      binWithout.classList.toggle("drag-over", dx > threshold);
+      if (e.cancelable) e.preventDefault();
+    }
+    function onUp(e) {
+      if (!dragging) return;
+      dragging = false;
+      const p = e.changedTouches ? e.changedTouches[0] : e;
+      const dx = p.clientX - startX;
+      binHas.classList.remove("drag-over");
+      binWithout.classList.remove("drag-over");
+      if (Math.abs(dx) > threshold) {
+        const bin = dx < 0 ? "has" : "without";
+        card.style.transition = "transform 180ms ease, opacity 180ms ease";
+        card.style.transform = `translate(${dx < 0 ? -260 : 260}px, -40px) rotate(${dx < 0 ? -20 : 20}deg)`;
+        card.style.opacity = "0";
+        setTimeout(() => commitPlacement(dish, bin), 160);
+      } else {
+        card.style.transition = "transform 180ms ease";
+        card.style.transform = "translate(0,0) rotate(0)";
+      }
+    }
+
+    card.addEventListener("pointerdown", onDown);
+    card.addEventListener("pointermove", onMove);
+    card.addEventListener("pointerup", onUp);
+    card.addEventListener("pointercancel", onUp);
+    card.addEventListener("touchstart", onDown, { passive: true });
+    card.addEventListener("touchmove", onMove, { passive: false });
+    card.addEventListener("touchend", onUp);
+  }
+
+  guessBtn.onclick = () => {
+    if (deckIndex < round.cards.length) return;
+    renderBins(true);
+    verdictArea.innerHTML = "";
+    guessBtn.disabled = true;
+    const win = allCorrect();
+
+    if (win) {
+      const v = document.createElement("p");
+      v.className = "tot-verdict";
+      v.style.textAlign = "center";
+      v.textContent = "\u2705 That's right!";
+      const sub = document.createElement("p");
+      sub.className = "asort-verdict-sub";
+      sub.textContent = "Streak: " + (streak + 1) + ". On to the next allergen.";
+      verdictArea.appendChild(v);
+      verdictArea.appendChild(sub);
+      const nextBtn = document.createElement("button");
+      nextBtn.className = "footer-btn footer-btn-home";
+      nextBtn.style.width = "100%";
+      nextBtn.style.marginTop = "10px";
+      nextBtn.textContent = "Next Round \u2192";
+      nextBtn.onclick = () => go("allergy-sort-run", { streak: streak + 1, prevAllergen: allergen });
+      verdictArea.appendChild(nextBtn);
+    } else {
+      const best = getAllergyBestStreak();
+      const isRecord = streak > best;
+      if (isRecord) { setAllergyBestStreak(streak); celebrate(); }
+      const v = document.createElement("p");
+      v.className = "tot-verdict";
+      v.style.textAlign = "center";
+      v.textContent = "\u274c Streak over";
+      const sub = document.createElement("p");
+      sub.className = "asort-verdict-sub";
+      sub.textContent = `You cleared ${streak} round${streak === 1 ? "" : "s"} before this one. ${isRecord ? "New personal best!" : "Best streak: " + best}. Tap any card to see what's really in it.`;
+      verdictArea.appendChild(v);
+      verdictArea.appendChild(sub);
+      const btnRow = document.createElement("div");
+      btnRow.className = "card-footer-nav";
+      const homeBtn = document.createElement("button");
+      homeBtn.className = "footer-btn";
+      homeBtn.textContent = "Game Room";
+      homeBtn.onclick = () => go("game-room");
+      const againBtn = document.createElement("button");
+      againBtn.className = "footer-btn footer-btn-home";
+      againBtn.textContent = "Play Again";
+      againBtn.onclick = () => go("allergy-sort-run", { streak: 0, prevAllergen: null });
+      btnRow.appendChild(homeBtn);
+      btnRow.appendChild(againBtn);
+      verdictArea.appendChild(btnRow);
+    }
+  };
+
+  renderCounts();
+  spawnActiveCard();
 }
 
 /* ---------- Learning: modules/courses, same engine for every restaurant ---------- */
@@ -2982,26 +4170,52 @@ let imposterPref = { difficulty: "easy", rounds: 10 };
 
 function buildImposterRules(difficulty) {
   const rules = [];
+  const allWines = WINES.concat(BOTTLE_WINES); // BTG + bottle list: full 167-wine pool
 
-  rules.push({ type: "region", pick: WINES.filter(w => w.region.includes("Napa")),
-    exclude: WINES.filter(w => !w.region.includes("Napa")),
-    why: "The other three are all from Napa Valley." });
+  // Region: data-driven, any region shared by 3+ wines (was hardcoded to Napa only)
+  const regionCounts = {};
+  allWines.forEach(w => { regionCounts[w.region] = (regionCounts[w.region] || 0) + 1; });
+  Object.keys(regionCounts).filter(r => regionCounts[r] >= 3).forEach(region => {
+    rules.push({ type: "region", pick: allWines.filter(w => w.region === region),
+      exclude: allWines.filter(w => w.region !== region),
+      why: `The other three are all from ${region}.` });
+  });
+
+  // Grape: single-varietal wines (grape field starts "100% X"), 3+ sharing the same grape
+  const singleGrape = allWines.filter(w => /^100% /.test(w.grape));
+  const grapeCounts = {};
+  singleGrape.forEach(w => { grapeCounts[w.grape] = (grapeCounts[w.grape] || 0) + 1; });
+  Object.keys(grapeCounts).filter(g => grapeCounts[g] >= 3).forEach(grape => {
+    rules.push({ type: "grape", pick: allWines.filter(w => w.grape === grape),
+      exclude: allWines.filter(w => w.grape !== grape),
+      why: `The other three are all ${grape.replace("100% ", "")} &mdash; the imposter is a different grape or a blend.` });
+  });
+
+  // Style: sparkling / white / red / dessert / sake
+  STYLE_ORDER.forEach(style => {
+    const has = allWines.filter(w => w.style === style);
+    const notHave = allWines.filter(w => w.style !== style);
+    if (has.length >= 3 && notHave.length >= 1) {
+      rules.push({ type: "style", pick: has, exclude: notHave,
+        why: `The other three are all ${STYLE_LABELS[style].toLowerCase()} &mdash; the imposter is a different style entirely.` });
+    }
+  });
 
   if (difficulty === "hard") {
-    rules.push({ type: "tannin", pick: WINES.filter(w => w.structure.tannin === 3), exclude: WINES.filter(w => w.structure.tannin === 2),
+    rules.push({ type: "tannin", pick: allWines.filter(w => w.structure.tannin === 3), exclude: allWines.filter(w => w.structure.tannin === 2),
       why: "The other three all sit right at medium(+) tannin &mdash; the imposter is a notch softer, at medium." });
-    rules.push({ type: "acidity", pick: WINES.filter(w => w.structure.acidity === 3), exclude: WINES.filter(w => w.structure.acidity === 2),
+    rules.push({ type: "acidity", pick: allWines.filter(w => w.structure.acidity === 3), exclude: allWines.filter(w => w.structure.acidity === 2),
       why: "The other three all sit right at medium acidity &mdash; the imposter is a notch softer." });
-    rules.push({ type: "body", pick: WINES.filter(w => w.structure.body === 3), exclude: WINES.filter(w => w.structure.body === 2),
+    rules.push({ type: "body", pick: allWines.filter(w => w.structure.body === 3), exclude: allWines.filter(w => w.structure.body === 2),
       why: "The other three are all medium body &mdash; the imposter is a notch lighter." });
   } else {
-    rules.push({ type: "tannin", pick: WINES.filter(w => w.structure.tannin >= 3), exclude: WINES.filter(w => w.structure.tannin <= 1),
+    rules.push({ type: "tannin", pick: allWines.filter(w => w.structure.tannin >= 3), exclude: allWines.filter(w => w.structure.tannin <= 1),
       why: "The other three are structured, tannic reds &mdash; the imposter barely has any grip." });
-    rules.push({ type: "acidity", pick: WINES.filter(w => w.structure.acidity >= 4), exclude: WINES.filter(w => w.structure.acidity <= 2),
+    rules.push({ type: "acidity", pick: allWines.filter(w => w.structure.acidity >= 4), exclude: allWines.filter(w => w.structure.acidity <= 2),
       why: "The other three are all high-acid, fresh-style pours &mdash; the imposter is soft and round." });
-    rules.push({ type: "body", pick: WINES.filter(w => w.structure.body >= 4), exclude: WINES.filter(w => w.structure.body <= 2),
+    rules.push({ type: "body", pick: allWines.filter(w => w.structure.body >= 4), exclude: allWines.filter(w => w.structure.body <= 2),
       why: "The other three are all full-bodied &mdash; the imposter is noticeably lighter on the palate." });
-    rules.push({ type: "body", pick: WINES.filter(w => w.structure.body <= 2), exclude: WINES.filter(w => w.structure.body >= 4),
+    rules.push({ type: "body", pick: allWines.filter(w => w.structure.body <= 2), exclude: allWines.filter(w => w.structure.body >= 4),
       why: "The other three are all light-bodied &mdash; the imposter is much fuller and richer." });
   }
 
@@ -3031,21 +4245,15 @@ function buildImposterRules(difficulty) {
     }
   });
 
-  const glassFamily = (g) => g.includes("Martini") ? "Martini" : g.includes("Rocks") ? "Rocks" : g.includes("Coupe") ? "Coupe" : null;
-  ["Shake & Strain", "Stir & Strain"].forEach(method => {
-    const has = COCKTAILS.filter(c => c.method === method);
-    const notHave = COCKTAILS.filter(c => c.method !== method);
-    if (has.length >= 3 && notHave.length >= 1) {
-      rules.push({ type: "cocktail-method", pick: has, exclude: notHave, itemType: "cocktail",
-        why: `The other three are all ${method === "Shake & Strain" ? "shaken" : "stirred"} cocktails &mdash; the imposter is built the other way.` });
-    }
-  });
-  ["Martini", "Rocks", "Coupe"].forEach(fam => {
-    const has = COCKTAILS.filter(c => glassFamily(c.glassware) === fam);
-    const notHave = COCKTAILS.filter(c => glassFamily(c.glassware) !== fam);
-    if (has.length >= 3 && notHave.length >= 1) {
-      rules.push({ type: "cocktail-glass", pick: has, exclude: notHave, itemType: "cocktail",
-        why: `The other three are all served in a ${fam.toLowerCase()} glass &mdash; the imposter comes in something different.` });
+  // Food section: 3+ dishes sharing a menu section (Starters, Sushi, Steaks, etc.)
+  const sectionCounts = {};
+  foodPool.forEach(d => { sectionCounts[d.section] = (sectionCounts[d.section] || 0) + 1; });
+  Object.keys(sectionCounts).filter(s => sectionCounts[s] >= 3).forEach(section => {
+    const has = foodPool.filter(d => d.section === section);
+    const notHave = foodPool.filter(d => d.section !== section);
+    if (notHave.length >= 1) {
+      rules.push({ type: "food-section", pick: has, exclude: notHave, itemType: "food",
+        why: `The other three are all from ${section} &mdash; the imposter comes from a different part of the menu.` });
     }
   });
 
@@ -3133,7 +4341,7 @@ function renderImposter() {
   tiles.forEach(item => {
     const tile = document.createElement("button");
     tile.className = "match-tile imposter-tile";
-    const displayName = (round.itemType === "food" || round.itemType === "cocktail") ? item.name : item.producer;
+    const displayName = round.itemType === "food" ? item.name : item.producer;
     tile.innerHTML = `<b>${displayName}</b>`;
     tile.onclick = () => {
       if (done) return;
@@ -3144,7 +4352,7 @@ function renderImposter() {
       grid.querySelectorAll(".imposter-tile").forEach((t, i) => {
         t.classList.add("revealed");
         const full = tiles[i];
-        t.innerHTML = (round.itemType === "food" || round.itemType === "cocktail")
+        t.innerHTML = round.itemType === "food"
           ? `<b>${full.name}</b>`
           : `<b>${full.producer}</b><br><span class="imposter-sub">${full.name}</span>`;
       });
@@ -3477,6 +4685,8 @@ function renderSommEnd(seconds, params) {
   btnRow.appendChild(againBtn);
   app.appendChild(btnRow);
 }
+
+migrateProgressToConfidence();
 
 if (getStoredAuth()) {
   render();

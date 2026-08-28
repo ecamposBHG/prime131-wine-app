@@ -38,7 +38,7 @@ function clearAuth() {
 function storeAuth(data) {
   localStorage.setItem(AUTH_TOKEN_KEY, data.token);
   localStorage.setItem(AUTH_USER_KEY, JSON.stringify({
-    staffId: data.staff_id, name: data.name, role: data.role
+    staffId: data.staff_id, restaurantId: data.restaurant_id, name: data.name, role: data.role
   }));
 }
 
@@ -177,7 +177,8 @@ function renderAuthScreen(onSuccess) {
       const data = await callAuthFunction("staff-login", {
         restaurant_slug: AUTH_CONFIG.restaurantSlug, name, pin
       });
-      storeAuth(data);
+            storeAuth(data);
+      ChiriusAnalytics.track('auth_login', {});
       onSuccess();
     } catch (err) {
       showError(panels.login, err.message);
@@ -195,7 +196,8 @@ function renderAuthScreen(onSuccess) {
     setLoading(panels.register, true, "Create account");
     try {
       const data = await callAuthFunction("staff-register", { join_code, name, pin });
-      storeAuth(data);
+            storeAuth(data);
+      ChiriusAnalytics.track('auth_register', {});
       onSuccess();
     } catch (err) {
       showError(panels.register, err.message);

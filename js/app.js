@@ -2173,7 +2173,10 @@ function renderLearningChapter(moduleId, chapterIndex, sectionIndex) {
   chapterIndex = Math.max(0, Math.min(chapterIndex, chapters.length - 1));
   const chapter = chapters[chapterIndex];
   sectionIndex = Math.max(0, Math.min(sectionIndex, chapter.sections.length - 1));
-  const section = chapter.sections[sectionIndex];
+    const section = chapter.sections[sectionIndex];
+  if (sectionIndex === 0) {
+    ChiriusAnalytics.track('learning_chapter_start', { module_id: moduleId, chapter_index: chapterIndex });
+  }
 
   if (chapters.length > 1) {
     const chapterKicker = document.createElement("p");
@@ -2256,14 +2259,17 @@ function renderLearningChapter(moduleId, chapterIndex, sectionIndex) {
   const nextBtn = document.createElement("button");
   nextBtn.className = "footer-btn footer-btn-home";
   nextBtn.textContent = isVeryLast ? "Finish \u203a" : "Next \u203a";
-  nextBtn.onclick = () => {
+    nextBtn.onclick = () => {
     if (!isLastSectionInChapter) {
       go("learning-chapter", { moduleId, chapterIndex, sectionIndex: sectionIndex + 1 }, false);
     } else if (!isLastChapter) {
+      ChiriusAnalytics.track('learning_chapter_complete', { module_id: moduleId, chapter_index: chapterIndex });
       go("learning-chapter", { moduleId, chapterIndex: chapterIndex + 1, sectionIndex: 0 }, false);
     } else if (hasTest) {
+      ChiriusAnalytics.track('learning_chapter_complete', { module_id: moduleId, chapter_index: chapterIndex });
       go("learning-test-intro", { moduleId }, false);
     } else {
+      ChiriusAnalytics.track('learning_chapter_complete', { module_id: moduleId, chapter_index: chapterIndex });
       go("learning-complete", { moduleId }, false);
     }
   };

@@ -285,8 +285,10 @@ function render() {
   else if (current.view === "learning-hub") renderLearningHub();
   else if (current.view === "learning-intro") renderLearningIntro(current.params.moduleId);
   else if (current.view === "learning-chapter") renderLearningChapter(current.params.moduleId, current.params.chapterIndex, current.params.sectionIndex);
+  else if (current.view === "learning-chapter-quiz") renderChapterQuiz(current.params.moduleId, current.params.chapterIndex, current.params.quizIndex);
   else if (current.view === "learning-test-intro") renderLearningTestIntro(current.params.moduleId);
   else if (current.view === "learning-test") renderLearningTest(current.params.moduleId, current.params.index);
+  else if (current.view === "learning-test-result") renderLearningTestResult(current.params.moduleId, current.params.correctCount, current.params.total, current.params.passed);
   else if (current.view === "learning-complete") renderLearningComplete(current.params.moduleId);
   makeDivsKeyboardAccessible();
   window.scrollTo(0, 0);
@@ -411,6 +413,26 @@ function setLearningFurthest(moduleId, sectionIndex) {
   p[moduleId] = cur;
   try { localStorage.setItem(LEARNING_PROGRESS_KEY, JSON.stringify(p)); } catch (e) {}
 }
+function getFinalTestAnswers(moduleId) {
+  const p = getLearningProgress()[moduleId];
+  return (p && p.finalTestAnswers) || {};
+}
+function setFinalTestAnswer(moduleId, questionIndex, chosenIndex) {
+  const p = getLearningProgress();
+  const cur = p[moduleId] || { furthest: -1, completed: false, testFurthest: -1 };
+  cur.finalTestAnswers = cur.finalTestAnswers || {};
+  cur.finalTestAnswers[questionIndex] = chosenIndex;
+  p[moduleId] = cur;
+  try { localStorage.setItem(LEARNING_PROGRESS_KEY, JSON.stringify(p)); } catch (e) {}
+}
+function clearFinalTestAnswers(moduleId) {
+  const p = getLearningProgress();
+  const cur = p[moduleId] || { furthest: -1, completed: false, testFurthest: -1 };
+  cur.finalTestAnswers = {};
+  cur.testFurthest = -1;
+  p[moduleId] = cur;
+  try { localStorage.setItem(LEARNING_PROGRESS_KEY, JSON.stringify(p)); } catch (e) {}
+}
 function setTestFurthest(moduleId, questionIndex) {
   const p = getLearningProgress();
   const cur = p[moduleId] || { furthest: -1, completed: false, testFurthest: -1 };
@@ -427,6 +449,18 @@ function markLearningComplete(moduleId) {
   try { localStorage.setItem(LEARNING_PROGRESS_KEY, JSON.stringify(p)); } catch (e) {}
   return !alreadyDone; // true the first time this module is finished
 }
+function isChapterQuizPassed(moduleId, chapterIndex) {
+  const p = getLearningProgress()[moduleId];
+  return !!(p && p.chapterQuizPassed && p.chapterQuizPassed[chapterIndex]);
+}
+function setChapterQuizPassed(moduleId, chapterIndex) {
+  const p = getLearningProgress();
+  const cur = p[moduleId] || { furthest: -1, completed: false, testFurthest: -1 };
+  cur.chapterQuizPassed = cur.chapterQuizPassed || {};
+  cur.chapterQuizPassed[chapterIndex] = true;
+  p[moduleId] = cur;
+  try { localStorage.setItem(LEARNING_PROGRESS_KEY, JSON.stringify(p)); } catch (e) {}
+}
 function isModuleUnlocked(mod) {
   if (!mod.unlockAfter) return true;
   const p = getLearningProgress();
@@ -440,6 +474,55 @@ function moduleStatus(mod) {
   return "not-started";
 }
 function findLearningModule(id) { return LEARNING_MODULES.find(m => m.id === id); }
+
+/* Final cumulative test must be passed at 100%. Two attempts allowed back to
+   back; after a second failure the module locks for 10 minutes before a
+   fresh pair of attempts is allowed again. State lives alongside the rest
+   of the module's progress record so it resets cleanly per module. */
+const FINAL_TEST_LOCKOUT_MS = 10 * 60 * 1000;
+function getFinalTestState(moduleId) {
+  const p = getLearningProgress()[moduleId];
+  return (p && p.finalTest) || { attemptsUsed: 0, lockedUntil: null };
+}
+function setFinalTestState(moduleId, state) {
+  const p = getLearningProgress();
+  const cur = p[moduleId] || { furthest: -1, completed: false, testFurthest: -1 };
+  cur.finalTest = state;
+  p[moduleId] = cur;
+  try { localStorage.setItem(LEARNING_PROGRESS_KEY, JSON.stringify(p)); } catch (e) {}
+}
+function finalTestLockStatus(moduleId) {
+  const state = getFinalTestState(moduleId);
+  const now = Date.now();
+  if (state.lockedUntil && now < state.lockedUntil) {
+    return { locked: true, remainingMs: state.lockedUntil - now, state };
+  }
+  if (state.lockedUntil && now >= state.lockedUntil) {
+    // cooldown has elapsed -- reset for a fresh pair of attempts
+    const fresh = { attemptsUsed: 0, lockedUntil: null };
+    setFinalTestState(moduleId, fresh);
+    return { locked: false, remainingMs: 0, state: fresh };
+  }
+  return { locked: false, remainingMs: 0, state };
+}
+function recordFinalTestFailure(moduleId) {
+  const state = getFinalTestState(moduleId);
+  const attemptsUsed = (state.attemptsUsed || 0) + 1;
+  const next = attemptsUsed >= 2
+    ? { attemptsUsed, lockedUntil: Date.now() + FINAL_TEST_LOCKOUT_MS }
+    : { attemptsUsed, lockedUntil: null };
+  setFinalTestState(moduleId, next);
+  return next;
+}
+function recordFinalTestPass(moduleId) {
+  setFinalTestState(moduleId, { attemptsUsed: 0, lockedUntil: null });
+}
+function formatMmSs(ms) {
+  const total = Math.max(0, Math.ceil(ms / 1000));
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${m}:${s < 10 ? "0" : ""}${s}`;
+}
 
 /* Chapter/block helpers: a module's content lives in mod.chapters (each a
    block with its own sections), always followed by a single trailing
@@ -3450,7 +3533,14 @@ function renderLearningChapter(moduleId, chapterIndex, sectionIndex) {
     nextBtn.onclick = () => {
     if (!isLastSectionInChapter) {
       go("learning-chapter", { moduleId, chapterIndex, sectionIndex: sectionIndex + 1 }, false);
-    } else if (!isLastChapter) {
+      return;
+    }
+    const chapterQuiz = chapter.quiz || [];
+    if (chapterQuiz.length && !isChapterQuizPassed(moduleId, chapterIndex)) {
+      go("learning-chapter-quiz", { moduleId, chapterIndex, quizIndex: 0 }, false);
+      return;
+    }
+    if (!isLastChapter) {
       ChiriusAnalytics.track('learning_chapter_complete', { module_id: moduleId, chapter_index: chapterIndex });
       go("learning-chapter", { moduleId, chapterIndex: chapterIndex + 1, sectionIndex: 0 }, false);
     } else if (hasTest) {
@@ -3466,6 +3556,284 @@ function renderLearningChapter(moduleId, chapterIndex, sectionIndex) {
   app.appendChild(nav);
 }
 
+/* ---------- Chapter mini-quizzes: mcq / sequence / sort ----------
+   Each chapter can carry its own `quiz` array (separate from the module's
+   trailing `test`). Every item must be answered correctly before the
+   learner can continue -- wrong answers get feedback and another try,
+   never a penalty. Once every item in a chapter's quiz has been passed
+   once, that chapter is marked done and future visits skip straight
+   through to the next chapter. */
+
+function advanceAfterChapterQuiz(moduleId, chapterIndex) {
+  setChapterQuizPassed(moduleId, chapterIndex);
+  const mod = findLearningModule(moduleId);
+  const chapters = moduleChapters(mod);
+  const isLastChapter = chapterIndex === chapters.length - 1;
+  const hasTest = mod.test && mod.test.length > 0;
+  ChiriusAnalytics.track('learning_chapter_complete', { module_id: moduleId, chapter_index: chapterIndex });
+  if (!isLastChapter) {
+    go("learning-chapter", { moduleId, chapterIndex: chapterIndex + 1, sectionIndex: 0 }, false);
+  } else if (hasTest) {
+    go("learning-test-intro", { moduleId }, false);
+  } else {
+    go("learning-complete", { moduleId }, false);
+  }
+}
+
+function renderChapterQuiz(moduleId, chapterIndex, quizIndex) {
+  header("Learning");
+  const mod = findLearningModule(moduleId);
+  if (!mod) { go("learning-hub"); return; }
+  const chapters = moduleChapters(mod);
+  const chapter = chapters[chapterIndex];
+  if (!chapter) { go("learning-hub"); return; }
+  const quiz = chapter.quiz || [];
+  if (!quiz.length) { advanceAfterChapterQuiz(moduleId, chapterIndex); return; }
+  quizIndex = Math.max(0, Math.min(quizIndex, quiz.length - 1));
+  const item = quiz[quizIndex];
+
+  const kicker = document.createElement("p");
+  kicker.className = "chapter-kicker";
+  kicker.textContent = `${chapter.title} \u00b7 Chapter Quiz \u2014 ${quizIndex + 1} of ${quiz.length}`;
+  app.appendChild(kicker);
+
+  const dots = document.createElement("div");
+  dots.className = "dots-row";
+  dots.innerHTML = quiz.map((_, i) => `<div class="dot-seg ${i <= quizIndex ? "filled" : ""}"></div>`).join("");
+  app.appendChild(dots);
+
+  const onPass = () => {
+    if (quizIndex === quiz.length - 1) advanceAfterChapterQuiz(moduleId, chapterIndex);
+    else go("learning-chapter-quiz", { moduleId, chapterIndex, quizIndex: quizIndex + 1 }, false);
+  };
+
+  if (item.type === "mcq") renderChapterQuizMCQ(item, onPass);
+  else if (item.type === "sequence") renderChapterQuizSequence(item, onPass);
+  else if (item.type === "sort") renderChapterQuizSort(item, onPass);
+}
+
+function renderChapterQuizMCQ(item, onPass) {
+  const body = document.createElement("div");
+  body.className = "slide-body";
+  body.innerHTML = `
+    <h2 class="slide-title">${item.question}</h2>
+    <div data-role="cq-opts"></div>
+    <p class="quiz-feedback" data-role="cq-feedback" style="display:none"></p>
+  `;
+  const optsWrap = body.querySelector('[data-role="cq-opts"]');
+  const feedback = body.querySelector('[data-role="cq-feedback"]');
+  let solved = false;
+  item.options.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.className = "quiz-opt";
+    btn.textContent = opt;
+    btn.onclick = () => {
+      if (solved) return;
+      if (i === item.correctIndex) {
+        solved = true;
+        btn.classList.add("correct");
+        feedback.textContent = "Correct \u2014 nice.";
+        feedback.style.display = "block";
+        optsWrap.querySelectorAll(".quiz-opt").forEach(b => { b.style.opacity = b === btn ? "1" : "0.5"; });
+        showChapterQuizContinue(body, onPass);
+      } else {
+        btn.classList.add("picked-wrong");
+        feedback.textContent = "Not quite \u2014 give it another shot.";
+        feedback.style.display = "block";
+        setTimeout(() => btn.classList.remove("picked-wrong"), 500);
+      }
+    };
+    optsWrap.appendChild(btn);
+  });
+  app.appendChild(body);
+}
+
+function showChapterQuizContinue(container, onPass) {
+  const nav = document.createElement("div");
+  nav.className = "card-footer-nav";
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "footer-btn footer-btn-home";
+  nextBtn.style.width = "100%";
+  nextBtn.textContent = "Continue \u203a";
+  nextBtn.onclick = onPass;
+  nav.appendChild(nextBtn);
+  container.appendChild(nav);
+}
+
+function renderChapterQuizSequence(item, onPass) {
+  const body = document.createElement("div");
+  body.className = "slide-body";
+  body.innerHTML = `
+    <h2 class="slide-title">${item.prompt}</h2>
+    <p class="slide-text" style="margin-bottom:10px;">Tap each step in the correct order.</p>
+    <div class="seq-slots" data-role="seq-slots"></div>
+    <div class="seq-pool" data-role="seq-pool"></div>
+    <p class="quiz-feedback" data-role="seq-feedback" style="display:none"></p>
+  `;
+  const slotsWrap = body.querySelector('[data-role="seq-slots"]');
+  const poolWrap = body.querySelector('[data-role="seq-pool"]');
+  const feedback = body.querySelector('[data-role="seq-feedback"]');
+
+  const total = item.items.length;
+  let placed = []; // ids in slot order
+
+  function renderSlots() {
+    slotsWrap.innerHTML = "";
+    for (let i = 0; i < total; i++) {
+      const slot = document.createElement("div");
+      slot.className = "seq-slot" + (placed[i] ? " filled" : "");
+      if (placed[i]) {
+        const label = item.items.find(it => it.id === placed[i]).label;
+        slot.innerHTML = `<span class="seq-slot-num">${i + 1}</span><span>${label}</span>`;
+        slot.onclick = () => { placed.splice(i, 1); renderSlots(); renderPool(); };
+      } else {
+        slot.innerHTML = `<span class="seq-slot-num">${i + 1}</span>`;
+      }
+      slotsWrap.appendChild(slot);
+    }
+  }
+  const poolOrder = shuffleArr(item.items);
+  function renderPool() {
+    poolWrap.innerHTML = "";
+    poolOrder.forEach(it => {
+      if (placed.includes(it.id)) return;
+      const chip = document.createElement("button");
+      chip.className = "seq-chip";
+      chip.textContent = it.label;
+      chip.onclick = () => {
+        if (placed.length >= total) return;
+        placed.push(it.id);
+        renderSlots();
+        renderPool();
+        if (placed.length === total) checkSequence();
+      };
+      poolWrap.appendChild(chip);
+    });
+  }
+  function checkSequence() {
+    const correct = placed.every((id, i) => id === item.correctOrder[i]);
+    if (correct) {
+      feedback.textContent = "That's the chain \u2014 correct.";
+      feedback.style.display = "block";
+      slotsWrap.querySelectorAll(".seq-slot").forEach(s => s.classList.add("correct"));
+      showChapterQuizContinue(body, onPass);
+    } else {
+      feedback.textContent = "Not quite the right order \u2014 resetting, give it another go.";
+      feedback.style.display = "block";
+      slotsWrap.querySelectorAll(".seq-slot").forEach(s => s.classList.add("wrong"));
+      setTimeout(() => { placed = []; feedback.style.display = "none"; renderSlots(); renderPool(); }, 900);
+    }
+  }
+
+  renderSlots();
+  renderPool();
+  app.appendChild(body);
+}
+
+function renderChapterQuizSort(item, onPass) {
+  const body = document.createElement("div");
+  body.className = "slide-body";
+  body.innerHTML = `
+    <h2 class="slide-title">${item.prompt}</h2>
+    <p class="testme-counter" data-role="sort-counter"></p>
+    <div class="asort-bins">
+      <div class="asort-bin">
+        <p class="asort-bin-header">${item.groupALabel}</p>
+        <div class="asort-well" data-bin="a"><div class="asort-count">0</div></div>
+      </div>
+      <div class="asort-bin">
+        <p class="asort-bin-header">${item.groupBLabel}</p>
+        <div class="asort-well" data-bin="b"><div class="asort-count">0</div></div>
+      </div>
+    </div>
+    <div data-role="sort-deck"></div>
+    <p class="quiz-feedback" data-role="sort-feedback" style="display:none"></p>
+  `;
+  app.appendChild(body);
+
+  const counter = body.querySelector('[data-role="sort-counter"]');
+  const binA = body.querySelector('[data-bin="a"]');
+  const binB = body.querySelector('[data-bin="b"]');
+  const countA = binA.querySelector(".asort-count");
+  const countB = binB.querySelector(".asort-count");
+  const deckZone = body.querySelector('[data-role="sort-deck"]');
+  const feedback = body.querySelector('[data-role="sort-feedback"]');
+
+  let queue = shuffleArr(item.chips);
+  let deckIndex = 0;
+  const results = {}; // id -> "a"|"b"
+
+  function renderBin(bin, groupKey) {
+    bin.querySelectorAll(".asort-placed").forEach(e => e.remove());
+    queue.forEach(chip => {
+      if (results[chip.id] !== groupKey) return;
+      const el = document.createElement("div");
+      el.className = "asort-placed";
+      const isCorrect = chip.group === groupKey;
+      el.classList.add(isCorrect ? "correct" : "wrong");
+      el.innerHTML = `<span class="asort-badge">${isCorrect ? "&#10003;" : "&#10005;"}</span>${chip.label}`;
+      bin.appendChild(el);
+    });
+  }
+
+  function spawnCard() {
+    deckZone.innerHTML = "";
+    counter.textContent = (queue.length - deckIndex) + " of " + queue.length + " left";
+    if (deckIndex >= queue.length) { finishPass(); return; }
+    const chip = queue[deckIndex];
+    const card = document.createElement("div");
+    card.className = "asort-active";
+    card.innerHTML = `<p class="asort-active-name">${chip.label}</p>`;
+    const row = document.createElement("div");
+    row.className = "asort-fallback-row";
+    const btnA = document.createElement("button");
+    btnA.className = "asort-fallback-btn";
+    btnA.textContent = "\u2190 " + item.groupALabel;
+    btnA.onclick = () => place("a");
+    const btnB = document.createElement("button");
+    btnB.className = "asort-fallback-btn";
+    btnB.textContent = item.groupBLabel + " \u2192";
+    btnB.onclick = () => place("b");
+    row.appendChild(btnA);
+    row.appendChild(btnB);
+    deckZone.appendChild(card);
+    deckZone.appendChild(row);
+
+    function place(groupKey) {
+      results[chip.id] = groupKey;
+      deckIndex++;
+      renderBin(binA, "a");
+      renderBin(binB, "b");
+      countA.textContent = Object.values(results).filter(v => v === "a").length;
+      countB.textContent = Object.values(results).filter(v => v === "b").length;
+      spawnCard();
+    }
+  }
+
+  function finishPass() {
+    const wrong = queue.filter(chip => results[chip.id] !== chip.group);
+    if (!wrong.length) {
+      feedback.textContent = "All sorted correctly.";
+      feedback.style.display = "block";
+      showChapterQuizContinue(body, onPass);
+    } else {
+      feedback.textContent = `${wrong.length} to fix \u2014 here they come again.`;
+      feedback.style.display = "block";
+      setTimeout(() => {
+        queue = shuffleArr(wrong);
+        deckIndex = 0;
+        wrong.forEach(chip => { delete results[chip.id]; });
+        renderBin(binA, "a"); renderBin(binB, "b");
+        countA.textContent = "0"; countB.textContent = "0";
+        feedback.style.display = "none";
+        spawnCard();
+      }, 1100);
+    }
+  }
+
+  spawnCard();
+}
+
 function renderLearningTestIntro(moduleId) {
   header("Learning");
   const mod = findLearningModule(moduleId);
@@ -3473,22 +3841,43 @@ function renderLearningTestIntro(moduleId) {
   const test = mod.test || [];
   if (!test.length) { go("learning-complete", { moduleId }, false); return; }
 
-  const p = getLearningProgress()[mod.id];
-  const testStarted = p && p.testFurthest > -1;
-
+  const lock = finalTestLockStatus(moduleId);
   const wrap = document.createElement("div");
   wrap.className = "intro-wrap";
+
+  if (lock.locked) {
+    wrap.innerHTML = `
+      <p class="intro-eyebrow">${mod.category} \u00b7 Final Test</p>
+      <h1 class="intro-title">Locked for a Bit</h1>
+      <p class="slide-text">Two attempts didn't clear 100% on this one. Take ${formatMmSs(lock.remainingMs)} to read back through the chapters \u2014 the test unlocks again after that.</p>
+      <button class="btn-start" data-role="reread-btn">Review the Lessons</button>
+      <button class="footer-btn" data-role="refresh-btn" style="margin-top:8px;">Check Again</button>
+    `;
+    wrap.querySelector('[data-role="reread-btn"]').onclick = () => go("learning-chapter", { moduleId, chapterIndex: 0, sectionIndex: 0 }, false);
+    wrap.querySelector('[data-role="refresh-btn"]').onclick = () => go("learning-test-intro", { moduleId }, false);
+    app.appendChild(wrap);
+    return;
+  }
+
+  const attemptsUsed = lock.state.attemptsUsed || 0;
+  const attemptsLeftLine = attemptsUsed === 0
+    ? `${test.length} question${test.length === 1 ? "" : "s"} \u2014 you need every one right to pass.`
+    : `You need 100% to pass. This is your last attempt before a 10-minute cooldown.`;
+
   wrap.innerHTML = `
-    <p class="intro-eyebrow">${mod.category} \u00b7 Knowledge Check</p>
+    <p class="intro-eyebrow">${mod.category} \u00b7 Final Test</p>
     <h1 class="intro-title">Ready for the Test?</h1>
-    <p class="slide-text">You've finished every chapter of ${mod.title}. Answer ${test.length} question${test.length === 1 ? "" : "s"} to complete the module.</p>
+    <p class="slide-text">You've finished every chapter of ${mod.title}. ${attemptsLeftLine}</p>
     <div class="intro-meta-row">
       <div class="intro-meta"><b>${test.length}</b><span>Questions</span></div>
+      <div class="intro-meta"><b>100%</b><span>To Pass</span></div>
     </div>
-    <button class="btn-start">${testStarted ? "Resume Test" : "Start Test"}</button>
+    <button class="btn-start">Start Test</button>
   `;
-  const startIndex = testStarted ? Math.min(p.testFurthest + 1, test.length - 1) : 0;
-  wrap.querySelector(".btn-start").onclick = () => go("learning-test", { moduleId, index: startIndex }, false);
+  wrap.querySelector(".btn-start").onclick = () => {
+    clearFinalTestAnswers(moduleId);
+    go("learning-test", { moduleId, index: 0 }, false);
+  };
   app.appendChild(wrap);
 }
 
@@ -3498,17 +3887,22 @@ function renderLearningTest(moduleId, index) {
   if (!mod) { go("learning-hub"); return; }
   const test = mod.test || [];
   if (!test.length) { go("learning-complete", { moduleId }, false); return; }
+
+  const lock = finalTestLockStatus(moduleId);
+  if (lock.locked) { go("learning-test-intro", { moduleId }, false); return; }
+
   index = Math.max(0, Math.min(index, test.length - 1));
   const q = test[index];
+  const answers = getFinalTestAnswers(moduleId);
 
   const testKicker = document.createElement("p");
   testKicker.className = "chapter-kicker";
-  testKicker.textContent = "Knowledge Check";
+  testKicker.textContent = "Final Test \u2014 100% required";
   app.appendChild(testKicker);
 
   const dots = document.createElement("div");
   dots.className = "dots-row";
-  dots.innerHTML = test.map((_, i) => `<div class="dot-seg ${i <= index ? "filled" : ""}"></div>`).join("");
+  dots.innerHTML = test.map((_, i) => `<div class="dot-seg ${i <= index ? "filled" : ""} ${answers[i] !== undefined ? "answered" : ""}"></div>`).join("");
   app.appendChild(dots);
 
   const body = document.createElement("div");
@@ -3518,28 +3912,22 @@ function renderLearningTest(moduleId, index) {
     <p class="slide-kicker">${kicker}</p>
     <h2 class="slide-title">${q.question}</h2>
     <div data-role="quiz-opts"></div>
-    <p class="quiz-feedback" data-role="quiz-feedback" style="display:none"></p>
   `;
   const optsWrap = body.querySelector('[data-role="quiz-opts"]');
+  let chosen = answers[index] !== undefined ? answers[index] : null;
   q.options.forEach((opt, i) => {
     const btn = document.createElement("button");
-    btn.className = "quiz-opt";
+    btn.className = "quiz-opt" + (chosen === i ? " selected" : "");
     btn.textContent = opt;
     btn.onclick = () => {
-      const feedback = body.querySelector('[data-role="quiz-feedback"]');
-      optsWrap.querySelectorAll(".quiz-opt").forEach((b, bi) => {
-        b.onclick = null;
-        if (bi === q.correctIndex) b.classList.add("correct");
-        else if (bi === i) b.classList.add("picked-wrong");
-      });
-      feedback.textContent = i === q.correctIndex ? "Correct" : "Not quite \u2014 correct answer highlighted above";
-      feedback.style.display = "block";
+      chosen = i;
+      setFinalTestAnswer(moduleId, index, i);
+      optsWrap.querySelectorAll(".quiz-opt").forEach((b, bi) => b.classList.toggle("selected", bi === i));
+      nextBtn.disabled = false;
     };
     optsWrap.appendChild(btn);
   });
   app.appendChild(body);
-
-  setTestFurthest(moduleId, index);
 
   const isLast = index === test.length - 1;
   const nav = document.createElement("div");
@@ -3551,13 +3939,72 @@ function renderLearningTest(moduleId, index) {
   else prevBtn.onclick = () => go("learning-test", { moduleId, index: index - 1 }, false);
   const nextBtn = document.createElement("button");
   nextBtn.className = "footer-btn footer-btn-home";
-  nextBtn.textContent = isLast ? "Finish \u203a" : "Next \u203a";
+  nextBtn.textContent = isLast ? "Submit Test" : "Next \u203a";
+  nextBtn.disabled = chosen === null;
   nextBtn.onclick = () => {
-    if (isLast) go("learning-complete", { moduleId }, false);
-    else go("learning-test", { moduleId, index: index + 1 }, false);
+    if (chosen === null) return;
+    if (isLast) {
+      const finalAnswers = getFinalTestAnswers(moduleId);
+      const correctCount = test.reduce((sum, tq, i) => sum + (finalAnswers[i] === tq.correctIndex ? 1 : 0), 0);
+      const passed = correctCount === test.length;
+      if (passed) recordFinalTestPass(moduleId);
+      else recordFinalTestFailure(moduleId);
+      go("learning-test-result", { moduleId, correctCount, total: test.length, passed }, false);
+    } else {
+      go("learning-test", { moduleId, index: index + 1 }, false);
+    }
   };
   nav.appendChild(prevBtn);
   nav.appendChild(nextBtn);
+  app.appendChild(nav);
+}
+
+function renderLearningTestResult(moduleId, correctCount, total, passed) {
+  header("Learning");
+  const mod = findLearningModule(moduleId);
+  if (!mod) { go("learning-hub"); return; }
+
+  if (passed) { go("learning-complete", { moduleId }, false); return; }
+
+  const lock = finalTestLockStatus(moduleId);
+  const wrap = document.createElement("div");
+  wrap.className = "complete-wrap";
+
+  if (lock.locked) {
+    wrap.innerHTML = `
+      <div class="complete-badge" style="background:var(--sumi-900); color:var(--error-500);">&#10005;</div>
+      <h2 class="complete-title">${correctCount} of ${total} \u2014 Not Yet</h2>
+      <p class="complete-sub">That was your second attempt without a perfect score. Take ${formatMmSs(lock.remainingMs)} to go back through the chapters before trying again.</p>
+    `;
+  } else {
+    wrap.innerHTML = `
+      <div class="complete-badge" style="background:var(--sumi-900); color:var(--error-500);">&#10005;</div>
+      <h2 class="complete-title">${correctCount} of ${total} \u2014 Not Yet</h2>
+      <p class="complete-sub">You need every question right to pass. Give it one more shot.</p>
+    `;
+  }
+  app.appendChild(wrap);
+
+  const nav = document.createElement("div");
+  nav.className = "card-footer-nav";
+  const hubBtn = document.createElement("button");
+  hubBtn.className = "footer-btn";
+  hubBtn.textContent = "Learning Hub";
+  hubBtn.onclick = () => go("learning-hub");
+  nav.appendChild(hubBtn);
+  if (!lock.locked) {
+    const retryBtn = document.createElement("button");
+    retryBtn.className = "footer-btn footer-btn-home";
+    retryBtn.textContent = "Try Again";
+    retryBtn.onclick = () => go("learning-test-intro", { moduleId });
+    nav.appendChild(retryBtn);
+  } else {
+    const reviewBtn = document.createElement("button");
+    reviewBtn.className = "footer-btn footer-btn-home";
+    reviewBtn.textContent = "Review the Lessons";
+    reviewBtn.onclick = () => go("learning-chapter", { moduleId, chapterIndex: 0, sectionIndex: 0 });
+    nav.appendChild(reviewBtn);
+  }
   app.appendChild(nav);
 }
 

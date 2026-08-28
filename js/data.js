@@ -5949,9 +5949,9 @@ const LEARNING_MODULES = [
           },
           {
             type: "text",
-            title: "Proof, Simplified",
-            body: "Proof shows up three times: distillation proof, barrel entry proof, and bottled proof. You don't need the math \u2014 just the guest-facing takeaway: higher proof isn't \"better,\" it's more intense.",
-            note: null
+            title: "Proof: What It Actually Means",
+            body: "Proof is double the alcohol percentage (ABV) \u2014 100 proof means 50% alcohol. It shows up three times along the chain, and each one does a different job: distillation proof is how concentrated the spirit is right off the still (lower keeps more grain character, higher scrubs it away for something cleaner and lighter); barrel entry proof is its strength going into the barrel (lower lets the wood extract flavor faster, higher leans more on the raw spirit); bottled proof is what's actually in the glass, usually cut down with water from a higher barrel-strength number.",
+            note: "Guest-facing takeaway: higher proof isn't \"better\" \u2014 it's more intense. Two whiskeys from the same distillery, same mash bill, can taste completely different purely from these three numbers. (Bottled-in-Bond, if a guest asks, is a real legal spec: exactly 100 proof.)"
           },
           {
             type: "text",
@@ -5970,6 +5970,47 @@ const LEARNING_MODULES = [
             title: "Whiskey Categories at a Glance",
             body: "Bourbon, rye, wheat whiskey, corn whiskey, Tennessee whiskey \u2014 all American whiskey, all built on the same chain, all separated mainly by mash bill and a few production rules. Bourbon and rye are the two we're zooming in on.",
             note: "Quick Check: what single ingredient decision has the biggest impact on a whiskey's flavor? \u2014 the mash bill (grain recipe)."
+          }
+        ],
+        quiz: [
+          {
+            type: "sequence",
+            prompt: "Put the whiskey chain in order.",
+            items: [
+              { id: "grain", label: "Grain" },
+              { id: "ferment", label: "Fermentation" },
+              { id: "distill", label: "Distillation" },
+              { id: "age", label: "Barrel Aging" },
+              { id: "bottle", label: "Bottling" }
+            ],
+            correctOrder: ["grain", "ferment", "distill", "age", "bottle"]
+          },
+          {
+            type: "sort",
+            prompt: "Sort each ingredient: is it actually used in a whiskey mash bill?",
+            groupALabel: "Used in Whiskey",
+            groupBLabel: "Not Used",
+            chips: [
+              { id: "corn", label: "Corn", group: "a" },
+              { id: "rye", label: "Rye Grain", group: "a" },
+              { id: "wheat", label: "Wheat", group: "a" },
+              { id: "barley", label: "Malted Barley", group: "a" },
+              { id: "hops", label: "Hops", group: "b" },
+              { id: "sugarcane", label: "Sugar Cane", group: "b" },
+              { id: "oats", label: "Oats", group: "b" }
+            ]
+          },
+          {
+            type: "mcq",
+            question: "A whiskey bottled at 100 proof is what percent alcohol?",
+            options: ["25%", "50%", "75%", "100%"],
+            correctIndex: 1
+          },
+          {
+            type: "mcq",
+            question: "A lower barrel entry proof generally means the wood extracts flavor...",
+            options: ["Faster", "Slower", "Not at all", "Only after 10 years"],
+            correctIndex: 0
           }
         ]
       },
@@ -6006,6 +6047,44 @@ const LEARNING_MODULES = [
             body: "Kentucky is bourbon's cultural home, not a legal requirement. Good talking point for the floor: bourbon can legally be made anywhere in the U.S.",
             note: "Quick Check: does bourbon have to be made in Kentucky? \u2014 No, it's tradition, not law."
           }
+        ],
+        quiz: [
+          {
+            type: "sort",
+            prompt: "Real bourbon rule, or myth?",
+            groupALabel: "Real Rule",
+            groupBLabel: "Myth",
+            chips: [
+              { id: "corn51", label: "At least 51% corn", group: "a" },
+              { id: "newoak", label: "Aged in new charred oak", group: "a" },
+              { id: "under160", label: "Distilled under 160 proof", group: "a" },
+              { id: "kentucky", label: "Must be made in Kentucky", group: "b" },
+              { id: "agestmt", label: "Must carry an age statement", group: "b" },
+              { id: "anyoak", label: "Can use any oak, new or used", group: "b" }
+            ]
+          },
+          {
+            type: "mcq",
+            question: "What does \"straight bourbon\" guarantee?",
+            options: [
+              "It was made in Kentucky",
+              "Aged at least 2 years, no coloring or flavoring added",
+              "It's 100% corn",
+              "It costs more than standard bourbon"
+            ],
+            correctIndex: 1
+          },
+          {
+            type: "mcq",
+            question: "Which flavors come mainly from corn in the mash bill?",
+            options: [
+              "Black pepper and dill",
+              "Sweetness and roundness",
+              "Smoke and peat",
+              "Citrus and salinity"
+            ],
+            correctIndex: 1
+          }
         ]
       },
       {
@@ -6041,6 +6120,38 @@ const LEARNING_MODULES = [
             body: "WhistlePig's entire lineup lives on the rye spectrum \u2014 from a lighter rye blend to a near-100% rye. Next module, we go bottle by bottle.",
             note: null
           }
+        ],
+        quiz: [
+          {
+            type: "sequence",
+            prompt: "Order these from lowest to highest rye content.",
+            items: [
+              { id: "low", label: "Low-Rye (~51%)" },
+              { id: "mid", label: "High-Rye Blend" },
+              { id: "high", label: "Near-100% Rye" }
+            ],
+            correctOrder: ["low", "mid", "high"]
+          },
+          {
+            type: "sort",
+            prompt: "Sort each tasting note: rye or bourbon?",
+            groupALabel: "Rye",
+            groupBLabel: "Bourbon",
+            chips: [
+              { id: "pepper", label: "Black pepper", group: "a" },
+              { id: "dill", label: "Dill / herbal", group: "a" },
+              { id: "dryspicy", label: "Dry & spicy", group: "a" },
+              { id: "vanilla", label: "Vanilla & caramel", group: "b" },
+              { id: "brownsugar", label: "Brown sugar sweetness", group: "b" },
+              { id: "round", label: "Round & sweet", group: "b" }
+            ]
+          },
+          {
+            type: "mcq",
+            question: "Which came first in American whiskey history?",
+            options: ["Bourbon", "Rye", "They arrived at the same time", "Neither predates Prohibition"],
+            correctIndex: 1
+          }
         ]
       }
     ],
@@ -6056,6 +6167,41 @@ const LEARNING_MODULES = [
         correctIndex: 1
       },
       {
+        question: "What is the correct order of the whiskey chain?",
+        options: [
+          "Grain \u2192 Distillation \u2192 Fermentation \u2192 Barrel Aging \u2192 Bottling",
+          "Grain \u2192 Fermentation \u2192 Distillation \u2192 Barrel Aging \u2192 Bottling",
+          "Fermentation \u2192 Grain \u2192 Distillation \u2192 Bottling \u2192 Barrel Aging",
+          "Grain \u2192 Barrel Aging \u2192 Fermentation \u2192 Distillation \u2192 Bottling"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "A whiskey bottled at 100 proof is what percent alcohol?",
+        options: ["25%", "50%", "75%", "100%"],
+        correctIndex: 1
+      },
+      {
+        question: "What does an age statement like \"10 Year\" guarantee?",
+        options: [
+          "The average age of all whiskey in the bottle",
+          "The youngest whiskey in the bottle is at least that old",
+          "The whiskey was bottled exactly 10 years after distillation",
+          "The barrel itself is 10 years old"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Which flavors come mainly from the barrel, not the grain?",
+        options: ["Black pepper and dill", "Vanilla, caramel, and baking spice", "Citrus and salinity", "Smoke and peat"],
+        correctIndex: 1
+      },
+      {
+        question: "What is bourbon's minimum corn requirement?",
+        options: ["25%", "51%", "75%", "100%"],
+        correctIndex: 1
+      },
+      {
         question: "Does bourbon have to be made in Kentucky?",
         options: [
           "Yes, it's a legal requirement",
@@ -6064,6 +6210,31 @@ const LEARNING_MODULES = [
           "Only for exports"
         ],
         correctIndex: 2
+      },
+      {
+        question: "What does \"straight bourbon\" guarantee?",
+        options: [
+          "It was made in Kentucky",
+          "Aged at least 2 years, no coloring or flavoring added",
+          "It's 100% corn",
+          "It costs more"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "What must bourbon be aged in?",
+        options: ["Any oak barrel", "New, charred oak barrels", "Used bourbon barrels only", "Stainless steel"],
+        correctIndex: 1
+      },
+      {
+        question: "What is rye whiskey's minimum rye grain requirement?",
+        options: ["25%", "51%", "75%", "100%"],
+        correctIndex: 1
+      },
+      {
+        question: "Which whiskey is historically older in America?",
+        options: ["Bourbon", "Rye", "They emerged together", "Neither predates Prohibition"],
+        correctIndex: 1
       },
       {
         question: "Compared to bourbon, what should you expect from a high-rye whiskey?",

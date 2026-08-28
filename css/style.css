@@ -841,7 +841,22 @@ button, input {
 .quiz-opt { display: block; width: 100%; text-align: left; background: var(--washi-200); border: 2px solid var(--washi-300); color: var(--shoyu-700); font-size: 14px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer; font-family: var(--font-body); }
 .quiz-opt.correct { border-color: var(--wasabi-500); }
 .quiz-opt.picked-wrong { border-color: var(--error-500); }
+.quiz-opt.selected { border-color: var(--bronze-500); background: var(--sumi-700); }
 .quiz-feedback { font-family: var(--font-mono); font-size: 11px; color: var(--wasabi-500); text-transform: uppercase; letter-spacing: 0.4px; margin-top: 6px; }
+.dot-seg.answered { background: var(--bronze-200); }
+
+/* Chapter mini-games: tap-to-order sequence */
+.seq-slots { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.seq-slot { border: 2px dashed var(--washi-300); background: var(--sumi-900); min-height: 40px; padding: 8px 12px; display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--shoyu-500); cursor: pointer; }
+.seq-slot.filled { border-style: solid; background: var(--washi-200); color: var(--shoyu-700); }
+.seq-slot.correct { border-color: var(--wasabi-500); }
+.seq-slot.wrong { border-color: var(--error-500); }
+.seq-slot-num { font-family: var(--font-mono); font-size: 11px; color: var(--bronze-200); min-width: 14px; }
+.seq-pool { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.seq-chip { background: var(--washi-200); border: 2px solid var(--washi-300); color: var(--shoyu-700); font-size: 13px; padding: 9px 12px; cursor: pointer; font-family: var(--font-body); }
+
+/* Chapter mini-games: tap-sort deck (mirrors .asort-* used by Allergy Sort) */
+.asort-active-name { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--shoyu-700); margin: 0 0 10px; text-align: center; }
 
 /* Completion screen — reuses .milestone-strip for the celebration line */
 .complete-wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 14px; }

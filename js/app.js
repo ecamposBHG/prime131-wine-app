@@ -289,7 +289,7 @@ function render() {
   else if (current.view === "learning-pretest-video") renderLearningPreTestVideo(current.params.moduleId);
   else if (current.view === "learning-test-intro") renderLearningTestIntro(current.params.moduleId);
   else if (current.view === "learning-test") renderLearningTest(current.params.moduleId, current.params.index);
-  else if (current.view === "learning-test-result") renderLearningTestResult(current.params.moduleId, current.params.correctCount, current.params.total, current.params.passed);
+  else if (current.view === "learning-test-result") renderLearningTestResult(current.params.moduleId, current.params.correctCount, current.params.total, current.params.passed, current.params.wrongIndices);
   else if (current.view === "learning-complete") renderLearningComplete(current.params.moduleId);
   makeDivsKeyboardAccessible();
   window.scrollTo(0, 0);
@@ -3978,11 +3978,13 @@ function renderLearningTest(moduleId, index) {
     if (chosen === null) return;
     if (isLast) {
       const finalAnswers = getFinalTestAnswers(moduleId);
-      const correctCount = test.reduce((sum, tq, i) => sum + (finalAnswers[i] === tq.correctIndex ? 1 : 0), 0);
-      const passed = correctCount === test.length;
+      const wrongIndices = [];
+      test.forEach((tq, i) => { if (finalAnswers[i] !== tq.correctIndex) wrongIndices.push(i); });
+      const correctCount = test.length - wrongIndices.length;
+      const passed = wrongIndices.length === 0;
       if (passed) recordFinalTestPass(moduleId);
       else recordFinalTestFailure(moduleId);
-      go("learning-test-result", { moduleId, correctCount, total: test.length, passed }, false);
+      go("learning-test-result", { moduleId, correctCount, total: test.length, passed, wrongIndices }, false);
     } else {
       go("learning-test", { moduleId, index: index + 1 }, false);
     }
@@ -3992,28 +3994,54 @@ function renderLearningTest(moduleId, index) {
   app.appendChild(nav);
 }
 
-function renderLearningTestResult(moduleId, correctCount, total, passed) {
+function renderLearningTestResult(moduleId, correctCount, total, passed, wrongIndices) {
   header("Learning");
   const mod = findLearningModule(moduleId);
   if (!mod) { go("learning-hub"); return; }
+  wrongIndices = wrongIndices || [];
 
-  if (passed) { go("learning-complete", { moduleId }, false); return; }
-
-  const lock = finalTestLockStatus(moduleId);
   const wrap = document.createElement("div");
   wrap.className = "complete-wrap";
+
+  if (passed) {
+    wrap.innerHTML = `
+      <div class="complete-badge">&#127881;</div>
+      <h2 class="complete-title">Congratulations!</h2>
+      <p class="complete-sub">${correctCount} of ${total} \u2014 perfect score.</p>
+    `;
+    app.appendChild(wrap);
+
+    const nav = document.createElement("div");
+    nav.className = "card-footer-nav";
+    const continueBtn = document.createElement("button");
+    continueBtn.className = "footer-btn footer-btn-home";
+    continueBtn.style.width = "100%";
+    continueBtn.textContent = "Continue \u203a";
+    continueBtn.onclick = () => go("learning-complete", { moduleId }, false);
+    nav.appendChild(continueBtn);
+    app.appendChild(nav);
+    return;
+  }
+
+  const lock = finalTestLockStatus(moduleId);
+  const test = mod.test || [];
+  const missedList = wrongIndices.map(i => `<li>Question ${i + 1}: ${test[i] ? test[i].question : ""}</li>`).join("");
 
   if (lock.locked) {
     wrap.innerHTML = `
       <div class="complete-badge" style="background:var(--sumi-900); color:var(--error-500);">&#10005;</div>
       <h2 class="complete-title">${correctCount} of ${total} \u2014 Not Yet</h2>
       <p class="complete-sub">That was your second attempt without a perfect score. Take ${formatMmSs(lock.remainingMs)} to go back through the chapters before trying again.</p>
+      <p class="slide-text" style="text-align:left; margin-top:10px;">You missed:</p>
+      <ul class="missed-list">${missedList}</ul>
     `;
   } else {
     wrap.innerHTML = `
       <div class="complete-badge" style="background:var(--sumi-900); color:var(--error-500);">&#10005;</div>
       <h2 class="complete-title">${correctCount} of ${total} \u2014 Not Yet</h2>
       <p class="complete-sub">You need every question right to pass. Give it one more shot.</p>
+      <p class="slide-text" style="text-align:left; margin-top:10px;">You missed:</p>
+      <ul class="missed-list">${missedList}</ul>
     `;
   }
   app.appendChild(wrap);

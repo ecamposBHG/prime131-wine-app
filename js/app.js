@@ -3907,8 +3907,12 @@ function renderLearningTestIntro(moduleId) {
     </div>
     <button class="btn-start">Start Test</button>
   `;
-  wrap.querySelector(".btn-start").onclick = () => {
+     wrap.querySelector(".btn-start").onclick = () => {
     clearFinalTestAnswers(moduleId);
+    // Analytics: any new/alternate test-flow function (different pass
+    // threshold, different UI) must carry this same track() call, with
+    // the matching learning_test_complete call at its own pass/fail point.
+    ChiriusAnalytics.track('learning_test_start', { module_id: moduleId, attempt_number: attemptsUsed + 1 });
     go("learning-test", { moduleId, index: 0 }, false);
   };
   app.appendChild(wrap);
@@ -3981,9 +3985,23 @@ function renderLearningTest(moduleId, index) {
       const wrongIndices = [];
       test.forEach((tq, i) => { if (finalAnswers[i] !== tq.correctIndex) wrongIndices.push(i); });
       const correctCount = test.length - wrongIndices.length;
-      const passed = wrongIndices.length === 0;
-      if (passed) recordFinalTestPass(moduleId);
-      else recordFinalTestFailure(moduleId);
+            const passed = wrongIndices.length === 0;
+      if (passed) {
+        recordFinalTestPass(moduleId);
+      } else {
+        recordFinalTestFailure(moduleId);
+      }
+            const stateAfter = getFinalTestState(moduleId);
+      // Analytics: see note at learning_test_start above -- any alternate
+      // test-flow function needs this same call at its pass/fail point.
+      ChiriusAnalytics.track('learning_test_complete', {
+        module_id: moduleId,
+        passed,
+        correct_count: correctCount,
+        total: test.length,
+        attempts_used: stateAfter.attemptsUsed || 0,
+        locked_out: !!stateAfter.lockedUntil
+      });
       go("learning-test-result", { moduleId, correctCount, total: test.length, passed, wrongIndices }, false);
     } else {
       go("learning-test", { moduleId, index: index + 1 }, false);

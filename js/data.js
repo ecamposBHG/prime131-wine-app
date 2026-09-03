@@ -729,6 +729,22 @@ const COCKTAILS = [
     garnish: "Three Gold Dusted Espresso Beans",
     directions: "Combine all ingredients into a shaker tin. Shake with ice and strain into a coupe glass. Garnish and serve.",
     prep: "Vanilla Bean Patr\u00f3n: drop 2 split vanilla pods into a Patr\u00f3n Reposado bottle to infuse on the backbar; keep at least 2 infused bottles on hand. Espresso Martini Mix: dissolve 1 can (94g) Illy Instant Classico into 40 oz warm water, add 24 oz Maven Cold Brew and 1 bottle (33.8 oz) Sweetbird Vanilla Syrup, stir. Label, date, chill. Yields 64 oz.", funFact: "Patrón Reposado rests in oak for several months before bottling, giving it a rounder character than blanco tequila — an unusual espresso martini base in place of vodka.", bestFor: "Dessert-course energy — a coffee lover who wants their after-dinner drink to double as dessert."
+  },
+  {
+    id: "c13", name: "Pumpkin Spice Margarita", glassware: "Double Rocks Glass", method: "Shake & Strain", category: "house",
+    flavorTags: ["Pumpkin", "Cinnamon", "Citrus", "Agave"],
+    ingredients: ["1.5 oz Espol\u00f2n Blanco Tequila", "0.5 oz Cointreau Orange Liqueur", "1.5 oz Berg House Pumpkin Puree", "0.75 oz Finest Call Single Pressed Lime Juice", "1 Dash Angostura Bitters"],
+    garnish: "Cinnamon Sugar Half Rim, Lime Wedge, Cinnamon Stick (Optional)",
+    directions: "Combine all ingredients in a mixing glass with ice. Shake and strain into a double rocks glass. Garnish and serve.",
+    prep: "", funFact: "Espol\u00f3n takes its name from the Spanish word for a rooster's spur, a nod to the brand's national-pride imagery on the bottle.", bestFor: "A margarita drinker who wants a fall-seasonal twist without losing the tequila-forward, citrusy backbone."
+  },
+  {
+    id: "c14", name: "Pumpkin Sour", glassware: "Coupe", method: "Shake & Strain", category: "house",
+    flavorTags: ["Pumpkin", "Honey", "Bourbon", "Silky"],
+    ingredients: ["2 oz Garrison Brothers HoneyDew Bourbon", "1 oz Berg House Pumpkin Puree", "1 oz Finest Call Single Pressed Lemon Juice", "1 oz Egg White", "1 Dash Angostura Bitters"],
+    garnish: "",
+    directions: "Combine all ingredients in a cocktail shaker with ice. Shake and strain into a coupe glass. Garnish and serve.",
+    prep: "", funFact: "Garrison Brothers HoneyDew starts as the distillery's own Small Batch bourbon, infused with Texas wildflower honey-soaked oak cubes rather than a honey barrel.", bestFor: "A whiskey sour fan looking for a fall-seasonal, honey-and-spice take on the classic egg-white sour."
   }
 ];
 
@@ -3494,6 +3510,23 @@ const LIQUOR = [
     moment: "A guest curious about Texas bourbon specifically, or one who wants something richer and bolder than a standard Kentucky pour.",
     memory: "Texas Hill Country wheated bourbon, corn-to-cork in Hye — the heat ages it fast, so it drinks older and darker than its years.",
     arsenal: "This isn't sourced whiskey with a Texas label — Garrison Brothers grows, distills, and bottles every drop in Hye."
+  },
+  {
+    id: "lq138", name: "Garrison Brothers HoneyDew", category: "Whiskey", subcategory: "American Whiskey — Other States",
+    producer: "Garrison Brothers Distillery", region: "Hye, Texas, USA",
+    mashBill: "Starts as Garrison Brothers' wheated Small Batch bourbon (#1 food-grade corn, soft red winter wheat, two-row malted barley), then infused with cubes cut from spent bourbon barrels and soaked in Burleson's Texas wildflower honey",
+    abv: 40, ageStatement: "Base bourbon aged a minimum of four years in new American white oak before honey infusion",
+    flavorTags: ["Wildflower Honey", "Elderberry", "Peach", "Toasted Oak"],
+    structure: { sweetness: 5, smoke: 1, spice: 2, body: 3, finish: 4 },
+    guestDescription: "A honey-forward riff on Garrison Brothers' Texas Hill Country bourbon — elderberry syrup, ripe peach and apricot, and Texas wildflower honey layered over the base bourbon's caramel and toasted oak, with a lingering warm finish.",
+    sellingPoints: ["Built on Garrison Brothers' actual Small Batch bourbon, not a neutral base with honey flavoring added", "Infused by soaking spent-barrel oak cubes in Burleson's Texas wildflower honey rather than using a honey barrel directly", "Bottled at a gentler 80 proof, making it an easier on-ramp for guests who find standard bourbon too hot"],
+    distillingNote: "Master Distiller Donnis Todd's team cuts cubes from Garrison Brothers' own spent bourbon barrels, soaks them in Burleson's Texas wildflower honey, then steeps the cubes in a stainless steel tank of Small Batch bourbon for roughly seven months before bottling.",
+    funFact: "Rather than aging in a barrel that once held honey, Garrison Brothers infuses HoneyDew by steeping honey-soaked oak cubes directly in the finished bourbon for about seven months.",
+    funFact2: "HoneyDew was awarded 99 points and Best Small Batch at the 2020 Sunset International Spirits Competition.",
+    shortStory: "Garrison Brothers, opened in 2006 in Hye, Texas, built its reputation on grain-to-glass Hill Country bourbon. HoneyDew takes that same Small Batch bourbon and layers in local wildflower honey character through an oak-cube infusion, rather than starting from scratch with a different mash bill.",
+    moment: "A guest who wants a sweeter, dessert-leaning bourbon pour rather than a classic straight bourbon.",
+    memory: "Garrison Brothers' Small Batch bourbon infused with Texas wildflower honey-soaked oak cubes — sweeter and rounder than the base bourbon, with elderberry and peach notes.",
+    arsenal: "This isn't a honey liqueur — it's Garrison Brothers' real Small Batch bourbon, infused with honey-soaked oak cubes rather than flavoring."
   },
   {
     id: "lq4", name: "High West", price: 14, category: "Whiskey", subcategory: "American Whiskey — Other States", allocation: true,

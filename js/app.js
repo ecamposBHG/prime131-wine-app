@@ -188,6 +188,42 @@ function similarBottlePour(wine) {
   return sameStyle[0];
 }
 
+// Liquor "similar pour" is derived entirely from real menu fields --
+// category, subcategory, and the five-axis structure rating every LIQUOR
+// entry already carries. Nothing is invented: the candidate pool is
+// narrowed to the same subcategory (falling back to the same category if
+// a subcategory ever has no siblings), and among that pool the bottle
+// whose structure profile is numerically closest wins. Same discipline as
+// similarPour/similarBottlePour above, just with a real tie-breaker
+// instead of "first match in array order" since liquor structure data is
+// fully populated across the list.
+function similarLiquorPour(liquor) {
+  let pool = liquor.subcategory
+    ? LIQUOR.filter(l => l.category === liquor.category && l.subcategory === liquor.subcategory && l.id !== liquor.id)
+    : [];
+  if (!pool.length) pool = LIQUOR.filter(l => l.category === liquor.category && l.id !== liquor.id);
+  if (!pool.length) return null;
+  if (!liquor.structure) return pool[0];
+
+  const keys = ["sweetness", "smoke", "spice", "body", "finish"];
+  let best = null;
+  let bestDist = Infinity;
+  pool.forEach(candidate => {
+    if (!candidate.structure) return;
+    let dist = 0;
+    keys.forEach(k => {
+      const a = liquor.structure[k] || 0;
+      const b = candidate.structure[k] || 0;
+      dist += (a - b) * (a - b);
+    });
+    if (dist < bestDist) {
+      bestDist = dist;
+      best = candidate;
+    }
+  });
+  return best || pool[0];
+}
+
 const WSET_BANDS = {
   sweetness: ["Dry", "Off-Dry", "Medium-Dry", "Medium-Sweet", "Sweet"],
   acidity: ["Low", "Medium(-)", "Medium", "Medium(+)", "High"],
@@ -1213,9 +1249,9 @@ function liquorStructureBars(structure) {
   }).join("");
 }
 
-function buildLiquorFaceHTML(l, idx) {
+function buildLiquorFaceHTML(l, similar, idx) {
   const hasSellContent = l.guestDescription || (l.sellingPoints && l.sellingPoints.length) || l.arsenal;
-  const hasUnderstandContent = l.distillingNote || (l.flavorTags && l.flavorTags.length) || l.structure;
+  const hasUnderstandContent = l.distillingNote || (l.flavorTags && l.flavorTags.length) || l.structure || similar;
   const hasKnowledgeContent = l.funFact || l.funFact2 || l.shortStory || l.moment || l.memory;
 
   if (idx === 0) {
@@ -1236,6 +1272,7 @@ function buildLiquorFaceHTML(l, idx) {
       ${l.distillingNote ? `<p class="face-h3"><span class="ic">&#127866;</span> Distilling note</p><p class="face-desc" style="margin-bottom:14px;">${l.distillingNote}</p>` : ""}
       ${l.flavorTags && l.flavorTags.length ? `<p class="face-h3"><span class="ic">&#127815;</span> Flavor profile</p><div class="flavor-grid">${l.flavorTags.map(t => `<div class="flavor-item"><div class="icon">${getFlavorIcon(t)}</div><p>${t}</p></div>`).join("")}</div>` : ""}
       ${l.structure ? `<p class="face-h3"><span class="ic">&#128202;</span> Structure</p>${liquorStructureBars(l.structure)}` : ""}
+      ${similar ? `<p class="back-line" style="margin-top:8px;"><b>Similar pour</b>${similar.name}</p>` : ""}
     `;
   } else {
     if (!hasKnowledgeContent) return `<p class="flip-label">3/3</p><p class="face-title">Sommelier knowledge</p><p class="empty-note" style="text-align:left;font-style:italic;">Details coming soon.</p>`;
@@ -1251,11 +1288,12 @@ function buildLiquorFaceHTML(l, idx) {
 }
 
 function renderLiquorFlipCard(l) {
+  const similar = similarLiquorPour(l);
   const flipcard = document.createElement("div");
   flipcard.className = "flipcard";
   const inner = document.createElement("div");
   inner.className = "flip-inner face-0";
-  inner.innerHTML = buildLiquorFaceHTML(l, 0);
+  inner.innerHTML = buildLiquorFaceHTML(l, similar, 0);
   flipcard.appendChild(inner);
 
   let faceIndex = 0;
@@ -1264,7 +1302,7 @@ function renderLiquorFlipCard(l) {
     setTimeout(() => {
       faceIndex = (faceIndex + 1) % 3;
       inner.className = "flip-inner face-" + faceIndex;
-      inner.innerHTML = buildLiquorFaceHTML(l, faceIndex);
+      inner.innerHTML = buildLiquorFaceHTML(l, similar, faceIndex);
       flipcard.classList.remove("flipping");
     }, 200);
   };

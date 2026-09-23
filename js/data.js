@@ -395,48 +395,16 @@ const WINES = [
   }
 ];
 
-// Houston Restaurant Weeks — a separate, smaller wine list shown above the
-// regular By The Glass list during HRW only. Kept as its own array (not
-// merged into WINES) so repeat bottles like the Telmont and Caymus stay
-// distinct entries here rather than duplicating/overwriting the year-round
-// BTG cards, per the brief this was built from.
-const HRW_WINES = [
+// Off The List Wines — special-selection wines shown as their own section
+// on the Wine screen. Kept as their own array (not merged into WINES) so
+// this stays a distinct, curated pour list rather than folding into the
+// year-round BTG cards. Formerly the Houston Restaurant Weeks list (HRW);
+// hrw3/hrw4/hrw6 carried over unchanged, hrw1/hrw2/hrw5 were removed as
+// pure duplicates already covered by the year-round By The Glass (w2, w9,
+// w16) and By The Bottle (bw142, bw40, bw84) entries.
+const OTL_WINES = [
   {
-    id: "hrw1", name: "Telmont \"Réserve Brut\" NV", style: "sparkling",
-    grape: "53% Pinot Meunier, 31% Chardonnay, 16% Pinot Noir", producer: "Champagne Telmont", region: "Épernay, Champagne, France",
-    winemaker: "Bertrand Lhôpital, Cellar Master",
-    flavorTags: ["White Peach", "Green Apple", "Brioche", "Toasted Almond"],
-    structure: { sweetness: 1, acidity: 4, tannin: 0, alcohol: 2, body: 3 },
-    guestDescription: "This is real Champagne &mdash; white peach, green apple, a little brioche and toasted almond from full malolactic. Beautiful for the raw bar or the caviar.",
-    sellingPoints: ["Real Champagne, full malolactic for a creamy, toasty edge", "Family-run since 1912, led today by fourth-generation cellar master Bertrand Lh&ocirc;pital", "Comprises the bulk of the house's production &mdash; their flagship pour, not an entry-level bottle"],
-    winemakingNote: "A Pinot Meunier-led blend that goes through full malolactic fermentation, which is what builds the creamy, brioche-and-honeysuckle character alongside the core apple and quince fruit.",
-    moment: "The opening pour for an HRW table, or anyone ordering oysters or caviar.",
-    memory: "Toasty, chalky, elegant real Champagne to open the meal.",
-    pairingDishIds: ["d-oysters", "d-caviar"],
-    arsenal: "This is real Champagne from a small French house — a great way to kick off an HRW table.",
-    funFact: "Telmont is racing toward a fully organic estate and grower-vineyard base by 2031, one of the stronger sustainability pushes in Champagne.",
-    funFact2: "The house was founded in 1912 by Henri Lh\u00f4pital in Damery, near \u00c9pernay, and is still family-run four generations later.",
-    shortStory: "Founded in a small village near \u00c9pernay in 1912, Telmont has stayed a family house for four generations \u2014 today led by cellar master Bertrand Lh\u00f4pital, with sustainability as a defining focus of the current era."
-  },
-  {
-    id: "hrw2", name: "Domaine de la Ch\u00e9zatte Sancerre Ros\u00e9", style: "white",
-    grape: "100% Pinot Noir, direct-press", producer: "Domaine de la Ch\u00e9zatte", region: "Cr\u00e9zancy, Sancerre, Loire Valley, France",
-    winemaker: "Estate winemaking team",
-    flavorTags: ["Strawberry", "Red Currant", "Red Cherry", "Citrus Zest"],
-    structure: { sweetness: 1, acidity: 4, tannin: 0, alcohol: 3, body: 1 },
-    guestDescription: "A Sancerre ros\u00e9, direct-pressed from Pinot Noir \u2014 strawberry, red currant, citrus zest, no oak. Pure, precise fruit, not a fruity poolside pour.",
-    sellingPoints: ["Made from Pinot Noir, direct-pressed for pure fruit with no oak", "Their smallest cuvée \u2014 just 5% of production, genuinely a rarity", "Frame it as a serious, food-friendly Loire ros\u00e9, not a sweet summer pour"],
-    winemakingNote: "The Pinot Noir is direct-pressed rather than macerated, which keeps the wine dry, precise, and true to its Sancerre terroir instead of leaning sweet or jammy.",
-    moment: "A guest who wants a serious, mineral-driven ros\u00e9 rather than a sweet poolside style.",
-    memory: "Precise, food-friendly Loire ros\u00e9 \u2014 not a fruity default.",
-    pairingDishIds: [],
-    arsenal: "Steer this away from 'fruity poolside' and toward 'serious, food-friendly Loire rosé.'",
-    funFact: "This rosé is just 5% of the estate's total production \u2014 their smallest cuvée, and a bit of a rarity next to their Sauvignon Blanc.",
-    funFact2: "The estate farms sustainably on south-facing flint and limestone soils in Cr\u00e9zancy, the most northerly village in Sancerre.",
-    shortStory: "A family-owned Sancerre estate best known for Sauvignon Blanc, Domaine de la Ch\u00e9zatte also direct-presses a small amount of Pinot Noir into this pale, precise ros\u00e9 \u2014 sustainably farmed on the region's flint and limestone slopes."
-  },
-  {
-    id: "hrw3", name: "Neal Family \"Rutherford Dust Vineyards\" White Wine Blend 2025", style: "white",
+    id: "otl1", name: "Neal Family \"Rutherford Dust Vineyards\" White Wine Blend 2025", style: "white",
     grape: "White wine blend (exact varietal composition not listed on the label)", producer: "Neal Family Vineyards", region: "Rutherford Dust Vineyards, Napa Valley, California",
     winemaker: "Mark Neal & family",
     flavorTags: ["Lemon Flower", "Tangerine Rind", "Bay Leaf", "Lychee"],
@@ -453,7 +421,7 @@ const HRW_WINES = [
     shortStory: "Mark Neal spent decades farming organic Napa fruit for other producers before founding his own family label in 1998 \u2014 today it's a biodynamic, certified-organic operation across Howell Mountain and Rutherford, run with his children."
   },
   {
-    id: "hrw4", name: "Alexana \"Mosaic\" Pinot Noir", style: "red",
+    id: "otl2", name: "Alexana \"Mosaic\" Pinot Noir", style: "red",
     grape: "Pinot Noir, multiple clones", producer: "Alexana Winery", region: "Dundee Hills, Willamette Valley, Oregon",
     winemaker: "Estate winemaking team",
     flavorTags: ["Black Cherry", "Raspberry", "Violet", "Sage"],
@@ -470,24 +438,7 @@ const HRW_WINES = [
     shortStory: "Planted on a patchwork of volcanic and marine soils across 32 blocks in Dundee Hills \u2014 the same ground where Willamette Valley Pinot Noir got its start in 1966 \u2014 Alexana's Estate Vineyard has twice been named to Wine Spectator's Top 100."
   },
   {
-    id: "hrw5", name: "Caymus Cabernet Sauvignon", style: "red",
-    grape: "Cabernet Sauvignon", producer: "Caymus Vineyards", region: "Napa Valley, California",
-    winemaker: "Chuck Wagner",
-    flavorTags: ["Blackcurrant", "Black Cherry", "Cocoa", "Cedar"],
-    structure: { sweetness: 1, acidity: 2, tannin: 3, alcohol: 5, body: 5 },
-    guestDescription: "This is Caymus \u2014 blackcurrant, black cherry, cocoa and cedar, soft velvety tannin. The steakhouse benchmark bottle most guests already know.",
-    sellingPoints: ["The name guests already ask for by default", "Blended across Napa's best sub-AVAs \u2014 Coombsville, Calistoga, Rutherford, Oakville", "Built for immediate drinkability, not austerity \u2014 an easy 'safe splurge' recommendation"],
-    winemakingNote: "Blended across fruit from several Napa sub-AVAs and aged extensively in oak, built for soft, velvety tannin and plush drinkability right out of the gate.",
-    moment: "A guest unsure what to order who wants a safe, plush splurge.",
-    memory: "The Cabernet everyone already trusts.",
-    pairingDishIds: [],
-    arsenal: "This one sells itself \u2014 plush, rich, crowd-pleasing.",
-    funFact: "Chuck Wagner and his parents opened Caymus in 1972 with 240 cases \u2014 it remains 100% family-owned today.",
-    funFact2: "Caymus takes its name from 'Rancho Caymus,' the original Spanish land grant covering part of Napa Valley.",
-    shortStory: "Founded with just 240 cases in 1972, Caymus is still entirely family-run over 50 years later \u2014 and remains one of the most recognized Cabernet names in America."
-  },
-  {
-    id: "hrw6", name: "Altamura Cabernet Sauvignon", style: "red",
+    id: "otl3", name: "Altamura Cabernet Sauvignon", style: "red",
     grape: "100% Cabernet Sauvignon", producer: "Altamura Vineyards & Winery", region: "Wooden Valley, Napa Valley, California",
     winemaker: "Frank Altamura",
     flavorTags: ["Blackcurrant", "Black Olive", "Tobacco Leaf", "Cedar"],
@@ -502,6 +453,23 @@ const HRW_WINES = [
     funFact: "Founder Frank Altamura trained under Ric Forman at Sterling and worked alongside Chuck Wagner and Randy Dunn at Caymus before founding Altamura in 1985.",
     funFact2: "Altamura is the only winery located in Wooden Valley, Napa's most secluded sub-AVA, within the Napa Valley appellation.",
     shortStory: "Frank Altamura learned the craft at Sterling and later worked alongside the Caymus and Dunn families before striking out on his own in 1985 \u2014 building the only winery in Napa's secluded Wooden Valley, dropping up to half the crop each year for concentration."
+  },
+  {
+    id: "otl4", name: "J. Lohr \"Arroyo Vista\" Chardonnay", style: "white",
+    grape: "100% Chardonnay", producer: "J. Lohr Vineyards & Wines", region: "Arroyo Seco AVA, Monterey County, California",
+    winemaker: "Kristen Barnhisel, White Winemaker",
+    flavorTags: ["Meyer Lemon", "Ripe Pear", "Baked Apple", "Toasted Oak"],
+    structure: { sweetness: 1, acidity: 3, tannin: 0, alcohol: 4, body: 4 },
+    guestDescription: "A rich Monterey Chardonnay off J. Lohr's own Arroyo Seco vineyard \u2014 Meyer lemon, ripe pear, baked apple and a long, sweet-oak finish. Classic California style with real bright acidity underneath.",
+    sellingPoints: ["Estate-grown on J. Lohr's own pioneering Arroyo Seco vineyard, not sourced fruit", "Built with classic Burgundian technique \u2014 barrel fermentation, malolactic, weekly lees stirring", "The house style guests already picture when they ask for a 'big, buttery Chardonnay'"],
+    winemakingNote: "Primary and malolactic fermentation take place in French oak barrels, with the lees stirred weekly during aging \u2014 the classic Burgundian technique behind the wine's rich, creamy texture and long oak finish.",
+    moment: "A guest who wants a full-bodied, classically Californian Chardonnay with real texture, not a lean unoaked style.",
+    memory: "Rich, oak-driven Monterey Chardonnay with bright acidity underneath.",
+    pairingDishIds: [],
+    arsenal: "This is J. Lohr's own Arroyo Seco fruit \u2014 lean into 'big, buttery California Chardonnay done right' for guests who ask for that style by name.",
+    funFact: "The vineyard sits on gravelly loam soils underlain by \u201cGreenfield potatoes\u201d \u2014 stones that soak up heat by day and radiate it back after sunset, helping ripen the fruit in the cool, windswept Arroyo Seco AVA.",
+    funFact2: "The blend leans on multiple Chardonnay clones \u2014 clone 76 contributes white floral and Meyer lemon character, while clones 95 and 96 add white nectarine and apricot.",
+    shortStory: "Arroyo Seco is one of the coolest, windiest AVAs in Monterey County, and J. Lohr planted here early \u2014 this bottling comes from that original estate fruit, fermented and aged using classic Burgundian barrel technique for a rich, food-friendly house-style Chardonnay."
   }
 ];
 
@@ -993,7 +961,7 @@ const CLASSIC_COCKTAILS = [
 
 // Wine By The Bottle — full bottle list, built out in phases by grape
 // variety. Kept as its own array (not merged into WINES) so it gets its
-// own browse/search flow, mirroring the HRW_WINES pattern above.
+// own browse/search flow, mirroring the OTL_WINES pattern above.
 const BOTTLE_WINES = [
   {
     id: "bw1", name: "Ladoucette Pouilly-Fumé", style: "white", price: 118, category: "Sauvignon Blanc",

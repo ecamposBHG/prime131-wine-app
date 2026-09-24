@@ -697,22 +697,39 @@ const COCKTAILS = [
     garnish: "Three Gold Dusted Espresso Beans",
     directions: "Combine all ingredients into a shaker tin. Shake with ice and strain into a coupe glass. Garnish and serve.",
     prep: "Vanilla Bean Patr\u00f3n: drop 2 split vanilla pods into a Patr\u00f3n Reposado bottle to infuse on the backbar; keep at least 2 infused bottles on hand. Espresso Martini Mix: dissolve 1 can (94g) Illy Instant Classico into 40 oz warm water, add 24 oz Maven Cold Brew and 1 bottle (33.8 oz) Sweetbird Vanilla Syrup, stir. Label, date, chill. Yields 64 oz.", funFact: "Patrón Reposado rests in oak for several months before bottling, giving it a rounder character than blanco tequila — an unusual espresso martini base in place of vodka.", bestFor: "Dessert-course energy — a coffee lover who wants their after-dinner drink to double as dessert."
+  }
+];
+
+const SEASONAL_COCKTAILS = [
+  {
+    id: "sc1", name: "Pumpkin Sour", glassware: "Coupe", method: "Shake & Strain", category: "seasonal",
+    flavorTags: ["Pumpkin", "Honey", "Bourbon", "Silky"],
+    ingredients: ["2 oz Garrison Brothers HoneyDew Bourbon", "2 oz Berg House Pumpkin Puree (house prep)", "1 oz Finest Call Single Pressed Lemon Juice", "1 oz Egg White"],
+    garnish: "1 Dash Angostura Bitters",
+    directions: "Combine all ingredients in a mixing glass with ice. Shake and strain into a coupe glass. Garnish and serve.",
+    prep: "Berg House Pumpkin Puree: in a thoroughly cleaned countertop blender, combine 33.8 oz Canned Pumpkin, 33.8 oz Sweetbird Vanilla Syrup, and 33.8 oz Sweetbird Pumpkin Spice Syrup. Blend on medium speed for 5 minutes until smooth and homogeneous. Portion into the appropriate service vessel, label with product name and prep date, and store chilled.",
+    funFact: "Garrison Brothers HoneyDew starts as the distillery's own Small Batch bourbon, infused with Texas wildflower honey-soaked oak cubes rather than a honey barrel.",
+    bestFor: "A whiskey sour fan looking for a fall-seasonal, honey-and-spice take on the classic egg-white sour."
   },
   {
-    id: "c13", name: "Pumpkin Spice Margarita", glassware: "Double Rocks Glass", method: "Shake & Strain", category: "house",
+    id: "sc2", name: "Pumpkin Harvest Margarita", glassware: "Double Rocks Glass", method: "Shake & Strain", category: "seasonal",
     flavorTags: ["Pumpkin", "Cinnamon", "Citrus", "Agave"],
-    ingredients: ["1.5 oz Espol\u00f2n Blanco Tequila", "0.5 oz Cointreau Orange Liqueur", "1.5 oz Berg House Pumpkin Puree", "0.75 oz Finest Call Single Pressed Lime Juice", "1 Dash Angostura Bitters"],
+    ingredients: ["1.5 oz Espol\u00f3n Blanco Tequila", "0.5 oz Cointreau Orange Liqueur", "1.5 oz Berg House Pumpkin Puree (house prep)", "0.75 oz Finest Call Single Pressed Lime Juice"],
     garnish: "Cinnamon Sugar Half Rim, Lime Wedge, Cinnamon Stick (Optional)",
     directions: "Combine all ingredients in a mixing glass with ice. Shake and strain into a double rocks glass. Garnish and serve.",
-    prep: "", funFact: "Espol\u00f3n takes its name from the Spanish word for a rooster's spur, a nod to the brand's national-pride imagery on the bottle.", bestFor: "A margarita drinker who wants a fall-seasonal twist without losing the tequila-forward, citrusy backbone."
+    prep: "Berg House Pumpkin Puree: in a thoroughly cleaned countertop blender, combine 33.8 oz Canned Pumpkin, 33.8 oz Sweetbird Vanilla Syrup, and 33.8 oz Sweetbird Pumpkin Spice Syrup. Blend on medium speed for 5 minutes until smooth and homogeneous. Portion into the appropriate service vessel, label with product name and prep date, and store chilled.",
+    funFact: "Espol\u00f3n takes its name from the Spanish word for a rooster's spur, a nod to the brand's national-pride imagery on the bottle.",
+    bestFor: "A margarita drinker who wants a fall-seasonal twist without losing the tequila-forward, citrusy backbone."
   },
   {
-    id: "c14", name: "Pumpkin Sour", glassware: "Coupe", method: "Shake & Strain", category: "house",
-    flavorTags: ["Pumpkin", "Honey", "Bourbon", "Silky"],
-    ingredients: ["2 oz Garrison Brothers HoneyDew Bourbon", "1 oz Berg House Pumpkin Puree", "1 oz Finest Call Single Pressed Lemon Juice", "1 oz Egg White", "1 Dash Angostura Bitters"],
-    garnish: "",
-    directions: "Combine all ingredients in a cocktail shaker with ice. Shake and strain into a coupe glass. Garnish and serve.",
-    prep: "", funFact: "Garrison Brothers HoneyDew starts as the distillery's own Small Batch bourbon, infused with Texas wildflower honey-soaked oak cubes rather than a honey barrel.", bestFor: "A whiskey sour fan looking for a fall-seasonal, honey-and-spice take on the classic egg-white sour."
+    id: "sc3", name: "Pumpkin Spice Martini", glassware: "Coupe (not martini)", method: "Shake & Strain", category: "seasonal",
+    flavorTags: ["Espresso", "Pumpkin Spice", "Vodka", "Roasted"],
+    ingredients: ["1.5 oz Grey Goose Vodka", "0.5 oz Mr. Black Cold Brew Liqueur", "2.5 oz Berg House Espresso Martini Mix (house prep)"],
+    garnish: "Pumpkin Cold Foam (Coffee Mate or House made), Pumpkin Pie Spice",
+    directions: "Combine all ingredients into a shaker tin. Shake with ice and strain into a coupe glass. Garnish and serve.",
+    prep: "",
+    funFact: "This fall riff swaps the Opulent Espresso Martini's tequila base for vodka and tops it with a pumpkin spice cold foam instead of espresso beans.",
+    bestFor: "An espresso martini regular who wants the fall-seasonal version without losing the coffee-forward core."
   }
 ];
 

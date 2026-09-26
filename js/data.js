@@ -6262,6 +6262,2076 @@ const LEARNING_MODULES = [
         correctIndex: 1
       }
     ]
+  },
+  {
+    id: "guest-journey-2-welcome",
+    title: "Module 2: The Welcome",
+    category: "Service",
+    unlockAfter: "guest-journey-1-arrival",
+    journeyPhase: 2,
+    chapters: [
+      {
+        title: "Greeting the Table",
+        sections: [
+          {
+            type: "text",
+            title: "Friday, 7:25 PM",
+            body: "Table 14 just sat. Your section is full: one table wants the check, another is waiting on a bottle. Table 14's guests are looking around, menus still closed.<br><br>You have about a minute. What do you do? Hold that answer. You'll check it in a moment.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Within One Minute",
+            body: "Be at the table within 1 minute of the guests being seated. Greet them and give your name: “Good evening, Mr. Smith, welcome to Prime 131, my name is ___.”<br><br>Greeting is the whole team's job. If you're stuck in your section, a teammate does the first step of the greeting, then tells the guests their server will be right with them: “Good evening, Mr. Smith, your server will be with you shortly…”<br><br>Approach warmly, make eye contact with everyone, and use the name from the soignée. If the party is seated incomplete, welcome the guests who are there and offer drinks. If they seem in a hurry, it's fine to leave menus for the ones who haven't arrived.<br><br>Greet first, and don't offer iced water in the same breath.",
+            note: "The minute after guests sit is when they wonder if they've been forgotten. A teammate's quick hello answers that question even when you can't. Keeping the greeting and the water offer separate matters for the same reason: it lets the greeting land as a welcome, not as the first item on a task list."
+          },
+          {
+            type: "text",
+            title: "Ask Before You Offer a Drink",
+            body: "Before anyone talks about drinks, ask about allergies, dietary restrictions, and special occasions, and acknowledge anything on the soignée.<br><br>“I have a note that indicates a gluten-free guest in your party. May I confirm who it is?”<br>“Does anyone have any allergies or dietary restrictions we should be aware of?”<br>“Are we celebrating any special occasion this evening?”<br>“Thank you for celebrating your special day with us, Happy Anniversary!”",
+            note: "Cocktails often contain ingredients a guest may be sensitive or allergic to, so the allergy question has to come before the drink recommendation, not after the order is in. The occasion question pays off later too: you can't plan an unexpected candle for a celebration you never learned about."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "Table 14 just sat and your section is full. What do you do?",
+            options: [
+              "Finish your other tables first. Guests expect a short wait.",
+              "Get to the table within a minute. If you truly can't, ask a teammate to welcome them and say you'll be right there.",
+              "Send a runner with water so they have something.",
+              "Wave from across the room and come over when you can."
+            ],
+            correctIndex: 1,
+            explanation: "The greeting standard is 1 minute, and it belongs to the whole team. A teammate can do the first step and tell the guests their server is coming. Sending water instead of a greeting skips the welcome, and a wave leaves the guests guessing."
+          },
+          {
+            type: "mcq",
+            question: "You reach the table. Which opening is right?",
+            options: [
+              "“Hi guys, can I start you with some water?”",
+              "“Good evening, Mr. Smith, welcome to Prime 131, my name is Dana.”",
+              "“What can I get you to drink?”",
+              "“Are you ready to order?”"
+            ],
+            correctIndex: 1,
+            explanation: "Greet by name and give your own. Casual names like “guys” don't fit, and asking for water or drinks first skips the greeting itself."
+          },
+          {
+            type: "mcq",
+            question: "The soignée notes a shellfish allergy. When do you bring it up?",
+            options: [
+              "After you take the cocktail order.",
+              "Only if the guest mentions it.",
+              "Before any drink conversation, and confirm who it is.",
+              "When you enter the food order."
+            ],
+            correctIndex: 2,
+            explanation: "Ask about allergies before discussing drinks, because some cocktails contain ingredients guests may react to. Waiting until the food order means the drink is already made."
+          }
+        ]
+      },
+      {
+        title: "Water and Cocktails",
+        sections: [
+          {
+            type: "text",
+            title: "Water First",
+            body: "Offer bottled or iced water: “May I start with any water for the moment… do you prefer bottled sparkling, still, or iced water?”<br><br>Bottled water goes on a coaster. If bottled is ordered, ask whether they'd like lime with sparkling and lemon with still.<br><br>If an Asst. Server is helping, the server directs them, so guests aren't asked twice.",
+            note: "Being asked the same question twice is how guests learn that the people serving them aren't talking to each other. One person asks, and everyone else works from that answer."
+          },
+          {
+            type: "text",
+            title: "Sell the First Drink",
+            body: "Offer three beverages as soon as you're at the table: “May I offer you a signature cocktail, local beer, or wine…?” Make a specific recommendation, keep descriptions accurate and short, and ask leading questions.<br><br>When a guest orders a classic, say what we pour and suggest three alternatives: “Do you have a preference on gin? We use Bombay, but we also have Hendrick's, Botanist, or Tanqueray 10 available.”<br><br><b>At the table:</b> have your handheld in your hand before you arrive, and never reach for it mid-conversation. Start with the most senior lady and go clockwise: ladies, then gentlemen. If children are present, ask their parents what they'd like. Repeat the order back.",
+            note: "A guest who is handed an open question tends to pick the safe, familiar thing. Naming three options and a specific favorite is easier to say yes to, and telling them the house pour before offering alternatives lets them trade up without feeling pushed. Working clockwise from the same starting point is also what makes position numbers reliable later, when someone else is running the drinks."
+          },
+          {
+            type: "text",
+            title: "No Ticket, No Drink",
+            body: "Enter water and cocktails immediately. No ticket means no drink.<br><br>Use modifiers so the order is clear, and get position numbers right, because teammates all help run drinks from the bar.<br><br>When a guest asks for a specific liquor, ring in the liquor first, then modify with the preparation. For a generic mixed drink, tell the guest our regular pour and ask if they have a preference: “We use Beefeater for the gin. Will that be fine or do you have a preference?”",
+            note: "The bar can only make what it can see, so a drink that isn't rung in yet doesn't exist, no matter what the guest heard you say. Position numbers matter for the same reason: the runner carrying the drink wasn't at the table and has nothing but the ticket to go on. Asking about brand before the drink is made is the only version of that conversation that doesn't end with an unwanted charge."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "A guest at seat 2 orders “a gin and tonic.” What do you say?",
+            options: [
+              "“Sure.” Then ring it in with the well gin.",
+              "“We use Bombay. Do you have a preference? We also have Hendrick's, Botanist, or Tanqueray 10.”",
+              "“Which gin do you want?”",
+              "“That's a bit boring. Try one of our cocktails.”"
+            ],
+            correctIndex: 1,
+            explanation: "Name what we pour and offer three alternatives. That tells the guest what they're getting and lets them choose something better. Guessing skips the choice, and putting down the guest's order is never part of a recommendation."
+          },
+          {
+            type: "sequence",
+            prompt: "Put the order in which you take drink orders at the table.",
+            items: [
+              { id: "lady", label: "The most senior lady" },
+              { id: "clockwise-ladies", label: "The other ladies, clockwise" },
+              { id: "gents", label: "The gentlemen, clockwise" },
+              { id: "repeat", label: "Repeat the whole order back" }
+            ],
+            correctOrder: ["lady", "clockwise-ladies", "gents", "repeat"],
+            correctMessage: "That's the order — correct."
+          },
+          {
+            type: "mcq",
+            question: "You take a table's drink orders. When do you ring them in?",
+            options: [
+              "When you've finished all your other tables.",
+              "With the food order, so it's one trip.",
+              "Immediately. No ticket means no drink.",
+              "Once the guests confirm they want a second round."
+            ],
+            correctIndex: 2,
+            explanation: "Water and cocktails are entered right after you take them. The bar works from the ticket, and every minute you wait is a minute the guests are waiting too."
+          }
+        ]
+      },
+      {
+        title: "The Menu Tour",
+        sections: [
+          {
+            type: "text",
+            title: "A Little Tour",
+            body: "Once the water and cocktail order is in, take the guests on a short tour of the menu. It's part of the initial greeting, but it comes after the drink order so drinks can be prepared while they read.<br><br>“As your drinks are being prepared, let me take you on a little tour of our menu.” Then walk it left to right: the appetizers and guest favorites, the special cuts of meat and what comes with them, other options for anyone not in the mood for steak, and the sides that go with the main course.<br><br>Finish with two lines: “We do recommend placing your full order at once to ensure that you have the best experience.” and “Let me know if you need any help deciding. In the meantime, I'll go ahead and grab those drinks for you.”<br><br>The standards give a sample tour with specific dishes. Personalize it, and use what's actually on tonight's menu.",
+            note: "The tour is timed to the drinks so the guests are busy while the bar works, not staring at a menu while you wait. Asking for the full order at once is what lets the kitchen pace the courses; if the order arrives in pieces, the second dish lands on top of the first. Saying you're going to grab their drinks also ends the conversation politely and gives them room to decide."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "When does the menu tour happen?",
+            options: [
+              "Before the greeting, to show you know the menu.",
+              "Right after the guests sit, before you take drinks.",
+              "After the water and cocktail order is taken, while the drinks are prepared.",
+              "Only when the guest asks for it."
+            ],
+            correctIndex: 2,
+            explanation: "The tour is part of the greeting but comes after the drink order, so the drinks are being made while the guests read."
+          },
+          {
+            type: "mcq",
+            question: "Why do you recommend placing the full order at once?",
+            options: [
+              "It saves you a trip to the table.",
+              "So the kitchen can pace the meal and guests get the best experience.",
+              "Guests can't change their minds afterward.",
+              "It speeds up the check."
+            ],
+            correctIndex: 1,
+            explanation: "A full order lets the kitchen time the courses properly. Fewer trips for you is a side effect, not the reason."
+          }
+        ]
+      },
+      {
+        title: "Your Mission",
+        sections: [
+          {
+            type: "text",
+            title: "Make It Yours",
+            body: "Write your own version of the first thirty seconds at a table: the greeting with your name, the allergy and occasion question, and the three-drink offer. Say it out loud once before your next shift.<br><br>Then say the tour's two closing lines out loud too. They're the ones people forget under pressure.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Your Mission",
+            body: "On your next shift, be at every table within 1 minute of seating, ask about allergies and occasions before you talk about drinks, and ring in every water and cocktail order the moment you take it.<br><br>Afterward, tell your manager two things: one table where you learned about an occasion because you asked, and one drink you upgraded by naming what we pour.<br><br>Your manager may watch a few greetings. They're looking for a pattern over the shift, not one perfect table.",
+            note: "The steps are easy to know and hard to do at 7:25 with a full section. Counting the times you did them, and remembering the one that worked, is how you find out whether the habit is actually forming."
+          }
+        ]
+      }
+    ],
+    test: [
+      {
+        question: "How soon after guests are seated should someone be at the table?",
+        options: ["30 seconds", "1 minute", "2 minutes", "5 minutes"],
+        correctIndex: 1
+      },
+      {
+        question: "What comes first at a new table?",
+        options: [
+          "Asking about allergies, dietary restrictions, and occasions, before discussing drinks",
+          "Taking the cocktail order",
+          "Offering iced water",
+          "The menu tour"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "Your Asst. Server is helping at the table. Who decides who asks about water?",
+        options: [
+          "Whoever gets there first",
+          "The Asst. Server, since it's their job",
+          "The server directs it, so guests aren't asked twice",
+          "The guests ask when they're ready"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "A guest orders a specific brand of vodka in a martini. How do you ring it in?",
+        options: [
+          "Ring the martini first, then note the vodka",
+          "Ring in the vodka first, then modify with the preparation",
+          "Ring it in as a well drink and tell the bartender",
+          "Wait until the bartender confirms they have it"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "When do you begin the menu tour?",
+        options: [
+          "As soon as the guests sit",
+          "After the water and cocktail order is taken",
+          "After the food order",
+          "Only if the guests ask"
+        ],
+        correctIndex: 1
+      }
+    ]
+  },
+  {
+    id: "guest-journey-3-order",
+    title: "Module 3: Drinks and the Food Order",
+    category: "Service",
+    unlockAfter: "guest-journey-2-welcome",
+    journeyPhase: 2,
+    chapters: [
+      {
+        title: "Water and Drinks Arrive",
+        sections: [
+          {
+            type: "text",
+            title: "Friday, 7:40 PM",
+            body: "Table 14's cocktails are up at the bar, and their water glasses are empty. You're holding a beverage tray with five drinks for three tables, and the ticket has position numbers on it.<br><br>What order do you serve in, and what do you say as you set each drink down? Hold that answer.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Water Service",
+            body: "Serve water within 2 minutes of ordering. Serve ladies first, then gentlemen. If children are present, serve them first.<br><br><b>Bottled:</b> open the cap in front of the guest, with a folded serviette for splashes. Pour from the right with the right hand, directly into the glass on the table. Keep the label facing the guest and leave the bottle on a coaster. If a table has both still and sparkling, cradle both bottles in one hand and let each guest choose. Use a different glass for bottled water so you can tell who's drinking what.<br><br><b>Iced:</b> bring the pitcher and a folded serviette. Hold the pitcher in your right hand and pour from the guest's right.<br><br>Never lift the glass to pour. Pour slowly, fill to about 4/5, and refill when it's half empty or less. When a bottle is empty, ask whether they'd like another. Never assume.",
+            note: "Pouring into a glass that stays on the table keeps your hands out of the guest's space and away from the lip where they'll drink. Refilling at half means the glass is never empty, so no guest ever has to ask. And asking before opening a second bottle matters because bottled water is a charge on the check: a guest who didn't ask for it shouldn't find it there."
+          },
+          {
+            type: "text",
+            title: "Extra Settings",
+            body: "In many restaurants the Asst. Server removes extra settings after guests sit. In Refined Dining this step doesn't apply. Extra settings come off before guests are seated, as you learned in Module 1.<br><br>Once guests are seated, extra settings stay unless they told us someone would not be joining.",
+            note: "The reason is the same as at the door. A table set for the wrong number is the first thing a guest notices, and clearing settings in front of them tells them the restaurant wasn't ready. Doing it before they sit means they never see it."
+          },
+          {
+            type: "text",
+            title: "Beverage Service",
+            body: "Serve drinks within 5 minutes of ordering. Always use a beverage tray, both to serve and to clear glassware.<br><br>Serve from the guest's right with your right hand, placed at the upper right of the setting, to the right of or below the water glass. Ladies first, then clockwise, then the men, and the host last if you know who it is.<br><br><b>Cocktails and beer:</b> pick up at the service bar and stab your ticket so it stays with you. Check that each drink is properly garnished. Arrange them on the tray in position-number order. Take away any empty glass before you set down the new one. Announce what you're serving: “Hendrick's and tonic,” “Crossroads Sauvignon Blanc.”<br><br><b>Canned, bottled, or mixed drinks:</b> pour in front of the guest, never pre-poured. (Cocktails are the exception.)<br><br><b>Wine by the glass (Refined Dining):</b> bring the bottle to the table, show the label, open it tableside, pour a small taste, and fill the glass once they confirm. Every glass is a 6 oz pour.",
+            note: "Arranging the tray by position number is what lets you serve without asking “who had the old fashioned?” Announcing each drink means guests never have to claim what they ordered. Pouring a bottled drink at the table proves it's what they asked for, and opening wine tableside does the same, which is why wine by the glass gets that treatment in Refined Dining."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "A guest's water glass is on the table. How do you pour?",
+            options: [
+              "Pick the glass up and fill it over the tray.",
+              "Pour into the glass on the table, from the guest's right, without lifting it.",
+              "Pour from the left with the left hand every time.",
+              "Fill it to the brim so it lasts longer."
+            ],
+            correctIndex: 1,
+            explanation: "Never lift the glass to pour. Pour from the right with the right hand, slowly, filled to about 4/5, and refill when it's half empty or less."
+          },
+          {
+            type: "sequence",
+            prompt: "Put the service order for a beverage tray at a table of mixed guests.",
+            items: [
+              { id: "children", label: "Children, if present" },
+              { id: "ladies", label: "Ladies, starting with the senior lady" },
+              { id: "men", label: "Gentlemen, clockwise" },
+              { id: "host", label: "The host, if known" }
+            ],
+            correctOrder: ["children", "ladies", "men", "host"],
+            correctMessage: "That's the order — correct."
+          },
+          {
+            type: "mcq",
+            question: "A guest at seat 3 has finished their old fashioned and you're bringing the next one. What do you do?",
+            options: [
+              "Set the new drink beside the empty glass.",
+              "Take the empty glass away before setting down the new drink.",
+              "Ask the guest to hand you the empty glass.",
+              "Leave the new drink on the tray until they finish."
+            ],
+            correctIndex: 1,
+            explanation: "Remove any empty glasses before serving the new drink, always with a tray, so the table stays clear and the guest isn't left with two drinks to keep track of."
+          },
+          {
+            type: "mcq",
+            question: "A guest at a Refined Dining table orders a glass of wine. What do you do?",
+            options: [
+              "Pour it at the bar and bring it out.",
+              "Bring the bottle, show the label, open it tableside, pour a small taste, then fill the glass.",
+              "Pour a 4 oz glass to save cost.",
+              "Ask the manager to bring a glass of whatever is open."
+            ],
+            correctIndex: 1,
+            explanation: "Wine by the glass in Refined Dining is presented and opened tableside, with a taste first. Every glass is a 6 oz pour."
+          }
+        ]
+      },
+      {
+        title: "Taking the Food Order",
+        sections: [
+          {
+            type: "text",
+            title: "Reading the Table",
+            body: "Go to the table when guests look ready. Closed menus are a reliable sign. Ask if they have questions and are ready to order. If they only order appetizers, give them time to decide and return within 5 minutes, or once you see they're ready.<br><br>Have your handheld ready with the table number, guest count, and time. Never trust your memory.<br><br>Don't ask the table a general “What would you care for?” Ask each guest individually and give them time. Ladies first, starting with the senior lady to the host's left, clockwise, then the men, host last. For children, ask the parents.",
+            note: "A question to the whole table gets several answers at once, and the quietest guest gets talked over. Asking one person at a time keeps the order straight, lets you match every dish to a position, and tells each guest they were heard."
+          },
+          {
+            type: "text",
+            title: "Suggest, Confirm, Repeat",
+            body: "Explain the menu with enthusiasm, including local information, and give first-time visitors a fuller explanation. Don't rush guests: “May I answer any questions, or help with our menu…?”<br><br>Always suggest an extra: an appetizer, salad, side, or beverage pairing. “May I suggest a side of crispy Brussels sprouts, or mashed potatoes to complement your meal…?” Keep recommendations positive, and never put down one item to make another sound better.<br><br>For meat sold by the ounce, confirm how it's served and charged: “Our Hokkaido Snow Beef Striploin is served and charged by the ounce, with a minimum of 4. May I confirm how many ounces you would like?”<br><br>Repeat the order back to each guest and ask for details where they apply: “The chef recommends medium rare for your steak. Do you prefer another temperature?” Then remove all the menus. If a guest may order more later, offer to bring one back or leave one for reference.",
+            note: "Guests often can't picture a full meal from a menu, and a specific suggestion helps them build one. The suggestion has to stay positive because the item you talk down may be the one the guest already chose. And saying the ounce price aloud is the only way to avoid the worst kind of surprise, the one that shows up on the check after the meat is already eaten."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "Your table has closed their menus and looks up. How do you start?",
+            options: [
+              "“What would everyone care for?”",
+              "Ask if they have questions and are ready to order, then take each guest's order individually, starting with the senior lady.",
+              "Take the host's order first, then go around.",
+              "Wait for them to wave you over."
+            ],
+            correctIndex: 1,
+            explanation: "Closed menus mean they're ready. Ask each guest individually so nobody gets talked over, and start with the senior lady to the host's left."
+          },
+          {
+            type: "mcq",
+            question: "A guest asks, “What's better, the filet or the striploin?” What's the right approach?",
+            options: [
+              "Tell them the striploin is overpriced.",
+              "Recommend one positively, describe it briefly, and never put the other down.",
+              "Say both are the same.",
+              "Tell them to ask the manager."
+            ],
+            correctIndex: 1,
+            explanation: "Keep recommendations positive and short. Never disparage one item to make another sound better."
+          },
+          {
+            type: "mcq",
+            question: "A guest orders the striploin, which is sold by the ounce. What do you do?",
+            options: [
+              "Ring it in at the standard portion.",
+              "Confirm it's charged by the ounce, and ask how many ounces they'd like.",
+              "Tell them the price at the end of the meal.",
+              "Let the kitchen decide."
+            ],
+            correctIndex: 1,
+            explanation: "Meat sold by the ounce needs the ounce count confirmed, along with how it's charged and any minimum, before it's entered."
+          }
+        ]
+      },
+      {
+        title: "Marking and Ringing It In",
+        sections: [
+          {
+            type: "text",
+            title: "Mark the Table",
+            body: "Prepare the table for what was ordered before the food leaves the kitchen: not after, and not at the same moment.<br><br>Remove what's not needed and add the right flatware, such as spoons for soup or share plates. Carry silver on a designated tray lined with a linen napkin. Place it far enough apart that a plate fits between, and stay open-handed to the guest. Hold silver from the base.<br><br>The table is usually already marked. Exceptions need different silver: soup gets a spoon to the right of the knife, oysters get an oyster fork to the right of the knife.<br><br>If a guest hasn't ordered a first course, mark them with a shared plate and the right silverware.",
+            note: "If the silver arrives after the plate, a hot dish waits on the table while you fix it, and the guest watches the food cool. Marking a shared plate for the guest with no first course means they're never sitting empty-handed while everyone else eats."
+          },
+          {
+            type: "text",
+            title: "Which Silver for What",
+            body: "<b>Appetizer fork:</b> all appetizers and desserts<br><b>Dinner fork:</b> all entrées and whole fish<br><b>Cocktail fork:</b> shellfish platters and all shelled items<br><b>Dinner knife:</b> everything except meat and poultry entrées<br><b>Steak knife:</b> all meat and poultry entrées<br><b>Tea spoon:</b> coffee, hot tea, ceviche, small plates<br><b>Dessert spoon:</b> soups, entrées with broth, desserts<br><b>Demitasse spoon:</b> espresso, and miscellaneous use",
+            note: "The right piece tells a guest we know what's coming: a steak knife beside a filet says the kitchen and the floor are working from the same plan. A wrong piece is a small error the guest can see, and it sends someone back to fix it while the food is on the way."
+          },
+          {
+            type: "text",
+            title: "Ring In the Whole Order",
+            body: "Enter the entire order and separate courses with a course line. If guests order the entrée separately from appetizers, note it. Check with the kitchen before any special request, though in most cases it's fine. Modify items with clear notes, and clarify anything confusing with the expeditor.<br><br><b>An allergy is handled with great care.</b> Find out what the guest would like to eat, then confirm with the Chef that those items are safe. Type the modification under each menu item the guest will eat, and type the allergy at the bottom of each course. Verify the seat number is correct.",
+            note: "Each course prints on its own ticket, and the cook working the entrée never saw the appetizer ticket. An allergy typed only once protects the guest for one course. Typing it at the bottom of every course, next to the right seat number, is what makes sure the person plating the food actually sees it."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "When do you mark the table for the ordered courses?",
+            options: [
+              "After the food is served.",
+              "As the food arrives.",
+              "Before the food leaves the kitchen.",
+              "Whenever the guest asks for silver."
+            ],
+            correctIndex: 2,
+            explanation: "Mark the table before the food leaves the kitchen, not after or at the same time, so hot food never waits on the table."
+          },
+          {
+            type: "mcq",
+            question: "A guest ordered oysters. What do you add to the table?",
+            options: [
+              "Nothing. Dinner silver is fine.",
+              "An oyster fork, to the right of the knife.",
+              "A steak knife.",
+              "A dessert spoon on the left."
+            ],
+            correctIndex: 1,
+            explanation: "Oysters need different silver, so the exception is an oyster fork placed to the right of the knife."
+          },
+          {
+            type: "mcq",
+            question: "A guest has a shellfish allergy. Where does the allergy go in the POS?",
+            options: [
+              "In the first course only.",
+              "At the bottom of every course, with the modification under each item they'll eat.",
+              "In the server notes for the check.",
+              "Nowhere. Tell the kitchen out loud."
+            ],
+            correctIndex: 1,
+            explanation: "Confirm the safe items with the Chef, then type the modification under each item and the allergy at the bottom of every course, with the seat number checked."
+          }
+        ]
+      },
+      {
+        title: "Your Mission",
+        sections: [
+          {
+            type: "text",
+            title: "Make It Yours",
+            body: "Pick the most complicated order you took last week. Walk through it out loud the way you'd repeat it back to the table: guest by guest, with the details you asked for at each one.<br><br>Then say the allergy handling out loud: who you confirm with, and where you type it.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Your Mission",
+            body: "On your next shift, serve every drink by position number and announce it, take each food order guest by guest, repeat it back before you ring it in, and mark every table before the food leaves the kitchen.<br><br>If you have an allergy table, type it at the bottom of every course.<br><br>Afterward, tell your manager two things: one time you asked a guest to confirm a detail (a temperature or the ounces) that would have been wrong otherwise, and one table you marked in time.<br><br>Your manager may watch a few orders. They're looking for a pattern over the shift, not one flawless table.",
+            note: "Repeating an order back feels slow when you're busy, and it's the exact moment a mistake gets caught for free. Noting the one time it saved you is what turns it from a rule into a habit."
+          }
+        ]
+      }
+    ],
+    test: [
+      {
+        question: "Bottled water is empty at a table. What do you do?",
+        options: [
+          "Bring another bottle right away",
+          "Ask whether they'd like another. Never assume",
+          "Refill it from the pitcher",
+          "Leave it until they ask"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Where do you serve a drink from, and with which hand?",
+        options: [
+          "The guest's left, with the left hand",
+          "The guest's right, with the right hand",
+          "Across the table, with both hands",
+          "Whichever is closest"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "How do you ask for a table's food order?",
+        options: [
+          "“What would everyone care for?”",
+          "Ask each guest individually and give them time",
+          "Take the host's order and let them speak for the table",
+          "Have the guests write their orders down"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "A guest with an allergy is ordering three courses. Where do you type the allergy?",
+        options: [
+          "Once, in the first course",
+          "In the check notes",
+          "At the bottom of each course",
+          "Only on the entrée"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "You're marking the table for a steak entrée. Which knife goes down?",
+        options: ["Dinner knife", "Steak knife", "Butter knife", "No knife. The kitchen brings one"],
+        correctIndex: 1
+      }
+    ]
+  },
+  {
+    id: "guest-journey-4-wine-bread",
+    title: "Module 4: Wine and Bread",
+    category: "Service",
+    unlockAfter: "guest-journey-3-order",
+    journeyPhase: 2,
+    chapters: [
+      {
+        title: "Offering Wine",
+        sections: [
+          {
+            type: "text",
+            title: "Friday, 7:55 PM",
+            body: "You've just repeated the food order back to Table 14. The host, Mr. Alvarez, ordered the filet and closed the menu. His wife is looking at the wine list, but nobody has said anything about it yet.<br><br>What's your next move? Hold that answer.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Once the Food Is Ordered",
+            body: "Offer wine as soon as the food order is taken. The order is the natural moment: now the guests know what they're eating.<br><br>If the host names a wine, note the name and vintage, and repeat it back. Mark the table with the right glassware, carried on a tray. Place glasses to the right of the water glass, or above it if the guest has a cocktail. If the guest declines, remove the wine list and any wine glasses.<br><br>Once the menu has been introduced, ask the host whether they've chosen a wine. Know the wine list well, ask leading questions, and avoid pretension.",
+            note: "Before the food is ordered, a wine recommendation has nothing to work from. After, you can suggest something that goes with what's on the table, and the guests are still deciding. Repeating name and vintage back matters because a bottle of the wrong vintage arrives at the table already opened and already wrong. And clearing the glasses when a guest declines keeps the table honest: it shows only what they're actually having."
+          },
+          {
+            type: "text",
+            title: "Six Moves to Sell Wine",
+            body: "<b>1. Ask about preferences.</b> “What kind of wine do you normally enjoy? Red, white, or something else?”<br><b>2. Feel out the mood.</b> “Are you in the mood for something light and refreshing, or something a bit more bold and full-bodied?”<br><b>3. Guide.</b> “If you like [preference], I'd recommend this one because it has [flavor notes].”<br><b>4. Offer a second suggestion.</b> “If you want something similar, we also have [another option] that pairs great with [food / occasion].”<br><b>5. Suggest pairings.</b> “If you're having [food], I'd recommend this wine. It complements it really well!”<br><b>6. Confirm.</b> “Would you like to go with this one, or would you like to try something else?”<br><br>Give guests an overview of how the wine list is designed. Once they choose a region, varietal, or style, help narrow the options.",
+            note: "Every step is a question the guest can answer without needing to know wine. Starting with what they already enjoy means the recommendation starts on their ground, not yours. The second suggestion gives them a real choice, which is what makes the first one feel like advice and not a push, and the last question leaves the door open so “no” is an easy answer to give."
+          },
+          {
+            type: "text",
+            title: "Pocket Wines",
+            body: "Each server builds a personal set of wines in different styles to suggest with confidence. For each one, know:<br><br>• The grape variety or varieties, and the blend percentages if it's a blend<br>• Where the winery is: country, region, sub-region<br>• An interesting story about the winery's name or history<br>• Who the winemaker is<br>• An interesting fact about the wine, such as a funny label name or the label artist",
+            note: "A guest can hear the difference between a wine you've memorized and a wine you know. A story or a fact lets you talk about the bottle the way you'd talk about something you like, which is what makes the recommendation trustworthy."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "Mr. Alvarez has finished ordering food. What's the right next step?",
+            options: [
+              "Bring the check.",
+              "Ask if the table would like wine, and if he names one, repeat the name and vintage back.",
+              "Wait until they ask for the wine list.",
+              "Bring the most expensive bottle."
+            ],
+            correctIndex: 1,
+            explanation: "Once the food order is taken, offer wine. If the host requests a specific one, note the name and vintage and repeat it back to confirm."
+          },
+          {
+            type: "sequence",
+            prompt: "Put the six moves of selling wine in order.",
+            items: [
+              { id: "pref", label: "Ask about preferences" },
+              { id: "mood", label: "Get a feel for their mood" },
+              { id: "guide", label: "Guide based on their response" },
+              { id: "second", label: "Offer a second suggestion" },
+              { id: "pair", label: "Suggest pairings" },
+              { id: "confirm", label: "Confirm the choice" }
+            ],
+            correctOrder: ["pref", "mood", "guide", "second", "pair", "confirm"],
+            correctMessage: "That's the order — correct."
+          },
+          {
+            type: "mcq",
+            question: "The guest declines wine. What do you do with the glasses you marked?",
+            options: [
+              "Leave them in case they change their mind.",
+              "Remove the wine list and any wine glasses.",
+              "Fill them with water.",
+              "Wait until the check."
+            ],
+            correctIndex: 1,
+            explanation: "If a guest declines, remove the wine list and the wine glasses so the table only shows what they're actually having."
+          }
+        ]
+      },
+      {
+        title: "Amuse and Bread",
+        sections: [
+          {
+            type: "text",
+            title: "Amuse Bouche",
+            body: "For a PPX table, serve the amuse bouche first, followed by bread service. This step only applies when there's a PPX.",
+            note: "The amuse is the kitchen's greeting. It comes before the bread because it's the first thing the kitchen chose for this table, and bread arriving ahead of it would push it to second place."
+          },
+          {
+            type: "text",
+            title: "Bread Service",
+            body: "Serve bread when it's part of the table or when it's ordered. Serve it warm, with oil or butter.<br><br>Pre-set the bread plates, with a butter knife if butter is used, before the bread arrives. Never put butter on a coffee saucer; use a bread and butter plate or a small plate. Set the basket in the center of the table, within reach of every guest, with one basket and tongs for every 4 guests.",
+            note: "Pre-setting the plates means the first thing the guest does is eat, not wait. Tongs keep hands off bread that other people will eat, and one basket per four guests means nobody has to reach across the table or ask for it to be passed."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "A table of 8 gets bread. How many baskets with tongs?",
+            options: ["1", "2", "3", "4"],
+            correctIndex: 1,
+            explanation: "One basket with tongs for every 4 guests, placed in the center of the table within reach of everyone."
+          },
+          {
+            type: "mcq",
+            question: "Which plate does butter go on?",
+            options: [
+              "A coffee saucer",
+              "A bread and butter plate or a small plate",
+              "The tablecloth",
+              "The dinner plate"
+            ],
+            correctIndex: 1,
+            explanation: "Never place butter on a coffee saucer. Use a bread and butter plate or small plate, and set it out with a butter knife before the bread arrives."
+          }
+        ]
+      },
+      {
+        title: "Wine Service",
+        sections: [
+          {
+            type: "text",
+            title: "Carry, Present, Pour",
+            body: "<b>Carry.</b> Cradle the base of the bottle with your arm bent for support, and display the bottle as you walk through the dining room.<br><br><b>Present.</b> Stand at the right of the host, or the guest who ordered, and show the name and vintage for approval. Open the bottle and pour a taste for the host.<br><br><b>Pour.</b> Once the host approves, pour for the ladies first and serve the host last, even if the host is a woman. Make sure there's enough for everyone: pour a measured first round so the bottle reaches every guest. Wipe the neck of the bottle with a serviette, and always bring a serviette when you pour.",
+            note: "The label is what the host is agreeing to, so the presentation has to show the guest exactly what they ordered before it's opened, because after that it can't go back. Serving the host last is the reverse of what most people expect. It's a courtesy: the person who chose the wine is the last to be served, because everyone else at the table comes first. Pouring a measured first round is what stops you running out at the fourth glass."
+          },
+          {
+            type: "text",
+            title: "Where the Bottle Goes",
+            body: "<b>Red:</b> leave it on the table on a coaster, label facing the guests.<br><b>White:</b> serve with a bottle chiller at the table if there is one. If not, use a wine bucket filled with ice only, never ice and water, with the table number written on the back of the bottle.<br><br>Remove the cork from the table after pouring.<br><br>Keep wine levels maintained throughout the meal. Guests should never have to pour wine themselves or ask for it to be poured.",
+            note: "The coaster and label direction protect the linen and keep the wine on display. A bucket of ice and water leaves a bottle that drips on the cloth and on the guest when you lift it, which is why it's ice only. Levels matter because the moment a guest picks up the bottle, we've told them the table isn't being looked after."
+          }
+        ],
+        quiz: [
+          {
+            type: "sequence",
+            prompt: "Put the steps of presenting a bottle of wine in order.",
+            items: [
+              { id: "carry", label: "Carry the bottle, displaying it as you walk" },
+              { id: "present", label: "Show the host name and vintage from their right" },
+              { id: "taste", label: "Open it and pour a taste for the host" },
+              { id: "pour", label: "Pour for the ladies, and the host last" }
+            ],
+            correctOrder: ["carry", "present", "taste", "pour"],
+            correctMessage: "That's the order — correct."
+          },
+          {
+            type: "mcq",
+            question: "You're pouring a bottle for a table with a host and four guests. Who's last?",
+            options: [
+              "The oldest guest",
+              "The host, even if the host is a woman",
+              "Whoever is closest to the bottle",
+              "Whoever finished their drink first"
+            ],
+            correctIndex: 1,
+            explanation: "Serve the host last, even if she's a woman. The host tasted the wine and approved it, so the guests are served first."
+          },
+          {
+            type: "mcq",
+            question: "You have a white wine but no bottle chiller. What do you do?",
+            options: [
+              "Leave it on the table.",
+              "Use a bucket of ice only, with the table number written on the back of the bottle.",
+              "Use a bucket of ice and water.",
+              "Keep it at the bar and pour it there."
+            ],
+            correctIndex: 1,
+            explanation: "If there's no chiller, use a wine bucket filled only with ice, never ice and water, and write the table number on the back of the bottle."
+          }
+        ]
+      },
+      {
+        title: "Your Mission",
+        sections: [
+          {
+            type: "text",
+            title: "Make It Yours",
+            body: "Choose one wine from tonight's list that you'd suggest with the filet, and write the five things you should be able to say about it: the grape, where it's from, the winery's story, the winemaker, and one interesting fact. Say them out loud once before your next shift.<br><br>Then practice the presentation line at the host's right: the name and the vintage.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Your Mission",
+            body: "On your next shift, offer wine at every table right after the food order, repeat every vintage back, and keep every wine level up without being asked.<br><br>Afterward, tell your manager two things: how many tables you offered wine to, and one pocket wine you were able to talk about with a story.<br><br>Your manager may watch a few wine services. They're looking for a pattern over the shift, not one perfect pour.",
+            note: "Offering wine at every table is uncomfortable the first few times, and it gets easier once you have a wine you're proud of. Counting your offers shows you whether you're really doing it, and the story you told is the proof that the pocket wine is working."
+          }
+        ]
+      }
+    ],
+    test: [
+      {
+        question: "When is the right moment to offer wine?",
+        options: [
+          "When the guests sit",
+          "Once the food order is taken",
+          "When the entrées arrive",
+          "Only if the guest asks"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "A host orders a wine. What do you do?",
+        options: [
+          "Repeat the name and vintage back to confirm",
+          "Write it on your hand",
+          "Assume the bottle you have is right",
+          "Ask the manager to confirm"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "Where do you stand to present the bottle?",
+        options: [
+          "Across the table",
+          "At the right of the host, or the guest who ordered",
+          "Behind the host's chair",
+          "At the head of the table"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "You pour a bottle of red for the table. What happens to the bottle?",
+        options: [
+          "It stays at the side station",
+          "It goes back to the bar",
+          "It stays on the table on a coaster, label facing the guests",
+          "It goes in a bucket of ice"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "How many bread baskets with tongs for a party of 8?",
+        options: ["1", "2", "3", "8"],
+        correctIndex: 1
+      }
+    ]
+  },
+  {
+    id: "guest-journey-5-first-course",
+    title: "Module 5: The First Course",
+    category: "Service",
+    unlockAfter: "guest-journey-4-wine-bread",
+    journeyPhase: 3,
+    chapters: [
+      {
+        title: "Presenting the Course",
+        sections: [
+          {
+            type: "text",
+            title: "Friday, 8:10 PM",
+            body: "You're at the pass. Four appetizers for Table 14 are up. Nobody has said which dish belongs to which seat, and you're not sure who ordered the tartare.<br><br>What do you do before you pick up a plate? Hold that answer.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Pickup",
+            body: "The first course should arrive within 10 minutes of ordering. Only pick up items the Chef has called, and check that every dish is complete with garnish before it leaves the line.<br><br>When you pick up, repeat the single-digit table number. No “Yes, Chef.” Know the position numbers and where each dish is going: check the ticket, and repeat the position in your head if you need to. Never auction the plate.<br><br>Make sure the table is marked with the right silverware before you serve, and that condiments are there or come with the dish.",
+            note: "Checking the plate at the pass is the last moment anyone can fix it cheaply, before it's in front of a guest. Repeating the table number is how the kitchen knows the right dish is going to the right place, and it's the reason “Yes, Chef” doesn't work: it says you heard, not where you're going. Auctioning a plate (“who had the tartare?”) turns the guest into the one doing your job."
+          },
+          {
+            type: "text",
+            title: "Serving It",
+            body: "Announce each dish as you serve it, with the drop lines: protein, side, sauce, garnish. Mention special requests (“Caesar salad with croutons on the side”) and explain specialty sauces.<br><br>Serve from the left with the left hand: the guest of honor first, then ladies starting with the senior lady to the left of the host and moving clockwise, then men, host last. Never cross a guest's middle line. Say “Pardon my reach” when it's needed.<br><br>If an appetizer is shared, tell the kitchen. Some dishes can be split there. If not, place a shared plate as part of each guest's setting.<br><br>Offer fresh ground pepper from the guest's right, pepper mill in hand, with eye contact and a smile. Before you leave, ask: “Is there anything else that I can get for you, Mr. Smith?” Then wish them a pleasant meal, and be creative. Avoid saying “enjoy” by itself.",
+            note: "Announcing the dish means guests never have to ask what they're eating, and it's the one moment you can say what's special about it. Serving from the left, left hand, keeps your body from crossing anyone's space. And a dish that arrives in the wrong orientation or with something missing is visible immediately, which is why the announcement includes the request and the sauce: the guest can catch a miss before they take a bite."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "You're at the pass and the Chef calls table 12. What do you do?",
+            options: [
+              "Say “Yes, Chef” and take the plates.",
+              "Repeat the table number, check the plates are complete, and confirm the position numbers on the ticket.",
+              "Take the plates and figure out the seats at the table.",
+              "Wait for the Chef to tell you the seats."
+            ],
+            correctIndex: 1,
+            explanation: "Repeat the single-digit table number when you pick up, and don't say “Yes, Chef.” Check every dish and know the position numbers before you walk out, so you never have to auction a plate."
+          },
+          {
+            type: "mcq",
+            question: "You reach the table with four appetizers. Which is right?",
+            options: [
+              "Set them down from the right and ask who ordered what.",
+              "Serve from the left with your left hand, guest of honor first, announcing each dish.",
+              "Hand the plates to the host to pass around.",
+              "Serve the men first, then the ladies."
+            ],
+            correctIndex: 1,
+            explanation: "Serve from the left with the left hand, the guest of honor first, then ladies clockwise from the senior lady, then men, host last, announcing each dish as it lands."
+          },
+          {
+            type: "mcq",
+            question: "Two guests are sharing an appetizer. What do you do?",
+            options: [
+              "Set it in the center and let them work it out.",
+              "Tell the kitchen it's shared, and place a shared plate for each guest if the kitchen can't split it.",
+              "Split it at the table in front of them.",
+              "Bring two dishes."
+            ],
+            correctIndex: 1,
+            explanation: "If an appetizer is shared, tell the kitchen. Some dishes can be split there, and if not, a shared plate goes in each guest's setting."
+          }
+        ]
+      },
+      {
+        title: "Check Back and Fire",
+        sections: [
+          {
+            type: "text",
+            title: "The Two-Minute Check-Back",
+            body: "Check back within 2 minutes of serving, to confirm the food is what the guest hoped for. The manager visits the table as well. Keep the visits discreet and combine them, so guests aren't interrupted or asked again and again.<br><br>Be specific: “Mr. Smith, is the filet mignon to your liking…?” or “Mr. Smith, are you enjoying your old fashioned…?” Don't ask “How is everything?” Ask “Is everything to your liking?” or “I wanted to check in and make sure everything is meeting your expectations.”<br><br>Check after two bites or two minutes. That's when guests often need condiments or seasoning.<br><br>Never allow a guest to stay unhappy with their food. Tell the manager right away. If we can't fix it, offer an alternative menu item.",
+            note: "“How is everything?” invites “Fine,” and a guest who's a little unhappy will say fine. A specific question about a specific dish is one they'll answer honestly. Two bites is the earliest point they know whether it's right, and the last point you can fix it while everyone else is still eating."
+          },
+          {
+            type: "text",
+            title: "Fire the Entrée",
+            body: "Fire the second course when the table is about halfway through the appetizers. Straight fire according to the matrix, and hit the fire key in the POS so the kitchen is alerted.<br><br>For a tasting menu, message which course to fire: “Pasta,” “Fish,” or “Main.”",
+            note: "The kitchen can't see the table. The fire key is how it learns the appetizers are half gone, and it's the only way the entrée lands about 10 minutes after the plates are cleared. Fire too early and the entrée sits under a lamp; too late and guests are waiting with nothing on the table."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "Two bites in, you approach Table 14. What do you say?",
+            options: [
+              "“How is everything?”",
+              "“Mr. Alvarez, is the filet mignon to your liking?”",
+              "“Everything okay?”",
+              "Nothing. Wait for them to flag you."
+            ],
+            correctIndex: 1,
+            explanation: "Be specific: name the guest and the dish. “How is everything?” is the question the standards say not to ask, because it gets an automatic answer."
+          },
+          {
+            type: "mcq",
+            question: "When do you fire the entrée?",
+            options: [
+              "When the guests order.",
+              "When the table is about halfway through the appetizers.",
+              "After the appetizer plates are cleared.",
+              "When the guests ask for it."
+            ],
+            correctIndex: 1,
+            explanation: "Fire the second course about halfway through the appetizers, and hit the fire key in the POS."
+          }
+        ]
+      },
+      {
+        title: "When a Guest Isn't Happy",
+        sections: [
+          {
+            type: "text",
+            title: "The First Four Things",
+            body: "When a guest is unhappy with a dish, do everything you can to fix it. There are three typical cases: the dish needs to be re-made to the guest's preference, a new item has to replace something they didn't like, or a dish needs to be cooked more.<br><br>In every case, do these first:<br><b>1. Apologize,</b> honestly and sincerely.<br><b>2. Listen</b> and understand the feedback.<br><b>3. Don't argue.</b><br><b>4. Remove the dish</b> from the guest as you speak.",
+            note: "A guest who feels unheard won't accept any fix, so listening comes before anything you can do in the kitchen. Arguing can only make you right and the guest unhappy. And removing the dish while you're still talking stops them from having to sit in front of the thing they're unhappy about."
+          },
+          {
+            type: "text",
+            title: "Three Situations",
+            body: "<b>Adjust to preference.</b> Find out exactly what they'd like changed (less salt, for example). Place the order at the POS and modify the dish. Bring the dish and the new order to a Manager, who goes to the expeditor or Chef to confirm the re-fire.<br><br><b>Guest wants something else.</b> Offer the menu and suggest a specific alternative based on what they disliked. Take the new order, enter it, and bring the dish and order to a Manager, who confirms with the expeditor or Chef.<br><br><b>Wrong temperature.</b> Find out exactly how they prefer it. Go straight to the Chef or expeditor with the dish. Fill out a re-fire ticket: table number, guest position number, item, temperature, time, and your initial. Once the kitchen has re-fired it, alert a Manager.<br><br>An undercooked steak can be re-fired to the guest's liking. An overcooked steak can't be uncooked: a new item has to be rung in and expedited.",
+            note: "A steak can only go one direction: more done. That's why the two cases run differently, and why a re-fire ticket needs a position number and a time, so the kitchen knows whose steak it is and how long that guest has already waited. Bringing the dish to a Manager, not just the kitchen, means someone with authority owns the guest's problem until it's solved."
+          },
+          {
+            type: "text",
+            title: "After the Re-Fire",
+            body: "The Manager returns to the table, gives a time frame for the new dish, apologizes, and follows up once the guest has it.<br><br>A complimentary dessert can be sent as a token of appreciation. Use your best judgment.<br><br>The Manager removes the dish from the check (POS: return). For a quick temperature re-fire this may not be needed. Before you present the check, double-check that every returned and complimentary item has been removed.",
+            note: "A guest who's waiting on a re-fire with no time frame is having a second bad experience on top of the first, so the time frame is as important as the apology. And a dish that's still on the check turns a problem we fixed into a new one at the very end, where it's the last thing the guest remembers."
+          }
+        ],
+        quiz: [
+          {
+            type: "sort",
+            prompt: "Sort each situation by what it needs.",
+            groupALabel: "Re-fire the dish",
+            groupBLabel: "Ring in a new item",
+            chips: [
+              { id: "under", label: "Steak is undercooked", group: "a" },
+              { id: "more", label: "Guest wants it cooked more", group: "a" },
+              { id: "over", label: "Steak is overcooked", group: "b" },
+              { id: "else", label: "Guest wants a different dish", group: "b" }
+            ]
+          },
+          {
+            type: "mcq",
+            question: "A guest says their steak is too rare. What comes first?",
+            options: [
+              "Explain that it was cooked to their order.",
+              "Apologize sincerely, listen, don't argue, and remove the dish as you speak.",
+              "Take it to the kitchen without saying anything.",
+              "Offer them a free dessert."
+            ],
+            correctIndex: 1,
+            explanation: "In every case, apologize honestly, listen, don't argue, and remove the dish while you speak. Then find out exactly how they prefer it."
+          },
+          {
+            type: "mcq",
+            question: "What goes on a re-fire ticket for a wrong temperature?",
+            options: [
+              "Just the table number",
+              "Table number, position number, item, temperature, time, and server initial",
+              "The guest's name and phone number",
+              "Only the item and temperature"
+            ],
+            correctIndex: 1,
+            explanation: "The re-fire ticket carries table number, guest position number, item, temperature, time, and server initial, so the kitchen knows exactly whose dish it is."
+          }
+        ]
+      },
+      {
+        title: "Your Mission",
+        sections: [
+          {
+            type: "text",
+            title: "Make It Yours",
+            body: "Write your own version of the specific check-back question for the three dishes you serve most. Say them out loud once before your next shift.<br><br>Then say the four re-fire steps out loud: apologize, listen, don't argue, remove the dish.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Your Mission",
+            body: "On your next shift, repeat the table number at every pickup, announce every dish you serve, and make one specific check-back at every table within two minutes.<br><br>Afterward, tell your manager two things: one time a specific question surfaced something a generic “how is everything” would have missed, and one time you fired a course on time.<br><br>Your manager may watch a few check-backs. They're looking for a pattern over the shift, not a flawless one.",
+            note: "It's easy to skip the check-back when the dining room is loud and nothing looks wrong. The times a specific question caught something are the evidence that it's worth doing when nothing looks wrong."
+          }
+        ]
+      }
+    ],
+    test: [
+      {
+        question: "How soon should the first course arrive after ordering?",
+        options: ["5 minutes", "10 minutes", "15 minutes", "20 minutes"],
+        correctIndex: 1
+      },
+      {
+        question: "What do you do at the pass when the Chef calls your table?",
+        options: [
+          "Say “Yes, Chef”",
+          "Repeat the single-digit table number",
+          "Ask what's on the plate",
+          "Take the plates and check later"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "How do you serve the first course?",
+        options: [
+          "From the right with the right hand",
+          "From the left with the left hand",
+          "From across the table",
+          "By passing plates to the host"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Which question is right for a check-back?",
+        options: [
+          "“How is everything?”",
+          "“Anything else?”",
+          "“Mr. Smith, is the filet mignon to your liking?”",
+          "“Is it good?”"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "A guest's steak is overcooked. What happens?",
+        options: [
+          "It's re-fired to the guest's liking",
+          "A new item is rung in and expedited",
+          "The guest is asked to accept it",
+          "It goes back for more cooking"
+        ],
+        correctIndex: 1
+      }
+    ]
+  },
+  {
+    id: "guest-journey-6-clear-entree",
+    title: "Module 6: Clearing and the Entrée",
+    category: "Service",
+    unlockAfter: "guest-journey-5-first-course",
+    journeyPhase: 3,
+    chapters: [
+      {
+        title: "Clearing the Course",
+        sections: [
+          {
+            type: "text",
+            title: "Friday, 8:35 PM",
+            body: "Three of the four guests at Table 14 have put their forks down. The fourth is still working on the last bite of a salad.<br><br>Do you clear? Hold that answer.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "When to Clear",
+            body: "Clear soiled plates within 2 minutes of all guests finishing. The same rules apply to clearing the entrée.<br><br>Wait until everyone is finished. Don't ask “Are you done with that?” Clear only when it's obvious that all the guests are done, or when a guest asks you to. Always ask “May I?” or “Can I?” Never assume.<br><br>Staff it properly: 1 person for a table of 2, 2 people for a table of 4, 3 people for a table of 6. No exceptions.",
+            note: "A plate taken while one guest is still eating tells that guest they're holding everyone up. Waiting more than two minutes after the last fork goes down leaves the table looking neglected. “Are you done with that?” puts the guest on the spot, so the standard is to read the table and ask permission with a simple “May I?” One person per two guests keeps the whole table cleared in a single quick pass, which is what makes it invisible."
+          },
+          {
+            type: "text",
+            title: "How to Clear",
+            body: "Clear from the right with your right hand into your left hand. If you must clear from the left, use the left hand into the right. Never reach across a guest. Start with the guest of honor, then ladies when possible.<br><br>Clear quietly. Dropping silverware means you're clearing incorrectly. If silver is on the table, lift the plate first, then the silver one piece at a time. If silver rests on the plate, lift them together. Never take silver off a plate and put it back down. Keep the silverware in the middle of the plate so it doesn't tilt and fall.<br><br>Never stack plates on the table or scrape food from one plate to another. Go to the dishwasher immediately and put similar items together neatly.<br><br>Clear everything except beverage glasses still in use, working big to small and most difficult to least difficult.",
+            note: "Every noise at the table interrupts the conversation, and the sound of silver hitting a plate is one of the few things guests hear over everything else. Scraping and stacking in front of guests turns their table into a bus station. Going straight to the dishwasher means dirty plates aren't sitting in the dining room, where every other guest can see them."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "Three of four guests are finished. What do you do?",
+            options: [
+              "Clear the three finished plates now.",
+              "Ask the fourth guest if they're finished.",
+              "Wait until all four are done, then clear within 2 minutes, asking “May I?”",
+              "Take the plates and leave the fourth."
+            ],
+            correctIndex: 2,
+            explanation: "Wait until everyone is finished, then clear within 2 minutes. Ask “May I?” Never ask “Are you done with that?” and never assume."
+          },
+          {
+            type: "mcq",
+            question: "How many team members clear a table of 6?",
+            options: ["1", "2", "3", "4"],
+            correctIndex: 2,
+            explanation: "One for a table of 2, two for a table of 4, three for a table of 6. No exceptions."
+          },
+          {
+            type: "mcq",
+            question: "A guest's silverware is resting on their plate. How do you lift it?",
+            options: [
+              "Take the silver off and set it on the table.",
+              "Lift the silver and plate together, keeping the silver in the middle.",
+              "Slide the silver off onto another plate.",
+              "Leave the silver for later."
+            ],
+            correctIndex: 1,
+            explanation: "If silver rests on the plate, lift them together. Never take silver off a plate and set it back down."
+          }
+        ]
+      },
+      {
+        title: "Crumb and Mark",
+        sections: [
+          {
+            type: "text",
+            title: "Crumbing the Table",
+            body: "After clearing, clean the table with a napkin, linen, or crumber, using a plate and never bare hands. Always crumb away from the guest, unobtrusively, with the fewest strokes. Keep the crumbing plate clean and the moist cloth folded and clean.<br><br><b>Tablecloth:</b> use a crumber.<br><b>Bare table:</b> use a small plate and a moist cleaning cloth, starting from each guest's left if possible.<br><b>Placemats:</b> fold them away from the guest so debris doesn't fall on laps, the table, or the floor, then crumb as for a bare table.<br><br>Crumb throughout the meal, not just before dessert. The goal is an impeccably clean table at all times, but don't over-crumb. If a tablecloth is stained in front of a guest, cover the stain with a clean napkin.",
+            note: "Crumbs swept toward a guest end up in their lap, so the direction is the whole technique. Fewest strokes matters because each stroke is a second you're in their space during their meal. And covering a stain with a napkin doesn't hide it from the guest, it tells them we saw it and did something about it."
+          },
+          {
+            type: "text",
+            title: "Marking for the Entrée",
+            body: "Prepare a mise en place tray with only the silverware the table needs, organized by position number or by setting type. Place the silver swiftly and discreetly, beginning with the ladies, and stay open-handed to the guest.<br><br><b>Fork:</b> mark from the left with your left hand.<br><b>Knife and spoon:</b> mark from the right with your right hand, the knife first from the center outward, the spoon last.<br><br>Leave room for a plate between pieces. If a guest hasn't ordered a second course, mark them a sharing plate. Hold all silver from its base to avoid fingerprints.",
+            note: "Using the hand nearest the guest's side means your arm never crosses in front of them. Carrying only what the table needs keeps the tray light and quiet. And holding silver by the base is a small thing that guests notice when it's wrong: a fingerprint on the bowl of a fork is the first thing the guest sees when they pick it up."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "Which way do you crumb?",
+            options: [
+              "Toward the guest, so the crumbs land on your plate.",
+              "Away from the guest, unobtrusively, with the fewest strokes.",
+              "Bare-handed, to be quick.",
+              "Only just before dessert."
+            ],
+            correctIndex: 1,
+            explanation: "Always crumb away from the guest, with a plate and cloth, never bare hands, and throughout the meal, not only before dessert."
+          },
+          {
+            type: "mcq",
+            question: "You're marking silver for the entrée. Which hand and side for the knife?",
+            options: [
+              "Left hand from the left",
+              "Right hand from the right, knife first from the center outward",
+              "Either hand from behind",
+              "Both hands from the center"
+            ],
+            correctIndex: 1,
+            explanation: "Forks are marked from the left with the left hand. Knives and spoons are marked from the right with the right hand, knife first from the center outward, spoon last."
+          }
+        ]
+      },
+      {
+        title: "Presenting the Entrée",
+        sections: [
+          {
+            type: "text",
+            title: "Serve It on Time",
+            body: "The standards match the first course, with a few differences. Serve the entrée 10 minutes after the first course is cleared. Don't be reactive. Always be proactive.<br><br>Announce the dish with its 3 major ingredients and any special requests: “filet mignon, medium rare, with béarnaise sauce on the side.” Explain specialty sauces.<br><br>Serve from the left with your left hand: children first, then ladies starting with the senior lady to the left of the host and moving clockwise, then the men, host last. Keep plates straight, protecting the look of each dish, and place plates with the featured menu item facing the guest.<br><br>Check that the table has the right silverware before you approach, and that condiments are present. Repeat single-digit table numbers at pickup, and never auction the plate. Wish guests a pleasant meal, avoiding “enjoy” by itself.",
+            note: "The 10 minutes is the pause that makes the meal feel unhurried, and it's short enough that guests never start to wonder what's happening. Facing the featured item toward the guest is the chef's plating, presented the way it was meant to be seen. And “be proactive” is the difference between a runner who's watching the table when the plates are cleared and one who learns about it when someone flags them down."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "Which announcement is right for an entrée?",
+            options: [
+              "“Here's the steak.”",
+              "“Filet mignon, medium rare, with béarnaise sauce on the side.”",
+              "“Who had the medium rare?”",
+              "“Enjoy.”"
+            ],
+            correctIndex: 1,
+            explanation: "Name the dish with its main ingredients and any special requests. Never auction the plate, and avoid saying “enjoy” by itself."
+          },
+          {
+            type: "mcq",
+            question: "When does the entrée arrive?",
+            options: [
+              "As soon as it's ready",
+              "10 minutes after the first course is cleared",
+              "5 minutes after the first course is served",
+              "When the guests ask"
+            ],
+            correctIndex: 1,
+            explanation: "Serve the entrée 10 minutes after the first course is cleared, being proactive, not reactive."
+          }
+        ]
+      },
+      {
+        title: "Your Mission",
+        sections: [
+          {
+            type: "text",
+            title: "Make It Yours",
+            body: "Pick one entrée on tonight's menu. Write the announcement: the dish, its three main ingredients, and how it's cooked or served. Say it out loud once before your next shift.<br><br>Then practice clearing: right hand from the right into the left hand, silver in the middle of the plate.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Your Mission",
+            body: "On your next shift, clear only when every guest has finished, ask “May I?” at each table, crumb away from the guest, and announce every entrée with its ingredients and special requests.<br><br>Afterward, tell your manager two things: one table where you waited for the last guest to finish before clearing, and one entrée announcement you gave without hesitating.<br><br>Your manager may watch a few clears. They're looking for a pattern over the shift, not one perfect table.",
+            note: "Waiting for the last guest to finish feels like wasted time when the section is busy. Noticing the tables where it worked is how you learn that waiting is what keeps the pace looking unhurried."
+          }
+        ]
+      }
+    ],
+    test: [
+      {
+        question: "When do you clear a course?",
+        options: [
+          "As soon as a guest puts their fork down",
+          "Within 2 minutes of all guests finishing",
+          "When the entrée is ready",
+          "After the guests ask twice"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Which question is right when clearing?",
+        options: [
+          "“Are you done with that?”",
+          "“May I?”",
+          "“All finished?”",
+          "None. Just clear"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "You must clear from the left. Which hands?",
+        options: [
+          "Right hand into the left",
+          "Left hand into the right",
+          "Both hands",
+          "You never clear from the left"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Where do you serve the entrée from?",
+        options: [
+          "The guest's left with the left hand",
+          "The guest's right with the right hand",
+          "Across the table",
+          "The head of the table"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "Which way does the featured item face when you place the entrée?",
+        options: [
+          "Toward the center of the table",
+          "Away from the guest",
+          "Toward the guest",
+          "It doesn't matter"
+        ],
+        correctIndex: 2
+      }
+    ]
+  },
+  {
+    id: "guest-journey-7-upkeep",
+    title: "Module 7: Check-Backs and Upkeep",
+    category: "Service",
+    unlockAfter: "guest-journey-6-clear-entree",
+    journeyPhase: 3,
+    chapters: [
+      {
+        title: "The Entrée Check-Back",
+        sections: [
+          {
+            type: "text",
+            title: "Friday, 8:55 PM",
+            body: "The entrées at Table 14 have just landed. You have a table wanting a check, another waiting on a coffee, and a manager crossing the room.<br><br>Who visits Table 14, and when? Hold that answer.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Two Minutes, Two Bites",
+            body: "Check back within 2 minutes or 2 bites of serving. The manager must check every table after the entrée. No exception. Managers should have their own sections, so multiple managers don't visit the same table.<br><br>Take a visual snapshot as you approach: water glasses filled, bread available if needed, wine replenished, guests happy. Be precise: “Are you enjoying the…?” or “You don't seem to care much for the ___. May I get you something else instead?” Sometimes a simple question fits best: “Are you enjoying your chopped salad?”<br><br>Report serious issues to the floor manager, but act for the guest first. Every minute counts.<br><br>This is also a good moment to recommend another bottle or glass of wine, pour more, offer more food, or see if anything else is needed.",
+            note: "This check-back matters because if anything is wrong, there is still time to fix it: the guest is in the middle of their most important course, not at the check. A snapshot lets you see problems the guest hasn't mentioned, like an empty glass or an untouched side. And “act first” is because every minute a guest spends waiting for someone to report a problem is a minute they spend unhappy. Fix it, then tell the manager."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "Who checks back at Table 14 after the entrée lands?",
+            options: [
+              "Only the server.",
+              "The server within 2 minutes or 2 bites, and the manager too. The manager checks every table after the entrée.",
+              "Only if the guests wave.",
+              "The runner."
+            ],
+            correctIndex: 1,
+            explanation: "Check within 2 minutes or 2 bites, and the manager must check every table after the entrée, with no exceptions."
+          },
+          {
+            type: "mcq",
+            question: "You notice a guest hasn't touched their side, and their wine glass is empty. What do you do?",
+            options: [
+              "Wait until they say something.",
+              "Ask about the side, pour more wine or offer another glass, and act for the guest before reporting.",
+              "Tell the manager and wait.",
+              "Clear the side."
+            ],
+            correctIndex: 1,
+            explanation: "Take the visual snapshot, then act. You can ask specifically about the side, offer more wine, and report to the manager after."
+          }
+        ]
+      },
+      {
+        title: "Keeping the Table",
+        sections: [
+          {
+            type: "text",
+            title: "Physical Inventory",
+            body: "Each time you're at a table, take a physical inventory. Clear dirty silverware, china, and glassware, and refill water and drinks.<br><br>Remove items guests no longer need, such as empty side plates, glasses, or bottles. When removing glassware, also take stirrers, fruit, cocktail napkins, and coasters, always using a tray. Offer refills when a glass or cup is under one third full. Replace a dropped fork. Clear plates from the center of the table as they empty, to avoid clutter.<br><br>Wipe a heavily soiled table as clean as you can, and cover a stained tablecloth with a napkin. Replace soiled or fallen napkins. If a guest leaves the table, refold their napkin immediately.",
+            note: "This is the one step in the journey where the standards state the reason: there is less to clear after entrées, the table looks neat, and guests perceive better service. Taking inventory on every visit means each one leaves the table a little better than you found it."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "You reach a table and see an empty bread plate, a dropped fork, and a half-empty water glass. What do you do?",
+            options: [
+              "Note it and come back when you're less busy.",
+              "Take the bread plate, replace the fork, and refill the water, on this visit.",
+              "Ask the guests if they need anything.",
+              "Send an assistant."
+            ],
+            correctIndex: 1,
+            explanation: "Each visit is a physical inventory: remove what's no longer needed, replace what's dropped, and refill water and drinks. Guests should never have to ask."
+          },
+          {
+            type: "mcq",
+            question: "At what level do you offer a refill on a glass or cup?",
+            options: [
+              "Only when it's empty",
+              "Under one third full",
+              "Only when the guest asks",
+              "Every visit, no matter what"
+            ],
+            correctIndex: 1,
+            explanation: "Offer refills when a glass or cup is under one third full."
+          }
+        ]
+      },
+      {
+        title: "Clearing the Entrée",
+        sections: [
+          {
+            type: "text",
+            title: "Everything Comes Off",
+            body: "Follow the same clearing rules as before, within 2 minutes of all guests finishing.<br><br>After all plates and flatware are gone, use a tray to remove all empty glassware except water glasses. If a glass isn't completely empty, ask before removing it. Clear the salt and pepper shakers. Only the water glasses in use and the centerpiece remain.<br><br>If a guest asks where the bathrooms are: “Please, allow me to show you the way, Madame / sir.”<br><br>Then crumb the table with the same method as before, throughout the meal.",
+            note: "Clearing everything down to water and the centerpiece is the signal that the entrée is over and the next thing is coming, which sets up dessert. Asking before removing a glass with wine still in it is the small thing that stops you from taking something a guest was still enjoying. And walking a guest to the bathroom, not pointing, is how “where is it?” becomes a moment of care."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "After the entrée, which items stay on the table?",
+            options: [
+              "Everything the guests haven't touched",
+              "Only water glasses in use and the centerpiece",
+              "Wine glasses and shakers",
+              "Nothing"
+            ],
+            correctIndex: 1,
+            explanation: "After plates and flatware are gone, remove empty glassware except water glasses, and clear the salt and pepper shakers. Only the water glasses in use and the centerpiece remain."
+          },
+          {
+            type: "mcq",
+            question: "A guest asks where the restroom is. What do you say?",
+            options: [
+              "“Straight back and to the left.”",
+              "“Please, allow me to show you the way, Madame / sir.”",
+              "“Ask the host.”",
+              "Point with your hand."
+            ],
+            correctIndex: 1,
+            explanation: "The standard is to walk them there. “Please, allow me to show you the way, Madame / sir.”"
+          }
+        ]
+      },
+      {
+        title: "Your Mission",
+        sections: [
+          {
+            type: "text",
+            title: "Make It Yours",
+            body: "Write your three favorite check-back questions for the entrées you serve most. Say them out loud once before your next shift.<br><br>Then walk the four-point snapshot in your head: water, bread, wine, guests.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Your Mission",
+            body: "On your next shift, check back at every entrée within 2 minutes or 2 bites, take a visual snapshot at every visit, and leave every table a little better than you found it.<br><br>Afterward, tell your manager two things: one time the snapshot showed you something the guest hadn't mentioned, and one table where the entrée went out and back cleanly.<br><br>Your manager will visit every table after the entrée. They're looking for a pattern over the shift, not one flawless visit.",
+            note: "It's easy to treat the snapshot as a formality until it catches something. The time it does is the reason to keep doing it, and remembering it is how the habit sticks."
+          }
+        ]
+      }
+    ],
+    test: [
+      {
+        question: "How soon after the entrée is served do you check back?",
+        options: [
+          "Within 2 minutes or 2 bites",
+          "Within 10 minutes",
+          "When the guests finish",
+          "When the manager asks"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "Which tables must the manager check after the entrée?",
+        options: [
+          "Only the large parties",
+          "Only tables with problems",
+          "Every table, no exception",
+          "Only the guests who ask"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "You find a problem at a table. What order do you follow?",
+        options: [
+          "Report to the manager, then wait",
+          "Act for the guest first, then report serious issues to the floor manager",
+          "Tell the assistant and leave",
+          "Ignore it unless the guest complains"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "At what level do you offer a refill?",
+        options: [
+          "Empty",
+          "Under one third full",
+          "Under half full",
+          "Full"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "After you clear the entrée, which shakers stay on the table?",
+        options: ["Salt only", "Pepper only", "Both", "Neither"],
+        correctIndex: 3
+      }
+    ]
+  },
+  {
+    id: "guest-journey-8-dessert-order",
+    title: "Module 8: Offering Dessert",
+    category: "Service",
+    unlockAfter: "guest-journey-7-upkeep",
+    journeyPhase: 3,
+    chapters: [
+      {
+        title: "Offering Dessert",
+        sections: [
+          {
+            type: "text",
+            title: "Friday, 9:20 PM",
+            body: "The entrées are cleared at Table 14, and the table is down to water and the centerpiece. Mrs. Alvarez said earlier that she was full. Mr. Alvarez is finishing his wine.<br><br>Do you bring the dessert menu? Hold that answer.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Menus, Without Being Asked",
+            body: "Present the dessert menu without being asked. No exceptions.<br><br>Bring the menus and never impose them. Recommend a dessert, be descriptive and accurate so the guest can picture it, but concise. Be confident, use a lively, positive tone, and believe what you're saying. Then excuse yourself so the guests can choose.<br><br>Offer coffee, tea, and cordials at the same time as the dessert order:<br>“Would you like a cappuccino or latte to accompany your dessert…?”<br>“Is whole milk okay, or do you have a preference…?”<br>“May I suggest a delicious sweet wine to pair with dessert…”",
+            note: "A guest who says they're full is often deciding out loud, not deciding for good, and a dessert menu is the smallest possible nudge. If we wait for the guest to ask, only the guests already planning dessert get one. Excusing yourself is just as important: standing over a table while people decide turns a choice into an obligation."
+          },
+          {
+            type: "text",
+            title: "What Did I Hear?",
+            body: "Stay aware of your surroundings and listen. There may be a birthday, an anniversary, or another occasion you didn't know about. An unexpected candle goes a long way.",
+            note: "Occasions don't always reach the reservation. A guest mentions it to their partner over the entrée, and the only person who can turn it into a moment is the one who was close enough to hear. Dessert is the last course, so it's the last chance."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "Mrs. Alvarez said earlier that she was full. What do you do at dessert?",
+            options: [
+              "Skip the dessert menu for that table.",
+              "Bring the dessert menus without being asked and recommend something specific, then step away.",
+              "Ask if they want dessert, and leave if they say no.",
+              "Wait until they ask."
+            ],
+            correctIndex: 1,
+            explanation: "Present the dessert menu without being asked. No exceptions. Recommend, then excuse yourself so they can choose."
+          },
+          {
+            type: "mcq",
+            question: "While clearing, you overhear a guest say to their partner, “Happy birthday.” What do you do?",
+            options: [
+              "Nothing. It's not on the reservation.",
+              "Note it, tell your manager, and add a candle to the dessert order.",
+              "Ask them loudly if it's their birthday.",
+              "Wait until they mention it to you."
+            ],
+            correctIndex: 1,
+            explanation: "Listen for occasions you didn't know about. An unexpected candle goes a long way, so pass it on and build it into the dessert order."
+          }
+        ]
+      },
+      {
+        title: "Taking the Order",
+        sections: [
+          {
+            type: "text",
+            title: "Within Three Minutes",
+            body: "Take the order within 3 minutes and repeat it for accuracy. Ask if guests have questions about the desserts.<br><br>Allergies often come up at dessert. Ask specific questions tactfully, check with the Chef as needed, and assure the guest that the dish is appropriate.<br><br>Take the order the way you took the food order: ladies first, starting with the senior lady to the host's left, clockwise, then the men, host last. For children, ask the parents.",
+            note: "Dessert is where guests tend to remember an allergy they didn't think to mention at the start, or where a dish they assumed was safe turns out to contain something new. Asking specifically, not generically, is what lets a guest answer honestly without feeling they're causing a fuss."
+          },
+          {
+            type: "text",
+            title: "Coffee, Tea, and Liquid Dessert",
+            body: "Take the coffee or tea order at the same time. If tea, ask about honey. Introduce brands and varieties, keep descriptions accurate and short, be definitive, and ask leading questions.<br><br>Suggest after-dinner drinks, especially if the guest skips dessert. They can act as a “liquid dessert.”<br><br><b>Order of service.</b> The most formal way is dessert first, then coffee once the dessert plates are cleared. This suits guests having cordials or a dessert beverage pairing. In Refined Dining, always ask whether the guest wants coffee before, with, or after dessert.",
+            note: "A guest who skips dessert still has something to end the evening on, and an after-dinner drink gives them a reason to stay at the table. Asking when they want coffee matters because guests differ, and some want it with the first bite of dessert while others want it after the plates are gone. Getting it wrong means the coffee is cold or late either way."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "You take the dessert order. How long do you have?",
+            options: ["1 minute", "3 minutes", "5 minutes", "10 minutes"],
+            correctIndex: 1,
+            explanation: "Take the dessert, coffee, tea, and cordial order within 3 minutes, and repeat it for accuracy."
+          },
+          {
+            type: "mcq",
+            question: "A guest says they'll skip dessert. What can you offer?",
+            options: [
+              "Nothing. Bring the check.",
+              "An after-dinner drink, such as a cordial, which can act as a “liquid dessert.”",
+              "A second entrée.",
+              "Another glass of water."
+            ],
+            correctIndex: 1,
+            explanation: "Suggest after-dinner drinks, especially if the guest skips dessert. They can act as a “liquid dessert.”"
+          },
+          {
+            type: "mcq",
+            question: "In Refined Dining, what do you ask about coffee?",
+            options: [
+              "Nothing. It's always after dessert.",
+              "Whether they want it before, with, or after dessert.",
+              "Whether it's regular or decaf.",
+              "Whether they want to skip it."
+            ],
+            correctIndex: 1,
+            explanation: "In Refined Dining, always ask whether the guest wants coffee before, with, or after dessert."
+          }
+        ]
+      },
+      {
+        title: "Ring In and Mark",
+        sections: [
+          {
+            type: "text",
+            title: "Ring It In Right Away",
+            body: "Enter the dessert, coffee, tea, and cordial order instantly. Enter the entire order, check with the kitchen before any special request, modify items with clear notes, and clarify anything confusing with the Chef.<br><br>A birthday candle is a very common modification. Don't forget it. An accurate position number is a must when a birthday is involved. Make it personal by running the dessert yourself.",
+            note: "A candle that isn't rung in is a candle that doesn't exist, and it's the one modification where a late fix can't be undone, because the moment has passed. The position number is what sends the candle to the right guest. And carrying the dessert yourself means the person who heard about the occasion is the person standing at the table when it arrives."
+          },
+          {
+            type: "text",
+            title: "Mark for Dessert",
+            body: "Quietly place all needed silverware on a mise en place tray. Set a dessert fork on the left and a dessert spoon on the right of each guest, staying open-handed. If guests share a dessert, mark share plates.",
+            note: "Marking before the dessert arrives is the same reason as before: the plate shouldn't wait for the silver. Share plates go down first so the guests sharing don't have to wait, or fight over one spoon."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "A guest at seat 2 is celebrating a birthday. How does the candle get there?",
+            options: [
+              "Tell the kitchen at the pass.",
+              "Ring it in as a modification with the correct position number, and run the dessert yourself.",
+              "Leave a note at the server station.",
+              "Bring a candle from the bar later."
+            ],
+            correctIndex: 1,
+            explanation: "A birthday candle is a common modification. Enter it, get the position number right, and run the dessert yourself to make it personal."
+          },
+          {
+            type: "mcq",
+            question: "Where do the dessert fork and spoon go?",
+            options: [
+              "Fork on the right, spoon on the left",
+              "Fork on the left, spoon on the right",
+              "Both on the right",
+              "Both above the plate"
+            ],
+            correctIndex: 1,
+            explanation: "Set a dessert fork on the left and a dessert spoon on the right of each guest, staying open-handed."
+          }
+        ]
+      },
+      {
+        title: "Your Mission",
+        sections: [
+          {
+            type: "text",
+            title: "Make It Yours",
+            body: "Pick the dessert you'd most like to sell tonight. Write one sentence that helps a guest picture it: what it looks like, what it tastes like, and why you like it. Say it out loud once before your next shift.<br><br>Then write your line for a guest who says they're full.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Your Mission",
+            body: "On your next shift, bring the dessert menu to every table without being asked, and listen at every table for an occasion you didn't know about.<br><br>Afterward, tell your manager two things: how many tables you brought a dessert menu to, and one occasion you learned about only because you were listening.<br><br>Your manager may watch a few dessert offers. They're looking for a pattern over the shift, not one perfect pitch.",
+            note: "Dessert is the course that gets skipped when everyone's tired. Counting the tables where you offered it is how you catch yourself before it becomes the habit."
+          }
+        ]
+      }
+    ],
+    test: [
+      {
+        question: "When do you present the dessert menu?",
+        options: [
+          "Only when asked",
+          "Without being asked. No exceptions",
+          "Only if the table looks interested",
+          "After the check"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "How long do you have to take the dessert order?",
+        options: ["1 minute", "3 minutes", "5 minutes", "10 minutes"],
+        correctIndex: 1
+      },
+      {
+        question: "A guest mentions a nut allergy at dessert. What do you do?",
+        options: [
+          "Recommend something without nuts from memory",
+          "Ask specific questions tactfully, check with the Chef, and assure the guest the dish is appropriate",
+          "Tell them it's too late",
+          "Skip dessert for that guest"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "What do you ask about coffee in Refined Dining?",
+        options: [
+          "Whether it's regular or decaf",
+          "Whether they want it before, with, or after dessert",
+          "Nothing",
+          "Whether they want sugar"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "What's on the table for a guest's dessert setting?",
+        options: [
+          "A dessert fork on the right, and a dessert spoon on the left",
+          "A dessert fork on the left, and a dessert spoon on the right",
+          "Only a dessert spoon",
+          "Only a dessert fork"
+        ],
+        correctIndex: 1
+      }
+    ]
+  },
+  {
+    id: "guest-journey-9-dessert-service",
+    title: "Module 9: Coffee, Dessert, and Clearing",
+    category: "Service",
+    unlockAfter: "guest-journey-8-dessert-order",
+    journeyPhase: 3,
+    chapters: [
+      {
+        title: "Coffee Service",
+        sections: [
+          {
+            type: "text",
+            title: "Friday, 9:40 PM",
+            body: "Table 14 ordered a cappuccino, a decaf, a regular coffee, and two desserts. The decaf and the regular are both black, and the cups look identical from a distance.<br><br>How do you keep them straight, and what do you never ask twice? Hold that answer.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Coffee at the Table",
+            body: "Serve within 5 minutes of taking the order, and coordinate the pickup with your Asst. Server. In Refined Dining, ask whether they want coffee before, with, or after dessert.<br><br>Place an empty cup, saucer, and teaspoon to the right of the dessert spoon, with the handle at 4 o'clock. Pour from the right with the pot in your right hand, ladies first. Set the cup on the table first, and never pour into cups on your tray. Fill to two-thirds to leave room for milk or cream.<br><br>Offer a second cup without waiting to be asked (specialty coffees are the exception). Never leave a coffee pot at a side station. Return it to the kitchen.",
+            note: "A cup set on the table before you pour can't spill on a guest or tip on the tray, and two-thirds leaves room for the milk the guest is about to add. The handle at 4 o'clock is where a right-handed guest's hand naturally lands. Leaving the pot at the side station is the one that costs you: by the time you need it, it's cold, or someone else has moved it."
+          },
+          {
+            type: "text",
+            title: "Specialty Coffee and Tea",
+            body: "<b>Specialty coffee:</b> always ask the milk type (cappuccino, latte, and so on). For espresso, ask single or double. Verbalize the milk type when you serve.<br><br><b>Don't:</b> ask for the milk type again on refills or repeat rounds, or ask “regular or decaf.” Mark the cup with a serviette instead. It's your responsibility to know the guest's order. Clarify with the server if you're unsure.<br><br><b>Tea:</b> know the steeping times and water temperature for each tea. Face the teapot handle toward the guest and tell them it will be hot.",
+            note: "Asking twice tells the guest you weren't listening the first time. Marking the decaf cup with a serviette lets you know which is which without the guest ever having to say it again. Facing the handle toward the guest and saying “it will be hot” is a burn prevented, which is worth one sentence."
+          },
+          {
+            type: "text",
+            title: "What Goes With It",
+            body: "Always serve cream or milk with coffee unless the guest declines. With tea, bring milk for black teas and honey and lemon for herbal teas.<br><br>One sugar caddy holds 5 regular, 5 brown, 5 Splenda, and 5 Sweet'N Low. Remove packet wrappers that guests leave on the table.<br><br>If there are no more refills, remove the empty cups and saucers, plus sugar bowls, milk pitchers, honey pots, and lemons. Keep refilling ice water, coffee, and tea.",
+            note: "Serving milk and sugar with the coffee is what keeps the guest from having to ask for them, and a full sugar caddy keeps it from needing a refill mid-conversation. Clearing the extras when the cups are done tells the table we noticed they're finished."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "You're pouring coffee at the table. What's the right way?",
+            options: [
+              "Pour into the cup on your tray, then carry it to the guest.",
+              "Set the cup on the table first, then pour from the right, filling to two-thirds.",
+              "Fill it to the brim.",
+              "Leave the pot on the table for them to pour."
+            ],
+            correctIndex: 1,
+            explanation: "Place the cup on the table first, then pour from the right with the pot in your right hand, ladies first, filled to two-thirds so there's room for milk or cream."
+          },
+          {
+            type: "mcq",
+            question: "A guest ordered decaf. You refill their cup later. What do you do?",
+            options: [
+              "Ask “regular or decaf?” again.",
+              "Refill it as decaf, using the serviette you marked the cup with.",
+              "Bring regular and hope.",
+              "Ask the manager."
+            ],
+            correctIndex: 1,
+            explanation: "Never ask regular or decaf on a refill. Mark the cup with a serviette, and know the guest's order. It's your responsibility."
+          },
+          {
+            type: "mcq",
+            question: "A guest orders a cappuccino. What do you ask?",
+            options: [
+              "Nothing",
+              "The milk type, and say it back when you serve",
+              "Whether it's hot or cold",
+              "Regular or decaf"
+            ],
+            correctIndex: 1,
+            explanation: "Always ask the milk type for a specialty coffee, and verbalize it when you serve. For espresso, ask single or double."
+          }
+        ]
+      },
+      {
+        title: "Presenting Dessert",
+        sections: [
+          {
+            type: "text",
+            title: "Within Ten Minutes",
+            body: "Present dessert within 10 minutes of taking the order. Serve to the correct position, ladies first, always from the left with your left hand.<br><br>Announce the dish as you set it down. Guests should never have to ask what they're being served. If a dessert is shared, place it between the guests sharing it, and bring the shared plates before the dessert arrives.",
+            note: "Dessert is the last thing the kitchen sends, and it's the one guests are most likely to remember, so it can't arrive as a mystery. Bringing the shared plates first means the dessert never sits untouched while two guests wait for a plate."
+          },
+          {
+            type: "text",
+            title: "Anticipation",
+            body: "Guests should never have to ask for anything. Keep the table properly set, drinks replenished on time, and milk and sugar always served with coffee.<br><br>Avoid overlapping service. Don't ask guests repeatedly whether they're ready to order or want more sparkling water. Coordinate with the right team member. Tell the floor manager if a guest doesn't like their wine. Tell your assistant server not to clear a table that is “taking a break” until you say so.<br><br>Offer help proactively, and stay professional and friendly.",
+            note: "This is the point of the whole journey in one line: a guest who has to ask for something has already noticed it was missing. Overlapping service is the same failure from the other side. Three team members asking about water is three chances for a guest to feel watched, not looked after."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "Two guests share a dessert. How do you serve it?",
+            options: [
+              "Place it between them, and bring the shared plates first.",
+              "Cut it in the kitchen and serve it to one guest.",
+              "Set it in front of the host.",
+              "Bring it and ask who's sharing."
+            ],
+            correctIndex: 0,
+            explanation: "A shared dessert goes between the guests sharing it, and the shared plates come before the dessert arrives."
+          },
+          {
+            type: "mcq",
+            question: "A table is “taking a break.” Your Asst. Server starts clearing. What should have happened?",
+            options: [
+              "Nothing. Clearing is always right.",
+              "You should have told your assistant not to clear until you instructed them.",
+              "The guests should have said so.",
+              "The manager should stop them."
+            ],
+            correctIndex: 1,
+            explanation: "Tell your assistant server not to clear a table that is “taking a break” until you instruct them."
+          }
+        ]
+      },
+      {
+        title: "Clearing Dessert",
+        sections: [
+          {
+            type: "text",
+            title: "Clear as They Finish",
+            body: "Dessert can be cleared as each guest finishes, without waiting for everyone, or when a guest asks. This is different from the other courses.<br><br>Clear from the right with the right hand into the left. If you must clear from the left, use the left hand into the right. Never reach across a guest. Clear quietly. The whole team clears, with the same staffing: 1 for 2 guests, 2 for 4, 3 for 6. Go to the dishwasher immediately and place similar items neatly together.<br><br>After the plates and silverware are gone, use a tray to remove empty glassware except water glasses. Ask before removing a glass that isn't empty.",
+            note: "By dessert the table is winding down, and guests finish at different times. Waiting for every plate means a finished guest sits in front of an empty dessert plate for several minutes. The rules that stay the same, quiet, staffed properly, right hand from the right, are the ones that keep clearing invisible."
+          },
+          {
+            type: "text",
+            title: "The Last Snapshot",
+            body: "This is the perfect time for a table snapshot: check inventory for refills and come back prepared with coffee, tea, or the water pitcher.<br><br>Water and coffee service must continue until the guest departs.",
+            note: "By now the table is nearly clear, so any gap is obvious. The guest who's still at the table, with an empty cup and nothing to do with their hands, is the one who's about to ask for the check early. A refill gives them a reason to stay."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "Two of four guests finish their dessert. What do you do?",
+            options: [
+              "Wait until everyone finishes.",
+              "Clear the finished plates, from the right, quietly.",
+              "Ask them to hand you their plates.",
+              "Leave them until the check."
+            ],
+            correctIndex: 1,
+            explanation: "Dessert can be cleared as each guest finishes, without waiting for everyone. Clear from the right, quietly."
+          },
+          {
+            type: "mcq",
+            question: "Guests are still at the table after dessert. What continues?",
+            options: [
+              "Nothing. Service has ended.",
+              "Water and coffee service, until the guest departs.",
+              "Only water.",
+              "Only coffee for those who ask."
+            ],
+            correctIndex: 1,
+            explanation: "Water and coffee service must continue until the guest departs."
+          }
+        ]
+      },
+      {
+        title: "Your Mission",
+        sections: [
+          {
+            type: "text",
+            title: "Make It Yours",
+            body: "Choose the dessert you'd announce most often. Say the announcement out loud as you'd say it setting the plate down. Then practice your coffee lines: the milk-type question, and the “it will be hot” for a teapot.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Your Mission",
+            body: "On your next shift, set every coffee cup on the table before you pour, announce every dessert as you set it down, and keep water and coffee moving until every guest has left.<br><br>Afterward, tell your manager two things: one time you remembered a guest's order (decaf, or a milk type) without asking again, and one table where you kept service going to the end.<br><br>Your manager may watch a few dessert services. They're looking for a pattern over the shift, not one perfect table.",
+            note: "By dessert the shift has been long, and this is where service tends to slip. Noticing the times you kept it going to the end is how you see it's a habit, not a burst of effort."
+          }
+        ]
+      }
+    ],
+    test: [
+      {
+        question: "Where does the handle of a coffee cup point?",
+        options: ["12 o'clock", "3 o'clock", "4 o'clock", "9 o'clock"],
+        correctIndex: 2
+      },
+      {
+        question: "How full do you pour a cup of coffee?",
+        options: ["To the brim", "Two-thirds", "Half", "One quarter"],
+        correctIndex: 1
+      },
+      {
+        question: "What do you never do with a coffee pot?",
+        options: [
+          "Pour from the right",
+          "Leave it at a side station",
+          "Offer a second cup",
+          "Pour ladies first"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Dessert arrives within how long of taking the order?",
+        options: ["5 minutes", "10 minutes", "15 minutes", "20 minutes"],
+        correctIndex: 1
+      },
+      {
+        question: "When can dessert be cleared?",
+        options: [
+          "Only when all guests finish",
+          "As each guest finishes, or when a guest asks",
+          "After the check",
+          "Only by the manager"
+        ],
+        correctIndex: 1
+      }
+    ]
+  },
+  {
+    id: "guest-journey-10-departure",
+    title: "Module 10: The Check and the Farewell",
+    category: "Service",
+    unlockAfter: "guest-journey-9-dessert-service",
+    journeyPhase: 4,
+    chapters: [
+      {
+        title: "Presenting the Check",
+        sections: [
+          {
+            type: "text",
+            title: "Friday, 10:05 PM",
+            body: "Table 14's dessert plates are gone. The guests are still talking, coffee cups half full. You're at the side station with their check already printed.<br><br>Do you take it to them? Hold that answer.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "When to Bring It",
+            body: "After the desserts are cleared, offer any further assistance. In Refined Dining, present the check when the guest requests it. (In Casual Dining it's presented if the guest declines more assistance.)<br><br>Water and coffee service continues until the guest leaves.<br><br>Ask if they'd care for anything else. Usually the answer is “No, thank you. We'll just take the check.” Then present it.",
+            note: "A check that arrives before it's asked for says “we'd like the table.” In Refined Dining, the guests decide when the evening ends. Keeping water and coffee going is what makes lingering feel welcome."
+          },
+          {
+            type: "text",
+            title: "The Check Itself",
+            body: "Present the check discreetly and elegantly, and process payment accurately within 5 minutes. Check presenters are clean, with a working black pen free of inscriptions.<br><br>Print the check and review it. Verify every item ordered is on the bill, and that guests aren't billed for anything they didn't receive. By now the table is as clear as it can be: dessert plates, most coffee cups, and glassware gone, with only water glasses left.<br><br>Lay the check flat near the host, and set the pen on top at an angle. This tells you when a guest has touched the check, without asking. Present it to the host of the group unless another member of the party directs otherwise. Use the guest's name: “I'll leave this for your convenience, Mr. Smith.”<br><br>Don't ask guests to settle the check, wait at the table to speed payment, or stand next to guests while they review the charges.",
+            note: "Checking the bill before you present it is where you catch a returned or complimentary item that's still on the bill, before the guest does. Leaving the pen at an angle answers “is it ready to be picked up?” without a single word. And standing next to a guest while they read the total turns a private moment into a public one."
+          },
+          {
+            type: "text",
+            title: "Processing Payment",
+            body: "Close the check as quickly as possible, so charges aren't delayed. Ensure correct payment before the guests leave, and monitor collection. Remove the check presenter from the table before they depart.<br><br>Say “Thank you!” three times, or a variation: when you present the check, when you pick up the card or cash, and when you return the voucher or change.<br><br>When you return the credit card voucher, thank the guest by name, and make sure it's properly filled out and signed before the guest leaves. Do this discreetly, out of sight. This is your responsibility.<br><br>For cash, never ask if they'd like change. Bring it automatically, and check that the cash covers the bill without openly counting money in the dining room.<br><br>Never argue with or embarrass a guest about the tip. If a credit card is declined, find a manager.",
+            note: "Three thank-yous work because each one marks a different moment: the check, the payment, and the return. A missing signature discovered after the guest has left can't be fixed, which is why the checking is done out of sight, before they go. Sending a declined card to a manager keeps the conversation private and off the server, which is a kindness to the guest."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "The dessert plates are gone, and the guests are still talking. In Refined Dining, when do you bring the check?",
+            options: [
+              "Right away, so they don't wait later.",
+              "When the guest requests it. Keep water and coffee going in the meantime.",
+              "After 15 minutes.",
+              "When they stop talking."
+            ],
+            correctIndex: 1,
+            explanation: "In Refined Dining, the check is presented when the guest requests it. Water and coffee service continues until they leave."
+          },
+          {
+            type: "mcq",
+            question: "You lay the check near the host. What's the correct way to set the pen?",
+            options: [
+              "In the center of the check.",
+              "On top of the presenter at an angle, so you can see when the check has been touched.",
+              "In a separate pocket.",
+              "Hand it to the guest."
+            ],
+            correctIndex: 1,
+            explanation: "Set the pen on top of the presenter at an angle. It signals when a guest has touched the check, without asking."
+          },
+          {
+            type: "mcq",
+            question: "A guest pays cash and hands you a bill larger than the total. What do you do?",
+            options: [
+              "Ask if they'd like change.",
+              "Bring the change automatically, without counting money openly in the dining room.",
+              "Keep it as the tip.",
+              "Ask the manager."
+            ],
+            correctIndex: 1,
+            explanation: "For cash, never ask if they'd like change. Bring it automatically."
+          },
+          {
+            type: "mcq",
+            question: "A credit card is declined. What do you do?",
+            options: [
+              "Tell the guest loudly at the table.",
+              "Find a manager.",
+              "Try it again several times.",
+              "Ask the guest for another card in front of the table."
+            ],
+            correctIndex: 1,
+            explanation: "If a credit card is declined, find a manager."
+          }
+        ]
+      },
+      {
+        title: "The Last Impression",
+        sections: [
+          {
+            type: "text",
+            title: "The Farewell",
+            body: "Every guest gets a warm farewell. Watch for signs a guest is preparing to leave. Pull the table out on a banquette, or pull chairs as guests rise.<br><br>The server thanks the guest by name, with anticipatory remarks. Assist guests with chairs, bags, packages, and coats. Help ladies with bags and packages before gentlemen. Escort the guest at least partially to the door. Smile, thank them for their patronage, and say it was a pleasure to have them. Thank guests for joining us for lunch or dinner and wish them a pleasant afternoon or evening.<br><br>Check that nothing was left behind. If a guest forgot something, try to meet them at the door or take it to the manager as soon as possible.<br><br>The host and/or manager also bids the guest a fond farewell by name, with an anticipatory invitation to return. Assist with future reservations or requests, and offer further help. Repeat business is vital.",
+            note: "The last few minutes are the ones a guest walks out with. Everything before the farewell is a good meal, and the farewell is what decides whether it was a good night. That's why it belongs to the whole team, not only the server. Inviting guests back by name, at the door, is the cheapest reservation the restaurant will ever take."
+          },
+          {
+            type: "text",
+            title: "Clear and Reset",
+            body: "After all guests have left, clear the table and prepare for the next reservation. Reset immediately and as quietly as possible, so the dining room always looks neat.<br><br>Pick up napkins first and use them to clear debris from chairs and banquettes. Straighten the table and push in chairs. Hold a tray in your hand, never on the table, and never place trays on furniture such as tables, chairs, or decorative surfaces. Pick up the remaining glassware first, then cups and saucers. Never stack plates or glassware on the table. Glassware goes on a tray, and plates are carried individually.<br><br>Take the tray directly to the kitchen. Don't leave dirty supplies in the dining room or at the station. Wipe the table with a lightly dampened rag (dampened with sanitizing solution), using a crumbing plate so crumbs and trash don't fall on the floor. Pick up or sweep food and trash from under and around the table.<br><br>Check all mise en place for cleanliness before you reset, then reset following the original guidelines. Completely reset one table before starting the next.",
+            note: "The next guests are walking in while you reset, so quiet and speed are the same thing as neatness. Trays in your hand, never on furniture, protect the surfaces guests will touch. Finishing one table completely before starting the next is what stops the dining room from having four half-reset tables when the host seats the next party."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "A guest rises to leave. What do you do?",
+            options: [
+              "Wave from your station.",
+              "Assist with chairs, bags, and coats, thank them by name, and escort them at least partway to the door.",
+              "Wait until they're out the door.",
+              "Ask them to fill out a comment card."
+            ],
+            correctIndex: 1,
+            explanation: "Assist with chairs, bags, packages, and coats, thank them by name, and escort them at least partially to the door."
+          },
+          {
+            type: "mcq",
+            question: "A guest left an umbrella at the table after walking out. What do you do?",
+            options: [
+              "Keep it until they return.",
+              "Try to meet them at the door, or take it to the manager as soon as possible.",
+              "Throw it away.",
+              "Leave it on the table."
+            ],
+            correctIndex: 1,
+            explanation: "If a guest forgot something, try to meet them at the door or take it to the manager ASAP."
+          },
+          {
+            type: "mcq",
+            question: "You're resetting a table. Where do you put your tray?",
+            options: [
+              "On the table you're clearing.",
+              "On a chair.",
+              "In your hand. Never on tables, chairs, or decorative surfaces.",
+              "On the banquette."
+            ],
+            correctIndex: 2,
+            explanation: "Hold a tray in your hand, never on the table, and never on furniture."
+          }
+        ]
+      },
+      {
+        title: "How We Speak",
+        sections: [
+          {
+            type: "text",
+            title: "The Language Guide",
+            body: "Every team member speaks to guests the same way: poised, courteous, friendly, efficient, clear, and accurate.<br><br>Don't be too familiar. Replace “O.K.,” “un-huh,” and “yeah, sure” with “Yes, I would be happy to,” “certainly,” “definitely,” “absolutely,” “of course,” or “with pleasure.”<br><br>Address guests by name, from the soignée or their credit card. Never call them “folks,” “pal,” “buddy,” or other casual names. You can never say “Thank you,” “Please,” and “You're welcome” enough.",
+            note: "Tone is how a guest hears the price of the room. The words that sound casual, “yeah, sure,” “folks,” are the ones that tell a guest they're at a place that doesn't take them seriously, and in Refined Dining they cost more than they would anywhere else. A name, used naturally, does the opposite."
+          },
+          {
+            type: "text",
+            title: "Instead Of / Say",
+            body: "<b>Instead of</b> “I don't know” <b>say</b> “I'll find out for you.”<br><b>Instead of</b> “I'm busy” <b>say</b> “I'll be with you in a moment.”<br><b>Instead of</b> “It's not my job” <b>say</b> “Let me find someone who will help you with that.”<br><b>Instead of</b> “How is everything?” <b>say</b> “Is everything to your liking?”<br><b>Instead of</b> “Enjoy” (alone) <b>say</b> a creative, specific wish for a pleasant meal.",
+            note: "Each replacement does the same thing: the guest gets an answer that ends with something being done for them. “I don't know” ends the conversation. “I'll find out for you” starts a task the guest can trust you to finish."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "A guest asks whether a dish contains a certain ingredient, and you don't know. What do you say?",
+            options: [
+              "“I don't know.”",
+              "“I'll find out for you.”",
+              "“Probably not.”",
+              "“Ask the manager.”"
+            ],
+            correctIndex: 1,
+            explanation: "Instead of “I don't know,” say “I'll find out for you.” Then do it. Guessing about an ingredient is never acceptable."
+          },
+          {
+            type: "mcq",
+            question: "A guest asks for something outside your section. What do you say?",
+            options: [
+              "“That's not my table.”",
+              "“Let me find someone who will help you with that.”",
+              "“Sure, yeah.”",
+              "“I'm busy.”"
+            ],
+            correctIndex: 1,
+            explanation: "Instead of “It's not my job,” say “Let me find someone who will help you with that.”"
+          },
+          {
+            type: "mcq",
+            question: "Which is the right way to address a table of four?",
+            options: [
+              "“Hey, folks.”",
+              "By name, from the soignée or the credit card.",
+              "“You guys.”",
+              "“Everybody.”"
+            ],
+            correctIndex: 1,
+            explanation: "Address guests by name, from the soignée or their credit card. Never “folks,” “pal,” “buddy,” or other casual names."
+          }
+        ]
+      },
+      {
+        title: "Your Mission",
+        sections: [
+          {
+            type: "text",
+            title: "Make It Yours",
+            body: "Write your own goodnight to a table, using the guest's name and one specific thing from the evening: a dish, an occasion, a bottle. Say it out loud once before your next shift.<br><br>Then say your replacement for “enjoy.”",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Your Mission",
+            body: "On your next shift, thank every guest three times at the check, use their name at the farewell, and walk at least one table to the door.<br><br>Afterward, tell your manager two things: one farewell where you used a specific detail from the evening, and one time you replaced a phrase from the language guide.<br><br>Your manager may watch a few farewells. They're looking for a pattern over the shift, not one flawless goodbye.",
+            note: "The farewell is the easiest step to rush at the end of a long night. A specific detail from the evening is what turns a goodbye into the reason a guest comes back."
+          }
+        ]
+      }
+    ],
+    test: [
+      {
+        question: "When is the check presented in Refined Dining?",
+        options: [
+          "As soon as dessert is cleared",
+          "When the guest requests it",
+          "After 15 minutes",
+          "When the table is needed"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Who receives the check?",
+        options: [
+          "The youngest guest",
+          "The host of the group, unless another member of the party directs otherwise",
+          "Whoever is closest",
+          "The senior lady"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "How many times do you say thank you around the check?",
+        options: ["Once", "Twice", "Three times, or variations", "Only at the end"],
+        correctIndex: 2
+      },
+      {
+        question: "You return a credit card voucher. What do you do?",
+        options: [
+          "Hand it back and walk away",
+          "Thank the guest by name, and check that it's filled out and signed, out of sight, before they leave",
+          "Leave it on the table",
+          "Ask them to sign it in front of you"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Which phrase is right in place of “I'm busy”?",
+        options: [
+          "“Give me a second.”",
+          "“I'll be with you in a moment.”",
+          "“Not now.”",
+          "“Hold on.”"
+        ],
+        correctIndex: 1
+      }
+    ]
   }
 ];
 
@@ -6288,7 +8358,18 @@ const LEARNING_COURSES = [
     title: "The Guest Journey",
     blurb: "The full order of service, from the first greeting to the last impression. Tap Journey anytime to see the whole thing.",
     journey: true,
-    moduleIds: ["guest-journey-1-arrival"]
+    moduleIds: [
+      "guest-journey-1-arrival",
+      "guest-journey-2-welcome",
+      "guest-journey-3-order",
+      "guest-journey-4-wine-bread",
+      "guest-journey-5-first-course",
+      "guest-journey-6-clear-entree",
+      "guest-journey-7-upkeep",
+      "guest-journey-8-dessert-order",
+      "guest-journey-9-dessert-service",
+      "guest-journey-10-departure"
+    ]
   },
   {
     id: "olive-wagyu",

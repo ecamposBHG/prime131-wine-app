@@ -1152,3 +1152,7 @@ button, input {
   .journey-overlay, .journey-sheet { animation: none; }
   .journey-phase-head::after, .journey-btn { transition: none; }
 }
+
+/* Learning rows (topic, course, module): the progress bar had no width in a
+   list row, so it collapsed to nothing. Give it one, rows only. */
+.list-row > .mini-track { width: 56px; flex-shrink: 0; margin-left: 12px; }

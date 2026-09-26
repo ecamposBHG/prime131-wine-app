@@ -320,6 +320,8 @@ function render() {
   else if (current.view === "liquor-list") renderLiquorList();
   else if (current.view === "liquor-card") renderLiquorCard(current.params.liquorId);
   else if (current.view === "learning-hub") renderLearningHub();
+  else if (current.view === "learning-topic") renderLearningTopic(current.params.topicId);
+  else if (current.view === "learning-course") renderLearningCourse(current.params.courseId);
   else if (current.view === "learning-intro") renderLearningIntro(current.params.moduleId);
   else if (current.view === "learning-chapter") renderLearningChapter(current.params.moduleId, current.params.chapterIndex, current.params.sectionIndex);
   else if (current.view === "learning-chapter-quiz") renderChapterQuiz(current.params.moduleId, current.params.chapterIndex, current.params.quizIndex);
@@ -3411,7 +3413,56 @@ function renderAllergySortRun() {
 
 /* ---------- Learning: modules/courses, same engine for every restaurant ---------- */
 
-function learningRowHTML(mod) {
+/* Learning is three levels deep: topics (Food, Bar, Service...) -> courses
+   -> modules. LEARNING_MODULES stays the flat list the lesson engine and
+   saved progress key off; LEARNING_TOPICS and LEARNING_COURSES (data.js)
+   only decide how modules are grouped for browsing. */
+function findLearningCourse(id) { return LEARNING_COURSES.find(c => c.id === id); }
+function courseOfModule(moduleId) { return LEARNING_COURSES.find(c => c.moduleIds.includes(moduleId)); }
+function courseModules(course) { return course.moduleIds.map(findLearningModule).filter(Boolean); }
+function modulePercent(mod) {
+  const status = moduleStatus(mod);
+  if (status === "completed") return 100;
+  if (status === "in-progress") {
+    const p = getLearningProgress()[mod.id];
+    return Math.round(((p.furthest + 1) / moduleTotalContent(mod)) * 100);
+  }
+  return 0;
+}
+function averagePercent(mods) {
+  return mods.length ? Math.round(mods.reduce((n, m) => n + modulePercent(m), 0) / mods.length) : 0;
+}
+function completedCount(mods) { return mods.filter(m => moduleStatus(m) === "completed").length; }
+function pluralize(n, one, many) { return `${n} ${n === 1 ? one : many}`; }
+
+function learningGroupRowHTML(dataAttr, id, title, meta, pct) {
+  const done = pct === 100;
+  const rightHTML = done
+    ? `<span class="chev">&#10003;</span>`
+    : `<div class="mini-track"><div class="mini-fill" style="width:${pct}%"></div></div>`;
+  return `
+    <div class="list-row" ${dataAttr}="${id}">
+      <div class="list-row-main">
+        <span class="mod-dot ${done ? "done" : ""}"></span>
+        <div class="list-row-text">
+          <p>${title}</p>
+          <span>${meta}</span>
+        </div>
+      </div>
+      ${rightHTML}
+    </div>
+  `;
+}
+
+/* Where "back to where I was browsing" goes once a module is finished. */
+function backToCourseTarget(moduleId) {
+  const course = courseOfModule(moduleId);
+  return course
+    ? { label: "Back to Course", go: () => go("learning-course", { courseId: course.id }) }
+    : { label: "Learning Hub", go: () => go("learning-hub") };
+}
+
+function learningRowHTML(mod, showCourse) {
   const status = moduleStatus(mod);
   const locked = status === "locked";
   const dotClass = status === "completed" ? "done" : (locked ? "locked" : "");
@@ -3437,13 +3488,14 @@ function learningRowHTML(mod) {
     : locked
       ? `<span class="lock-ic">&#128274;</span>`
       : `<div class="mini-track"><div class="mini-fill" style="width:${pct}%"></div></div>`;
+  const parentCourse = showCourse ? courseOfModule(mod.id) : null;
   return `
     <div class="list-row ${locked ? "locked" : ""}" data-module="${mod.id}" ${locked ? 'tabindex="-1" aria-disabled="true"' : ""}>
       <div class="list-row-main">
         <span class="mod-dot ${dotClass}"></span>
         <div class="list-row-text">
           <p>${mod.title}</p>
-          <span>${metaText}</span>
+          <span>${parentCourse ? `${parentCourse.title} · ` : ""}${metaText}</span>
         </div>
       </div>
       ${rightHTML}
@@ -3453,7 +3505,8 @@ function learningRowHTML(mod) {
 
 /* ---------- Guest Journey overview ----------
    A course module that sets `journeyPhase` gets a "Journey" button in the
-   header of its intro, lesson, and completion screens. It opens the whole
+   header of its intro, lesson, and completion screens, and the course
+   itself (`journey: true`) gets one on its module list. It opens the whole
    order of service (GUEST_JOURNEY in data.js) as a sheet over the current
    screen, with the module's own phase open and marked. It is deliberately
    never added to chapter quizzes, the final test, or the test result, so
@@ -3463,8 +3516,11 @@ function journeyEsc(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-function addJourneyButton(mod) {
-  if (!mod || !mod.journeyPhase || typeof GUEST_JOURNEY === "undefined") return;
+/* `source` is either a module (journeyPhase: the phase it teaches, opened and
+   marked "You are here") or a course (journey: true, no single phase, so
+   every phase starts collapsed). */
+function addJourneyButton(source) {
+  if (!source || !(source.journeyPhase || source.journey) || typeof GUEST_JOURNEY === "undefined") return;
   const hdr = app.querySelector(".app-header");
   if (!hdr) return;
   const btn = document.createElement("button");
@@ -3473,17 +3529,17 @@ function addJourneyButton(mod) {
   btn.setAttribute("aria-haspopup", "dialog");
   btn.setAttribute("aria-label", "Show the full Guest Journey");
   btn.textContent = "Journey";
-  btn.onclick = () => showJourneyOverview(mod, btn);
+  btn.onclick = () => showJourneyOverview(source.journeyPhase || null, btn);
   hdr.appendChild(btn);
 }
 
-function showJourneyOverview(mod, trigger) {
+function showJourneyOverview(currentPhaseId, trigger) {
   if (document.querySelector(".journey-overlay")) return;
   const phases = GUEST_JOURNEY.phases;
   const totalSteps = phases.reduce((n, ph) => n + ph.steps.length, 0);
 
   const phasesHTML = phases.map(ph => {
-    const here = ph.id === mod.journeyPhase;
+    const here = currentPhaseId !== null && ph.id === currentPhaseId;
     const stepsHTML = ph.steps.map(st => `
       <li class="journey-step">
         <span class="journey-step-n">${journeyEsc(st.n)}</span>
@@ -3552,24 +3608,70 @@ function showJourneyOverview(mod, trigger) {
   overlay.querySelector(".journey-close").focus();
 }
 
+/* Level 1: topics. Only topics that have at least one course are shown, so
+   adding a topic to LEARNING_TOPICS is safe before its first course exists. */
 function renderLearningHub() {
   header("Learning");
 
-  const groups = { "in-progress": [], "not-started": [], "locked": [], "completed": [] };
-  LEARNING_MODULES.forEach(m => groups[moduleStatus(m)].push(m));
-
   const wrap = document.createElement("div");
   let html = "";
-  if (groups["in-progress"].length) {
-    html += `<p class="section-label">In Progress</p>` + groups["in-progress"].map(learningRowHTML).join("");
+
+  const inProgress = LEARNING_MODULES.filter(m => moduleStatus(m) === "in-progress");
+  if (inProgress.length) {
+    html += `<p class="section-label">In Progress</p>` + inProgress.map(m => learningRowHTML(m, true)).join("");
   }
-  if (groups["not-started"].length || groups["locked"].length) {
-    html += `<p class="section-label">Not Started</p>` + groups["not-started"].concat(groups["locked"]).map(learningRowHTML).join("");
-  }
-  if (groups["completed"].length) {
-    html += `<p class="section-label">Completed</p>` + groups["completed"].map(learningRowHTML).join("");
-  }
+
+  const topics = LEARNING_TOPICS.filter(t => LEARNING_COURSES.some(c => c.topic === t.id));
+  html += `<p class="section-label">Topics</p>` + topics.map(t => {
+    const courses = LEARNING_COURSES.filter(c => c.topic === t.id);
+    const mods = courses.flatMap(courseModules);
+    const done = completedCount(mods);
+    const meta = `${pluralize(courses.length, "course", "courses")} · ${done} of ${pluralize(mods.length, "module", "modules")} complete`;
+    return learningGroupRowHTML("data-topic", t.id, t.title, meta, averagePercent(mods));
+  }).join("");
+
   wrap.innerHTML = html;
+  wrap.querySelectorAll(".list-row").forEach(row => {
+    if (row.dataset.topic) row.onclick = () => go("learning-topic", { topicId: row.dataset.topic });
+    else if (row.dataset.module && !row.classList.contains("locked")) row.onclick = () => go("learning-intro", { moduleId: row.dataset.module });
+  });
+  app.appendChild(wrap);
+}
+
+/* Level 2: the courses inside one topic. */
+function renderLearningTopic(topicId) {
+  const topic = LEARNING_TOPICS.find(t => t.id === topicId);
+  if (!topic) { go("learning-hub", {}, false); return; }
+  header(topic.title);
+
+  const courses = LEARNING_COURSES.filter(c => c.topic === topic.id);
+  const wrap = document.createElement("div");
+  wrap.innerHTML = `<p class="section-label">Courses</p>` + courses.map(c => {
+    const mods = courseModules(c);
+    const done = completedCount(mods);
+    const meta = `${pluralize(mods.length, "module", "modules")}${done ? ` · ${done} complete` : ""}`;
+    return learningGroupRowHTML("data-course", c.id, c.title, meta, averagePercent(mods));
+  }).join("");
+  wrap.querySelectorAll(".list-row").forEach(row => {
+    row.onclick = () => go("learning-course", { courseId: row.dataset.course });
+  });
+  app.appendChild(wrap);
+}
+
+/* Level 3: the modules inside one course, in the order they're meant to be
+   taken. Courses that set `journey` also get the Guest Journey button. */
+function renderLearningCourse(courseId) {
+  const course = findLearningCourse(courseId);
+  if (!course) { go("learning-hub", {}, false); return; }
+  header(course.title);
+  addJourneyButton(course);
+
+  const wrap = document.createElement("div");
+  wrap.innerHTML = `
+    ${course.blurb ? `<p class="slide-text">${course.blurb}</p>` : ""}
+    <p class="section-label">Modules</p>
+    ${courseModules(course).map(m => learningRowHTML(m)).join("")}
+  `;
   wrap.querySelectorAll(".list-row").forEach(row => {
     if (row.classList.contains("locked")) return;
     row.onclick = () => go("learning-intro", { moduleId: row.dataset.module });
@@ -4249,10 +4351,11 @@ function renderLearningTestResult(moduleId, correctCount, total, passed, wrongIn
 
   const nav = document.createElement("div");
   nav.className = "card-footer-nav";
+  const backTarget = backToCourseTarget(moduleId);
   const hubBtn = document.createElement("button");
   hubBtn.className = "footer-btn";
-  hubBtn.textContent = "Learning Hub";
-  hubBtn.onclick = () => go("learning-hub");
+  hubBtn.textContent = backTarget.label;
+  hubBtn.onclick = backTarget.go;
   nav.appendChild(hubBtn);
   if (!lock.locked) {
     const retryBtn = document.createElement("button");
@@ -4293,10 +4396,11 @@ function renderLearningComplete(moduleId) {
 
   const nav = document.createElement("div");
   nav.className = "card-footer-nav";
+  const backTarget = backToCourseTarget(moduleId);
   const hubBtn = document.createElement("button");
   hubBtn.className = "footer-btn";
-  hubBtn.textContent = "Learning Hub";
-  hubBtn.onclick = () => go("learning-hub");
+  hubBtn.textContent = backTarget.label;
+  hubBtn.onclick = backTarget.go;
   nav.appendChild(hubBtn);
   if (unlocked) {
     const nextBtn = document.createElement("button");

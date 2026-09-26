@@ -5624,6 +5624,9 @@ const LIQUOR = [
 // Every module always finishes a chapter, then (if test.length) goes
 // through the same "Ready for the Test?" screen before completion —
 // a one-chapter module and a multi-chapter module both end the same way.
+// Learning browses topics -> courses -> modules: LEARNING_TOPICS and
+// LEARNING_COURSES (below) group these modules. Every module id must appear
+// in exactly one course's moduleIds, or it can't be reached from Learning.
 // PLACEHOLDER CONTENT: the modules below are sample/demo content only,
 // used to verify the Learning engine end-to-end. Replace with real,
 // owner-provided material before treating this as live training copy.
@@ -6028,7 +6031,7 @@ const LEARNING_MODULES = [
   },
   {
     id: "guest-journey-1-arrival",
-    title: "Guest Journey 1: The Arrival",
+    title: "Module 1: The Arrival",
     category: "Service",
     unlockAfter: null,
     journeyPhase: 1,
@@ -6046,13 +6049,13 @@ const LEARNING_MODULES = [
             type: "text",
             title: "Why the First Minutes Matter",
             body: "Arrival has a 5-minute budget: greet within 30 seconds, escort and seat, present menus, and hand off the soignée. By the time your server says hello, the guest has already met us.",
-            note: "Any team member can acknowledge arriving guests. If you're close, say it. If you're across the room, make eye contact. Either way, within 30 seconds."
+            note: "A guest left standing at the door starts the night feeling ignored, and everything good that follows has to work harder to make up for it. Thirty seconds is short enough that one sentence or a glance prevents it, which makes it the cheapest moment of the night to win a guest."
           },
           {
             type: "text",
             title: "Three Guests, Three Greetings",
             body: "<b>Repeat guest.</b> Use the last name and say you're glad to have them back. “Good evening, Mr. Smith, it's great to have you with us again…”<br><br><b>Reservation.</b> Ask for the last name and the reservation time. Listen to how they say their name, check them in, then use it the way they said it. “May I have your last name and the time of the reservation…” Mark the reservation Partially Arrived or Arrived.<br><br><b>Walk-in.</b> Check availability, then get a phone number and first and last name. Mark them (for example, “wearing red sweater, bar seat #1”). “Allow me a moment to check for availability…”",
-            note: null
+            note: "A name is the fastest way to show we noticed someone. For a regular it proves we remember them; for a first-timer it tells them they're a guest, not a table number. Listening for how they say it now is also what lets your server say it correctly later."
           }
         ],
         quiz: [
@@ -6089,7 +6092,7 @@ const LEARNING_MODULES = [
             type: "text",
             title: "No Table Yet",
             body: "Check availability first. If nothing is open, offer the bar and take a name and number so you can find them: “At the moment, we don't have a table available, however if you would like I can seat you at the bar and we will let you know as soon as the first table becomes available. May I have your phone number, as well as your first and last name…”<br><br>If there's a wait, quote a realistic one: “We currently have about 15 minutes for the next table. May I offer you a seat at the bar in the meantime…” When a table opens, tell them, escort them, and thank them for their patience.",
-            note: "Never quote a wait you haven't checked. Fifteen minutes is an example, not a rule."
+            note: "Guests will wait if they know where they stand. Offering the bar and taking a name turns a dead end into a plan. And a wait you can keep protects your credibility: say 15 and make it 40, and they'll stop believing everything else we tell them tonight."
           },
           {
             type: "text",
@@ -6101,7 +6104,7 @@ const LEARNING_MODULES = [
             type: "text",
             title: "If They Don't Like the Table",
             body: "Tell them you'll speak to the manager right away to find a table more to their liking. Never promise they'll get exactly what they want. Ask them to wait at the bar.<br><br>“Please allow me to check our availability. May I direct you to the bar while you wait…”<br><br><b>Never leave guests standing in the middle of the dining room or next to another table.</b>",
-            note: null
+            note: "A promise you can't keep turns a small request into a real complaint. “Let me check” keeps the door open; “of course,” followed by “sorry, that one's taken,” closes it. And guests left standing in the dining room feel exposed in front of every other table, which is why the bar comes first."
           }
         ],
         quiz: [
@@ -6150,19 +6153,19 @@ const LEARNING_MODULES = [
             type: "text",
             title: "The Soignée",
             body: "A soignée (swan-yay) is a printout of what we know about a guest from past visits, including at sister restaurants: food and drink preferences, allergies, special occasions, relationships to Chefs, owners, or managers, and press.<br><br><b>Code 1, no notes:</b> Server<br><b>Code 2, PPX or celebration:</b> Server, Manager<br><b>Code 3, allergy:</b> Server station, Manager, Chef<br><br>Never print it ahead of time, and handle it with care.",
-            note: null
+            note: "The soignée is how the restaurant remembers a guest. Without it, an allergy from their last visit or an anniversary on the reservation is invisible to the team tonight. With it, the kitchen can protect the guest and the server can make the evening personal before the guest has said a word."
           },
           {
             type: "text",
             title: "The Handoff",
             body: "Pass the soignée to the server and/or manager. Make sure the server knows each guest's name, how to pronounce it, and the seat number, so the name and notes are used from the first hello.<br><br>You heard the guest say their name at the stand, so pass it on the way you heard it, not the way it's spelled. Not sure you heard it right? Repeat it back: “Mr. Szymanski, for 4 guests…” and the guest will correct you.",
-            note: "Read the soignée before approaching the table, and use the guest's name in a natural way."
+            note: "You're the only one who heard the guest say their name at the stand, and your server is the one who has to say it at the table. If it arrives as a spelling, the first thing the guest hears at their table is their own name said wrong. The seat number matters just as much: it's what sends the anniversary or the allergy to the right person."
           },
           {
             type: "text",
             title: "When the Party Size Changes",
             body: "In Refined Dining, each table is set for the exact number of guests.<br><br><b>Fewer guests.</b> The Host removes the setting, or asks a team member to. Extra settings are not removed after guests are seated unless they were told someone would not be joining.<br><br><b>More guests.</b> Check reservation availability first and always do your best to accommodate. The Host places the extra setting and chair, or asks a team member to help.<br><br>Either way: “Allow us a moment while we prepare your table…”",
-            note: null
+            note: "In Refined Dining the table is part of the first impression: guests see it set for exactly them. Fixing the setting before they sit keeps the reset out of sight. Fixing it after they sit turns a small logistics change into something they have to watch happen."
           }
         ],
         quiz: [
@@ -6216,8 +6219,8 @@ const LEARNING_MODULES = [
           {
             type: "text",
             title: "Your Mission",
-            body: "On your next shift, greet every reservation by last name, and hand off every soignée with the name, its pronunciation, and the seat number.<br><br>If you don't work the host stand, acknowledge every arriving guest you pass within 30 seconds, whether or not the Host is there.<br><br>Afterward, tell your manager two things: how many reservations you greeted by last name, and one handoff where the server used the guest's name from the first hello.",
-            note: "Your manager may watch a few arrivals. Look for a pattern over the shift, not one perfect greeting."
+            body: "On your next shift, greet every reservation by last name, and hand off every soignée with the name, its pronunciation, and the seat number.<br><br>If you don't work the host stand, acknowledge every arriving guest you pass within 30 seconds, whether or not the Host is there.<br><br>Afterward, tell your manager two things: how many reservations you greeted by last name, and one handoff where the server used the guest's name from the first hello.<br><br>Your manager may watch a few arrivals. They're looking for a pattern over the shift, not one perfect greeting.",
+            note: "Knowing the greeting isn't the same as saying it at 7:10 with the door open and tickets piling up. A real shift is where it becomes a habit, and reporting back is how you notice what actually happened instead of what you assume happened."
           }
         ]
       }
@@ -6259,6 +6262,47 @@ const LEARNING_MODULES = [
         correctIndex: 1
       }
     ]
+  }
+];
+
+// ============================================================
+// LEARNING TOPICS + COURSES -- how Learning is browsed:
+// topic (Food, Bar, Service...) -> course -> module.
+// A topic with no courses is hidden until it has one.
+// { id, title }
+// ============================================================
+const LEARNING_TOPICS = [
+  { id: "food", title: "Food" },
+  { id: "wine", title: "Wine" },
+  { id: "bar", title: "Bar" },
+  { id: "service", title: "Service" }
+];
+
+// { id, topic (a LEARNING_TOPICS id), title, blurb?, journey? (true adds the
+//   Guest Journey button to the course screen),
+//   moduleIds: [ ...LEARNING_MODULES ids, in the order they should be taken ] }
+const LEARNING_COURSES = [
+  {
+    id: "guest-journey",
+    topic: "service",
+    title: "The Guest Journey",
+    blurb: "The full order of service, from the first greeting to the last impression. Tap Journey anytime to see the whole thing.",
+    journey: true,
+    moduleIds: ["guest-journey-1-arrival"]
+  },
+  {
+    id: "olive-wagyu",
+    topic: "food",
+    title: "Olive Wagyu",
+    blurb: "Where it comes from, why it eats differently from other Wagyu, and how to sell it.",
+    moduleIds: ["olive-wagyu-service"]
+  },
+  {
+    id: "whiskey-101",
+    topic: "bar",
+    title: "Whiskey 101",
+    blurb: "How whiskey is made, and what separates bourbon from rye.",
+    moduleIds: ["whiskey-101-bourbon-rye"]
   }
 ];
 

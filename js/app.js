@@ -164,28 +164,82 @@ function renderFlipCard(wine) {
   return flipcard;
 }
 
+// "Similar pour" is scored from the real fields every wine already carries
+// (grape, region, structure, flavor tags, price) rather than "first match in
+// array order" -- which used to send every California Cabernet to whichever
+// bottle happened to be listed first. The candidate pool stays inside the
+// same list (BTG, Off The List, or bottle list) and, for bottles, the same
+// category, so a Champagne never points at a Sake. Lowest score wins; ties
+// break on closest price, then list order, so the answer is stable.
+// SIMILAR_POUR_OVERRIDES lets a specific wine be pinned to a hand-picked
+// pairing ({ "bw68": "bw71" }) when the scorer's pick isn't the one a
+// sommelier would make.
+const SIMILAR_POUR_OVERRIDES = {
+  // BTG whites: the scorer pairs these with the rosés because the white pool is tiny.
+  w4: "w5",  // Santa Margherita Pinot Grigio -> Emmolo Sauvignon Blanc (crisp, unoaked)
+  w5: "w4"   // Emmolo Sauvignon Blanc -> Santa Margherita Pinot Grigio
+};
+
+function similarityScore(a, b) {
+  const w = { sweetness: 1.5, acidity: 1, tannin: 1.5, alcohol: 1, body: 1.5 };
+  let score = 0;
+  Object.keys(w).forEach(k => {
+    const d = ((a.structure && a.structure[k]) || 0) - ((b.structure && b.structure[k]) || 0);
+    score += w[k] * d * d;
+  });
+
+  const tagsA = (a.flavorTags || []).map(t => t.toLowerCase());
+  const tagsB = new Set((b.flavorTags || []).map(t => t.toLowerCase()));
+  score -= 1.5 * tagsA.filter(t => tagsB.has(t)).length;
+
+  const gA = (a.grape || "").toLowerCase();
+  const gB = (b.grape || "").toLowerCase();
+  if (gA && gA === gB) score -= 3;
+  else {
+    const words = s => s.split(/[^a-zà-ÿ]+/).filter(x => x.length > 3 && x !== "blend" && x !== "100");
+    const wB = new Set(words(gB));
+    if (words(gA).some(x => wB.has(x))) score -= 1.5;
+  }
+
+  const rA = (a.region || "").split(",").map(x => x.trim().toLowerCase());
+  const rB = (b.region || "").split(",").map(x => x.trim().toLowerCase());
+  if (rA.length && rB.length && rA[rA.length - 1] === rB[rB.length - 1]) score -= 1;
+  if (rA.some(x => x.length > 3 && rB.includes(x) && x !== rA[rA.length - 1])) score -= 1;
+
+  if (a.subcategory && a.subcategory === b.subcategory) score -= 2;
+  if (a.price && b.price) score += 2 * Math.abs(Math.log(a.price / b.price));
+  return score;
+}
+
+function pickSimilarPour(wine, pool) {
+  const overrideId = SIMILAR_POUR_OVERRIDES[wine.id];
+  if (overrideId) {
+    const pinned = pool.find(w => w.id === overrideId);
+    if (pinned) return pinned;
+  }
+  const candidates = pool.filter(w => w.id !== wine.id);
+  if (!candidates.length) return null;
+  let best = null;
+  let bestScore = Infinity;
+  candidates.forEach(c => {
+    const sc = similarityScore(wine, c);
+    if (sc < bestScore - 1e-9) { bestScore = sc; best = c; }
+  });
+  return best;
+}
+
 function similarPour(wine) {
-  const sameStyle = WINES.filter(w => w.style === wine.style && w.id !== wine.id);
-  if (!sameStyle.length) return null;
-  return sameStyle[0];
+  return pickSimilarPour(wine, WINES.filter(w => w.style === wine.style));
 }
 
 function similarOtlPour(wine) {
-  const sameStyle = OTL_WINES.filter(w => w.style === wine.style && w.id !== wine.id);
-  if (!sameStyle.length) return null;
-  return sameStyle[0];
+  return pickSimilarPour(wine, OTL_WINES.filter(w => w.style === wine.style));
 }
 
 function similarBottlePour(wine) {
-  if (wine.subcategory) {
-    const sameSubcategory = BOTTLE_WINES.filter(w => w.category === wine.category && w.subcategory === wine.subcategory && w.id !== wine.id);
-    if (sameSubcategory.length) return sameSubcategory[0];
-  }
-  const sameCategory = BOTTLE_WINES.filter(w => w.category === wine.category && w.id !== wine.id);
-  if (sameCategory.length) return sameCategory[0];
-  const sameStyle = BOTTLE_WINES.filter(w => w.style === wine.style && w.id !== wine.id);
-  if (!sameStyle.length) return null;
-  return sameStyle[0];
+  let pool = BOTTLE_WINES.filter(w => w.category === wine.category);
+  if (pool.length < 2) pool = BOTTLE_WINES.filter(w => w.style === wine.style);
+  return pickSimilarPour(wine, pool);
 }
 
 // Liquor "similar pour" is derived entirely from real menu fields --

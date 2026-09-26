@@ -6025,6 +6025,315 @@ const LEARNING_MODULES = [
         correctIndex: 1
       }
     ]
+  },
+  {
+    id: "guest-journey-1-arrival",
+    title: "Guest Journey 1: The Arrival",
+    category: "Service",
+    unlockAfter: null,
+    journeyPhase: 1,
+    chapters: [
+      {
+        title: "The First 30 Seconds",
+        sections: [
+          {
+            type: "text",
+            title: "Friday, 7:10 PM",
+            body: "The Host is escorting a table to the back. Two guests walk in and find the host stand empty. You're nearby, carrying a tray of water glasses.<br><br>What do you do? Hold that answer in your head. You'll check it in a minute.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Why the First Minutes Matter",
+            body: "Arrival has a 5-minute budget: greet within 30 seconds, escort and seat, present menus, and hand off the soignée. By the time your server says hello, the guest has already met us.",
+            note: "Any team member can acknowledge arriving guests. If you're close, say it. If you're across the room, make eye contact. Either way, within 30 seconds."
+          },
+          {
+            type: "text",
+            title: "Three Guests, Three Greetings",
+            body: "<b>Repeat guest.</b> Use the last name and say you're glad to have them back. “Good evening, Mr. Smith, it's great to have you with us again…”<br><br><b>Reservation.</b> Ask for the last name and the reservation time. Listen to how they say their name, check them in, then use it the way they said it. “May I have your last name and the time of the reservation…” Mark the reservation Partially Arrived or Arrived.<br><br><b>Walk-in.</b> Check availability, then get a phone number and first and last name. Mark them (for example, “wearing red sweater, bar seat #1”). “Allow me a moment to check for availability…”",
+            note: null
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "You're carrying a tray of water glasses near the door. Two guests walk in and the host stand is empty. What do you do?",
+            options: [
+              "Keep going. The Host will be back in a minute.",
+              "Make eye contact and say, “Good evening, our Host will be with you shortly.”",
+              "Set the tray down and start checking them in.",
+              "Smile and nod from across the room."
+            ],
+            correctIndex: 1,
+            explanation: "Any team member acknowledges arriving guests within 30 seconds: with words if you're close, with eye contact if you're not. You don't need to take over the Host's job, only to make sure the guests are seen. A nod from across the room only works when you're too far to speak, and walking past is how guests decide we don't care."
+          },
+          {
+            type: "mcq",
+            question: "A couple you've served before arrives for their 7:30 reservation. You remember them: Mr. and Mrs. Alvarez. Which greeting fits best?",
+            options: [
+              "“Hi guys, do you have a reservation?”",
+              "“Good evening, Mr. Alvarez, it's great to have you with us again…”",
+              "“Welcome! How many in your party?”",
+              "“Name for the reservation?”"
+            ],
+            correctIndex: 1,
+            explanation: "Repeat guests get their last name and a note that we're glad to have them back. It shows we remember them before they've said a word. The other greetings treat a returning guest like a stranger, and casual names like “guys” don't match how we address guests."
+          }
+        ]
+      },
+      {
+        title: "Waits, Tables, and Seating",
+        sections: [
+          {
+            type: "text",
+            title: "No Table Yet",
+            body: "Check availability first. If nothing is open, offer the bar and take a name and number so you can find them: “At the moment, we don't have a table available, however if you would like I can seat you at the bar and we will let you know as soon as the first table becomes available. May I have your phone number, as well as your first and last name…”<br><br>If there's a wait, quote a realistic one: “We currently have about 15 minutes for the next table. May I offer you a seat at the bar in the meantime…” When a table opens, tell them, escort them, and thank them for their patience.",
+            note: "Never quote a wait you haven't checked. Fifteen minutes is an example, not a rule."
+          },
+          {
+            type: "text",
+            title: "Walk Them There",
+            body: "<b>1. Escort.</b> Walk with the guests at a comfortable speed and seat them at a suitable table. Guests with difficulty walking are not seated at a far table. Start light conversation: “How is your evening going so far…”<br><br><b>2. Seat.</b> Assist in this order: the elderly, children, ladies, then gentlemen, offering chair assistance. Pull out the table if guests sit on a banquette.<br><br><b>3. Menus.</b> Once they're seated, offer the cocktail and wine menus in the same order, then clockwise, one menu for every 2 guests. Hand them from the guest's left so they receive them with the right hand.<br><br><b>4. Tell them who's next.</b> “Your server will be right with you shortly. Enjoy your dinner…”",
+            note: null
+          },
+          {
+            type: "text",
+            title: "If They Don't Like the Table",
+            body: "Tell them you'll speak to the manager right away to find a table more to their liking. Never promise they'll get exactly what they want. Ask them to wait at the bar.<br><br>“Please allow me to check our availability. May I direct you to the bar while you wait…”<br><br><b>Never leave guests standing in the middle of the dining room or next to another table.</b>",
+            note: null
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "Two walk-ins ask for a table. Every table is taken. What do you say?",
+            options: [
+              "“We're full. You can wait by the door.”",
+              "“Allow me a moment to check for availability… We don't have a table at the moment, but I can seat you at the bar and let you know as soon as one opens. May I have your phone number and your first and last name?”",
+              "“It'll be about 15 minutes.” (You haven't checked.)",
+              "“Do you have a reservation? No? We can't help you.”"
+            ],
+            correctIndex: 1,
+            explanation: "Check first, offer the bar, and take a name and number so you can find them. Sending guests away, or quoting a time you haven't checked, loses them before they've had a chance to be a guest."
+          },
+          {
+            type: "mcq",
+            question: "You seat a couple. Before you leave, the guest says, “Could we sit somewhere else? This is too close to the door.” What do you do?",
+            options: [
+              "“I'm sorry, this is the only table available.”",
+              "“Of course! I'll move you to that corner right now.” (You haven't checked whether it's free.)",
+              "“Please allow me to check our availability. May I direct you to the bar while you wait…” Then find a manager right away.",
+              "Ask them to stand by the table while you go find a manager."
+            ],
+            correctIndex: 2,
+            explanation: "Tell them you'll speak to the manager right away to find a table more to their liking, and ask them to wait at the bar. Never promise a table you haven't checked, and never leave guests standing in the middle of the dining room or next to another table."
+          },
+          {
+            type: "sequence",
+            prompt: "Put guests in the order they're assisted with seating.",
+            items: [
+              { id: "elderly", label: "The elderly" },
+              { id: "children", label: "Children" },
+              { id: "ladies", label: "Ladies" },
+              { id: "gentlemen", label: "Gentlemen" }
+            ],
+            correctOrder: ["elderly", "children", "ladies", "gentlemen"],
+            correctMessage: "That's the order — correct."
+          }
+        ]
+      },
+      {
+        title: "Soignée and Handoff",
+        sections: [
+          {
+            type: "text",
+            title: "The Soignée",
+            body: "A soignée (swan-yay) is a printout of what we know about a guest from past visits, including at sister restaurants: food and drink preferences, allergies, special occasions, relationships to Chefs, owners, or managers, and press.<br><br><b>Code 1, no notes:</b> Server<br><b>Code 2, PPX or celebration:</b> Server, Manager<br><b>Code 3, allergy:</b> Server station, Manager, Chef<br><br>Never print it ahead of time, and handle it with care.",
+            note: null
+          },
+          {
+            type: "text",
+            title: "The Handoff",
+            body: "Pass the soignée to the server and/or manager. Make sure the server knows each guest's name, how to pronounce it, and the seat number, so the name and notes are used from the first hello.<br><br>You heard the guest say their name at the stand, so pass it on the way you heard it, not the way it's spelled. Not sure you heard it right? Repeat it back: “Mr. Szymanski, for 4 guests…” and the guest will correct you.",
+            note: "Read the soignée before approaching the table, and use the guest's name in a natural way."
+          },
+          {
+            type: "text",
+            title: "When the Party Size Changes",
+            body: "In Refined Dining, each table is set for the exact number of guests.<br><br><b>Fewer guests.</b> The Host removes the setting, or asks a team member to. Extra settings are not removed after guests are seated unless they were told someone would not be joining.<br><br><b>More guests.</b> Check reservation availability first and always do your best to accommodate. The Host places the extra setting and chair, or asks a team member to help.<br><br>Either way: “Allow us a moment while we prepare your table…”",
+            note: null
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "A reservation is noted for a shellfish allergy. Who gets the soignée?",
+            options: [
+              "Server only",
+              "Server and Manager",
+              "Server station, Manager, and Chef",
+              "Nobody. The Host tells the kitchen out loud."
+            ],
+            correctIndex: 2,
+            explanation: "Allergy notes are code 3: the server station, the Manager, and the Chef all get the soignée. Code 1 (no notes) goes to the Server, and code 2 (PPX or celebration) goes to the Server and Manager."
+          },
+          {
+            type: "mcq",
+            question: "You've just seated the Hendersons, a party of four. Their soignée notes an anniversary at seat 3. Your server is at the pass. What do you say?",
+            options: [
+              "“Table 12 just sat.”",
+              "“Here's the soignée for 12. They're celebrating something.”",
+              "“Table 12 is the Hendersons, four guests, said HEN-der-son. Seat 3 is the anniversary, and I've already told the manager.”",
+              "Leave the soignée at the server station and go back to the stand."
+            ],
+            correctIndex: 2,
+            explanation: "The server needs the name, how it's pronounced, and the seat number that goes with each note, so they can use the guest's name naturally from the first hello. The other options leave the server guessing or skip the handoff."
+          },
+          {
+            type: "mcq",
+            question: "The stand is busy. A reservation for 4 arrives, but only 3 are here, and they tell you the fourth won't be joining. The table is set for 4. What do you do?",
+            options: [
+              "Seat them and let the server deal with the extra setting.",
+              "Tell them, “Allow us a moment while we prepare your table…” then remove the extra setting yourself or ask a team member to.",
+              "Seat them and remove the setting once they're settled.",
+              "Tell them they'll have to wait 15 minutes for a table set for 3."
+            ],
+            correctIndex: 1,
+            explanation: "In Refined Dining, each table must be set for the exact number of guests. Extra settings are not removed after guests are seated unless they were told someone would not be joining, so the reset happens before they sit."
+          }
+        ]
+      },
+      {
+        title: "Your Mission",
+        sections: [
+          {
+            type: "text",
+            title: "Make It Yours",
+            body: "Write the first sentence you'd say to a reservation arriving tonight. Use the last name and keep it natural. Then say it out loud once before your next shift.<br><br>For a repeat guest: “Good evening, Mr. Smith, it's great to have you with us again…”<br>For a first-timer: “Good evening, welcome. May I have your last name and the time of the reservation…”",
+            note: null
+          },
+          {
+            type: "text",
+            title: "Your Mission",
+            body: "On your next shift, greet every reservation by last name, and hand off every soignée with the name, its pronunciation, and the seat number.<br><br>If you don't work the host stand, acknowledge every arriving guest you pass within 30 seconds, whether or not the Host is there.<br><br>Afterward, tell your manager two things: how many reservations you greeted by last name, and one handoff where the server used the guest's name from the first hello.",
+            note: "Your manager may watch a few arrivals. Look for a pattern over the shift, not one perfect greeting."
+          }
+        ]
+      }
+    ],
+    test: [
+      {
+        question: "A party of 6 is seated. How many cocktail and wine menus does the Host bring?",
+        options: ["1", "2", "3", "6"],
+        correctIndex: 2
+      },
+      {
+        question: "A couple arrives, and both a window table and a terrace table are open. What do you ask?",
+        options: [
+          "“Would you prefer to sit inside or on the terrace…?”",
+          "Nothing. Seat them at the closest open table.",
+          "“Any table is fine, right?”",
+          "“Do you mind sitting wherever we have open?”"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "At 4:30, a coworker offers to print tonight's soignées now to save time. What's your answer?",
+        options: [
+          "Great, that saves us a lot of work.",
+          "Print them, but keep them face down.",
+          "No. Soignées are never printed ahead of time.",
+          "Print only the code 3s."
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "A guest using a cane is walked across the whole dining room to the last open table at the back. What's wrong?",
+        options: [
+          "Nothing. Any open table works.",
+          "Guests with difficulty walking should not be seated at a far table.",
+          "Guests should always sit near the host stand.",
+          "The Host should have carried the menus."
+        ],
+        correctIndex: 1
+      }
+    ]
   }
 ];
+
+// ============================================================
+// GUEST JOURNEY -- the full order of service, shown as an overview
+// from any non-quiz screen of a course module that sets
+// `journeyPhase` (the phase id it teaches). Source: Guest Journey
+// 2026 (v3.2026.0105). 4 phases, 43 steps.
+// ============================================================
+const GUEST_JOURNEY = {
+  title: "The Guest Journey",
+  phases: [
+    {
+      id: 1, title: "Arrival", limit: "Within 5 minutes",
+      steps: [
+        { n: "1.1", task: "Greet arriving guests", owner: "Host / Service Team", timing: "Within 30 seconds of arrival" },
+        { n: "1.2", task: "Escort guests to the table", owner: "Host" },
+        { n: "1.3", task: "Assist guests with seating", owner: "Host" },
+        { n: "1.4", task: "Present the menu", owner: "Host" },
+        { n: "1.5", task: "Give server and/or manager the soignée", owner: "Host" }
+      ]
+    },
+    {
+      id: 2, title: "Ordering", limit: "Within 15 minutes",
+      steps: [
+        { n: "2.1", task: "Greet the table", owner: "Server", timing: "Within 1 minute of seating" },
+        { n: "2.2", task: "Ask about allergies, dietary restrictions, celebrations", owner: "Server" },
+        { n: "2.3", task: "Offer choice of water", owner: "Server / Asst. Server" },
+        { n: "2.4", task: "Take cocktail order", owner: "Server" },
+        { n: "2.5", task: "Enter beverage order into POS", owner: "Server", timing: "Immediately after taking the order" },
+        { n: "2.6", task: "Introduce the menu", owner: "Server" },
+        { n: "2.7", task: "Remove extra settings (if applicable)", owner: "Asst. Server" },
+        { n: "2.8", task: "Water service", owner: "Asst. Server", timing: "Within 2 minutes of ordering" },
+        { n: "2.9", task: "Beverage service", owner: "Server", timing: "Within 5 minutes of ordering" },
+        { n: "2.10", task: "Answer questions, suggest, take food order", owner: "Server", timing: "Immediately after taking the order" },
+        { n: "2.11", task: "Mark table for first course", owner: "Server" },
+        { n: "2.12", task: "Enter remaining food order into POS", owner: "Server", timing: "Immediately after taking the order" },
+        { n: "2.13", task: "Offer wine selection", owner: "Server" },
+        { n: "2.14", task: "Serve amuse bouche (PPX, if applicable)", owner: "Asst. Server" },
+        { n: "2.15", task: "Bread service (if applicable)", owner: "Asst. Server" },
+        { n: "2.16", task: "Wine service", owner: "Server / Manager" }
+      ]
+    },
+    {
+      id: 3, title: "Dining", limit: "Within 60 minutes",
+      steps: [
+        { n: "3.1", task: "Present first course (appetizers)", owner: "Runner / Service Team", timing: "Within 10 minutes of ordering" },
+        { n: "3.2", task: "Check back with the table", owner: "Service Team / Manager", timing: "Within 2 minutes" },
+        { n: "3.3", task: "Fire course (entrée)", owner: "Server", timing: "About halfway through appetizers" },
+        { n: "3.4", task: "Clear first course", owner: "Asst. Server / Service Team", timing: "Within 2 minutes of everyone finishing" },
+        { n: "3.5", task: "Crumb the table", owner: "Server" },
+        { n: "3.6", task: "Mark table for entrée", owner: "Server" },
+        { n: "3.7", task: "Present entrée", owner: "Runner / Service Team", timing: "10 minutes after first course is cleared" },
+        { n: "3.8", task: "Check back with the table", owner: "Server / Manager", timing: "Within 2 minutes / 2 bites" },
+        { n: "3.9", task: "Table and side station maintenance", owner: "Server / Service Team", timing: "Continuous" },
+        { n: "3.10", task: "Clear entrée", owner: "Server / Service Team", timing: "Within 2 minutes of everyone finishing" },
+        { n: "3.11", task: "Crumb the table", owner: "Server" },
+        { n: "3.12", task: "Offer dessert, coffee, tea, cordials", owner: "Server" },
+        { n: "3.13", task: "Take dessert, coffee, tea, cordial order", owner: "Server", timing: "Within 3 minutes" },
+        { n: "3.14", task: "Enter dessert and drinks order into POS", owner: "Server", timing: "Immediately after taking the order" },
+        { n: "3.15", task: "Mark table for dessert", owner: "Server" },
+        { n: "3.16", task: "Coffee / tea service", owner: "Server", timing: "Within 5 minutes of ordering" },
+        { n: "3.17", task: "Present dessert", owner: "Server / Service Team", timing: "Within 10 minutes of ordering" },
+        { n: "3.18", task: "Clear dessert", owner: "Server / Service Team" }
+      ]
+    },
+    {
+      id: 4, title: "Final Check & Departure", limit: "Within 10 minutes",
+      steps: [
+        { n: "4.1", task: "Offer further assistance", owner: "Server" },
+        { n: "4.2", task: "Present and process the check", owner: "Server", timing: "Within 5 minutes of guest request" },
+        { n: "4.3", task: "The last impression", owner: "All team members" },
+        { n: "4.4", task: "Clear and reset the table", owner: "Asst. Server" }
+      ]
+    }
+  ]
+};
 

@@ -3451,6 +3451,107 @@ function learningRowHTML(mod) {
   `;
 }
 
+/* ---------- Guest Journey overview ----------
+   A course module that sets `journeyPhase` gets a "Journey" button in the
+   header of its intro, lesson, and completion screens. It opens the whole
+   order of service (GUEST_JOURNEY in data.js) as a sheet over the current
+   screen, with the module's own phase open and marked. It is deliberately
+   never added to chapter quizzes, the final test, or the test result, so
+   it can't be used mid-question. Opening it changes no route or progress. */
+
+function journeyEsc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function addJourneyButton(mod) {
+  if (!mod || !mod.journeyPhase || typeof GUEST_JOURNEY === "undefined") return;
+  const hdr = app.querySelector(".app-header");
+  if (!hdr) return;
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "journey-btn";
+  btn.setAttribute("aria-haspopup", "dialog");
+  btn.setAttribute("aria-label", "Show the full Guest Journey");
+  btn.textContent = "Journey";
+  btn.onclick = () => showJourneyOverview(mod, btn);
+  hdr.appendChild(btn);
+}
+
+function showJourneyOverview(mod, trigger) {
+  if (document.querySelector(".journey-overlay")) return;
+  const phases = GUEST_JOURNEY.phases;
+  const totalSteps = phases.reduce((n, ph) => n + ph.steps.length, 0);
+
+  const phasesHTML = phases.map(ph => {
+    const here = ph.id === mod.journeyPhase;
+    const stepsHTML = ph.steps.map(st => `
+      <li class="journey-step">
+        <span class="journey-step-n">${journeyEsc(st.n)}</span>
+        <div class="journey-step-main">
+          <p class="journey-step-task">${journeyEsc(st.task)}</p>
+          <p class="journey-step-meta">${journeyEsc(st.owner)}${st.timing ? ` · ${journeyEsc(st.timing)}` : ""}</p>
+        </div>
+      </li>`).join("");
+    return `
+      <details class="journey-phase${here ? " is-here" : ""}"${here ? " open" : ""}>
+        <summary class="journey-phase-head">
+          <span class="journey-phase-num">${ph.id}</span>
+          <span class="journey-phase-text">
+            <span class="journey-phase-title">${journeyEsc(ph.title)}${here ? `<span class="journey-here">You are here</span>` : ""}</span>
+            <span class="journey-phase-meta">${ph.steps.length} steps · ${journeyEsc(ph.limit)}</span>
+          </span>
+        </summary>
+        <ol class="journey-steps">${stepsHTML}</ol>
+      </details>`;
+  }).join("");
+
+  const overlay = document.createElement("div");
+  overlay.className = "journey-overlay";
+  overlay.innerHTML = `
+    <div class="journey-sheet" role="dialog" aria-modal="true" aria-labelledby="journey-title">
+      <div class="journey-head">
+        <div>
+          <p class="journey-eyebrow">Order of service</p>
+          <h2 class="journey-title" id="journey-title">${journeyEsc(GUEST_JOURNEY.title)}</h2>
+          <p class="journey-sub">${phases.length} phases · ${totalSteps} steps</p>
+        </div>
+        <button type="button" class="journey-close" aria-label="Close the Guest Journey">&#10005;</button>
+      </div>
+      <div class="journey-body">${phasesHTML}</div>
+    </div>
+  `;
+
+  const prevOverflow = document.body.style.overflow;
+  let closed = false;
+  const close = () => {
+    if (closed) return;
+    closed = true;
+    document.removeEventListener("keydown", onKey, true);
+    window.removeEventListener("popstate", close);
+    overlay.remove();
+    document.body.style.overflow = prevOverflow;
+    if (trigger && document.body.contains(trigger)) trigger.focus();
+  };
+  const onKey = (e) => {
+    if (e.key === "Escape") { e.preventDefault(); close(); return; }
+    if (e.key !== "Tab") return;
+    const focusables = overlay.querySelectorAll("button, summary");
+    if (!focusables.length) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  };
+
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
+  overlay.querySelector(".journey-close").onclick = close;
+  document.addEventListener("keydown", onKey, true);
+  window.addEventListener("popstate", close);
+  document.body.style.overflow = "hidden";
+  document.body.appendChild(overlay);
+  overlay.querySelector(".journey-close").focus();
+}
+
 function renderLearningHub() {
   header("Learning");
 
@@ -3480,6 +3581,7 @@ function renderLearningIntro(moduleId) {
   header("Learning");
   const mod = findLearningModule(moduleId);
   if (!mod) { go("learning-hub"); return; }
+  addJourneyButton(mod);
 
   const status = moduleStatus(mod);
   const p = getLearningProgress()[mod.id];
@@ -3515,6 +3617,7 @@ function renderLearningChapter(moduleId, chapterIndex, sectionIndex) {
   if (!mod) { go("learning-hub"); return; }
   const chapters = moduleChapters(mod);
   if (!chapters.length) { go("learning-hub"); return; }
+  addJourneyButton(mod);
   chapterIndex = Math.max(0, Math.min(chapterIndex, chapters.length - 1));
   const chapter = chapters[chapterIndex];
   sectionIndex = Math.max(0, Math.min(sectionIndex, chapter.sections.length - 1));
@@ -3714,6 +3817,13 @@ function renderChapterQuizMCQ(item, onPass) {
         feedback.textContent = "Correct \u2014 nice.";
         feedback.style.display = "block";
         optsWrap.querySelectorAll(".quiz-opt").forEach(b => { b.style.opacity = b === btn ? "1" : "0.5"; });
+        // Optional per-question teaching note (used by scenario-style quizzes)
+        if (item.explanation) {
+          const explain = document.createElement("div");
+          explain.className = "fact-block quiz-explain";
+          explain.innerHTML = `<b>Why</b><p>${item.explanation}</p>`;
+          feedback.insertAdjacentElement("afterend", explain);
+        }
         showChapterQuizContinue(body, onPass);
       } else {
         btn.classList.add("picked-wrong");
@@ -3792,7 +3902,7 @@ function renderChapterQuizSequence(item, onPass) {
   function checkSequence() {
     const correct = placed.every((id, i) => id === item.correctOrder[i]);
     if (correct) {
-      feedback.textContent = "That's the chain \u2014 correct.";
+      feedback.textContent = item.correctMessage || "That's the chain \u2014 correct.";
       feedback.style.display = "block";
       slotsWrap.querySelectorAll(".seq-slot").forEach(s => s.classList.add("correct"));
       showChapterQuizContinue(body, onPass);
@@ -4165,6 +4275,7 @@ function renderLearningComplete(moduleId) {
   const mod = findLearningModule(moduleId);
   if (!mod) { go("learning-hub"); return; }
 
+  addJourneyButton(mod);
   const firstTime = markLearningComplete(moduleId);
   if (firstTime) celebrate();
 

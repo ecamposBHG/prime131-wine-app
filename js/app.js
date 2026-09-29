@@ -3631,6 +3631,17 @@ function showJourneyOverview(currentPhaseId, trigger) {
     </div>
   `;
 
+  // Size the sheet to exactly fill the lesson area below the app header
+  // (the header itself, with its Back/Journey buttons, stays uncovered),
+  // so the sheet's height stays fixed while phases open and close --
+  // it no longer shrink-wraps to whichever content happens to be visible.
+  const appHeader = app.querySelector(".app-header");
+  const headerBottom = appHeader ? Math.max(appHeader.getBoundingClientRect().bottom, 0) : 0;
+  const sheetHeight = Math.max(window.innerHeight * 0.5, window.innerHeight - headerBottom);
+  const sheetEl = overlay.querySelector(".journey-sheet");
+  sheetEl.style.height = `${sheetHeight}px`;
+  sheetEl.style.maxHeight = `${sheetHeight}px`;
+
   const prevOverflow = document.body.style.overflow;
   let closed = false;
   const close = () => {

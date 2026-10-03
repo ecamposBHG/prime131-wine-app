@@ -8462,3 +8462,58 @@ const GUEST_JOURNEY = {
   ]
 };
 
+
+/* Monday "Steak Night" limited menu (starts Mon 10/05/2026). Every item is a
+   regular-menu dish: `dishId` points at DISHES so allergens, pairings and quiz
+   content stay in one place. `label`, `desc` and `price` are the Monday menu's
+   own wording and prices (DISHES carries no price field). Shown from the
+   "Monday" button on the Food menu screen. */
+const MONDAY_MENU = {
+  title: "Steak Night",
+  eyebrow: "Monday menu",
+  groups: [
+    {
+      title: "Appetizers",
+      items: [
+        { dishId: "d-oysters", label: "East Coast Oysters", desc: "Chilled ½ dozen, fresh wasabi, shallots, ponzu", price: 18 },
+        { dishId: "d-clam-chowder", label: "Smoked Clam Chowder", desc: "Bacon bits, crispy potato, celery leaves, chili oil", price: 16 },
+        { dishId: "d-shishitos", label: "Fried Shishitos", desc: "Ponzu, sesame seeds", price: 9 },
+        { dishId: "d-crunchy-spicy-tuna-roll", label: "Crunchy Spicy Tuna Roll", desc: "Avocado, tama arare, kaiware, sweet soy sauce", price: 16 },
+        { dishId: "d-dragon-roll", label: "Dragon Roll", desc: "Shrimp tempura, jumbo lump crab salad, mango, avocado, sriracha", price: 19 }
+      ]
+    },
+    {
+      title: "Steak dinners",
+      note: "Served with the house salad, grilled sourdough bread, and a choice of French fries with spicy aioli, ricotta stuffed mac N cheese, or grilled asparagus.",
+      servedWithDishIds: ["d-chopped-salad", "d-sourdough", "d-fries", "d-mac-cheese", "d-asparagus"],
+      items: [
+        { dishId: "d-wagyu-skirt", label: "6 oz American Wagyu Skirt Steak", price: 48 },
+        { dishId: "d-filet-8", label: "8 oz Filet", price: 59 },
+        { dishId: "d-ny-strip-16", label: "16 oz Prime NY Strip", price: 75 },
+        { dishId: "d-tenderloin-8", label: "8 oz American Wagyu Filet", price: 87 },
+        { dishId: "d-ribeye", label: "18 oz American Wagyu Ribeye", price: 145 },
+        { dishId: "d-burger", label: "Prime 131 Burger", desc: "American cheese, veal bacon, brioche bun, special sauce", price: 39 },
+        { dishId: "d-branzino", label: "Salt Grilled Branzino", desc: "Fresh herb salad, brown butter, lemon", price: 52 },
+        { dishId: "d-marinated-chicken", label: "Marinated Baby Chicken", desc: "Espelette, spicy aioli", price: 42 }
+      ]
+    },
+    {
+      title: "Prime Board",
+      board: true,
+      price: 365,
+      note: "Shared by up to 4 people. Served with 4 house salads, grilled sourdough, and 4 sides: French fries with spicy aioli, stuffed ricotta mac n cheese, or grilled asparagus.",
+      servedWithDishIds: ["d-chopped-salad", "d-sourdough", "d-fries", "d-mac-cheese", "d-asparagus"],
+      items: [
+        { dishId: "d-tomahawk", label: "32 oz Australian Tomahawk" },
+        { dishId: "d-ny-strip-16", label: "16 oz Prime NY Strip" }
+      ]
+    },
+    {
+      title: "Desserts",
+      items: [
+        { dishId: "d-skillet-fudge", label: "Skillet Fudge" },
+        { dishId: "d-basque-cheesecake", label: "Basque Cheesecake" }
+      ]
+    }
+  ]
+};

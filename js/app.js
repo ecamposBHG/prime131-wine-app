@@ -1260,6 +1260,114 @@ function renderPairFoodWineList() {
 
 function renderMenuList() {
   renderDishList("Food menu", "Search the menu", true);
+  addMondayButton();
+}
+
+/* ---------- Monday Steak Night menu ----------
+   A "Monday" button in the Food menu header opens the limited Monday menu
+   (MONDAY_MENU in data.js) as the same sheet the Guest Journey uses. Each item
+   points at a regular DISHES entry, so tapping one opens its normal detail
+   page. Opening the sheet changes no route or progress. */
+function addMondayButton() {
+  if (typeof MONDAY_MENU === "undefined") return;
+  const hdr = app.querySelector(".app-header");
+  if (!hdr) return;
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "journey-btn monday-btn";
+  btn.setAttribute("aria-haspopup", "dialog");
+  btn.setAttribute("aria-label", `Show the Monday ${MONDAY_MENU.title} menu`);
+  btn.textContent = "Monday";
+  btn.onclick = () => showMondayMenu(btn);
+  hdr.appendChild(btn);
+}
+
+function showMondayMenu(trigger) {
+  if (document.querySelector(".journey-overlay")) return;
+  const known = new Set(DISHES.map(d => d.id));
+  const groups = MONDAY_MENU.groups;
+  const dishCount = groups.filter(g => !g.board).reduce((n, g) => n + g.items.length, 0);
+  const hasBoard = groups.some(g => g.board);
+
+  const itemHTML = (it) => {
+    const inner = `
+      <span class="monday-item-main">
+        <span class="monday-item-name">${journeyEsc(it.label)}</span>
+        ${it.desc ? `<span class="monday-item-desc">${journeyEsc(it.desc)}</span>` : ""}
+      </span>
+      ${typeof it.price === "number" ? `<span class="monday-item-price">$${it.price}</span>` : ""}`;
+    return known.has(it.dishId)
+      ? `<button type="button" class="monday-item" data-dish="${journeyEsc(it.dishId)}">${inner}</button>`
+      : `<div class="monday-item is-static">${inner}</div>`;
+  };
+
+  const groupsHTML = groups.map(g => `
+    <section class="monday-group">
+      <div class="monday-group-head">
+        <h3 class="monday-group-title">${journeyEsc(g.title)}</h3>
+        ${typeof g.price === "number" ? `<span class="monday-item-price">$${g.price}</span>` : ""}
+      </div>
+      ${g.note ? `<p class="monday-note">${journeyEsc(g.note)}</p>` : ""}
+      ${g.items.map(itemHTML).join("")}
+    </section>`).join("");
+
+  const overlay = document.createElement("div");
+  overlay.className = "journey-overlay";
+  overlay.innerHTML = `
+    <div class="journey-sheet" role="dialog" aria-modal="true" aria-labelledby="monday-title">
+      <div class="journey-head">
+        <div>
+          <p class="journey-eyebrow">${journeyEsc(MONDAY_MENU.eyebrow)}</p>
+          <h2 class="journey-title" id="monday-title">${journeyEsc(MONDAY_MENU.title)}</h2>
+          <p class="journey-sub">${dishCount} dishes${hasBoard ? " &middot; Prime Board" : ""} &middot; Tap a dish for details</p>
+        </div>
+        <button type="button" class="journey-close" aria-label="Close the Monday menu">&#10005;</button>
+      </div>
+      <div class="journey-body">${groupsHTML}</div>
+    </div>
+  `;
+
+  // Same fixed-height sizing as the Guest Journey sheet: fill the area below
+  // the app header so the Back/Monday buttons stay uncovered.
+  const appHeader = app.querySelector(".app-header");
+  const headerBottom = appHeader ? Math.max(appHeader.getBoundingClientRect().bottom, 0) : 0;
+  const sheetHeight = Math.max(window.innerHeight * 0.5, window.innerHeight - headerBottom);
+  const sheetEl = overlay.querySelector(".journey-sheet");
+  sheetEl.style.height = `${sheetHeight}px`;
+  sheetEl.style.maxHeight = `${sheetHeight}px`;
+
+  const prevOverflow = document.body.style.overflow;
+  let closed = false;
+  const close = () => {
+    if (closed) return;
+    closed = true;
+    document.removeEventListener("keydown", onKey, true);
+    window.removeEventListener("popstate", close);
+    overlay.remove();
+    document.body.style.overflow = prevOverflow;
+    if (trigger && document.body.contains(trigger)) trigger.focus();
+  };
+  const onKey = (e) => {
+    if (e.key === "Escape") { e.preventDefault(); close(); return; }
+    if (e.key !== "Tab") return;
+    const focusables = overlay.querySelectorAll("button");
+    if (!focusables.length) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  };
+
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
+  overlay.querySelector(".journey-close").onclick = close;
+  overlay.querySelectorAll(".monday-item[data-dish]").forEach(b => {
+    b.onclick = () => { const id = b.dataset.dish; close(); go("dish-detail", { dishId: id }); };
+  });
+  document.addEventListener("keydown", onKey, true);
+  window.addEventListener("popstate", close);
+  document.body.style.overflow = "hidden";
+  document.body.appendChild(overlay);
+  overlay.querySelector(".journey-close").focus();
 }
 
 function renderCocktailTypeChooser() {

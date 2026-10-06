@@ -733,6 +733,57 @@ const SEASONAL_COCKTAILS = [
   }
 ];
 
+// Non-alcoholic (zero-proof) cocktails. Source: Berg Hospitality Group Reset Menu.
+// Batched house preps are attached to the drink that uses them via `prep`.
+// `about` is the source recipe card's own description (shown on the Build face).
+const NA_COCKTAILS = [
+  {
+    id: "nb1", name: "Limoncell-No Martini", glassware: "Coupe", method: "Shake & Strain", category: "non-alcoholic",
+    flavorTags: ["Lemon", "Chamomile", "Cane Sugar"],
+    ingredients: ["2 oz Pallini Limonzero", "2 oz Triple Chamomile Tea", "0.5 oz Lemon Juice"],
+    garnish: "Lemon Sugar Rim, Blueberry Skewer",
+    directions: "Combine all ingredients into a shaker tin. Shake with ice until well chilled. Strain into a coupe that has been prepared with a lemon sugar rim. Garnish and serve.",
+    prep: "Lemon Sugar (rim): combine 10 True Lemon packets with 80 White Sugar in an appropriately sized vessel and mix until thoroughly uniform. Portion into appropriate vessels for service. Label, date, and store in an airtight container. Shelf life 30 days.",
+    about: "A zero proof martini-style offering that leans into elegance and simplicity, with Pallini Limonzero as the focal point. Chamomile tea adds softness and length while lemon and cane sugar refine the balance without excess. Reads composed and intentional, fitting seamlessly into an aperitif or dessert-adjacent slot."
+  },
+  {
+    id: "nb2", name: "Slims Cup", glassware: "Collins (12 oz)", method: "Shake & Strain over ice", category: "non-alcoholic",
+    flavorTags: ["Cucumber", "Citrus", "Black Tea", "Botanical"],
+    ingredients: ["2 oz Clean G", "2 oz Berg Cucumber Lime Sour (house prep)", "1.5 oz Black Tea"],
+    garnish: "Cucumber Ribbon, Mint Bouquet, Lemon Wedge",
+    directions: "Combine all ingredients into a shaker tin. Shake with ice until well chilled. Strain over fresh ice into a 12 oz Collins. Garnish and serve.",
+    prep: "Berg Cucumber Lime Sour: combine 33.8 oz Cucumber Juice, 33.8 oz Sweetbird Cane Sugar Syrup, 16.9 oz Lemon Juice, and 16.9 oz Lime Juice in an appropriately sized vessel. Mix until thoroughly combined. Portion into appropriate vessels for service. Label, date, and refrigerate. Shelf life 30 days.",
+    about: "A direct play on the classic Pimm's Cup, translated into a modern zero proof format. Clean G establishes a composed botanical base while Berg Cucumber Lime Sour recreates the cooling cucumber citrus profile of the original serve. Black tea provides tannic structure that mimics the depth and grip of a spirit-driven build."
+  },
+  {
+    id: "nb3", name: "Oh Nojito", glassware: "Collins (12 oz)", method: "Shake & Strain over ice", category: "non-alcoholic",
+    flavorTags: ["Mint", "Matcha", "Lime", "Coconut"],
+    ingredients: ["2 oz Ritual Rum Alternative", "2 oz Mint Matcha Syrup (house prep)", "1.5 oz Lime Juice", "2 oz Strange Sparkling Coconut Water"],
+    garnish: "Mint Bouquet, Coconut Flakes Half Rim",
+    directions: "Combine all ingredients (minus Strange Sparkling Coconut Water) into a shaker tin. Shake with ice until well chilled. Strain over fresh ice into a 12 oz Collins. Top with Strange Sparkling Coconut Water. Garnish and serve.",
+    prep: "Mint Matcha Syrup: in a sanitized mixing bowl, combine 1 bottle (33.8 oz) Sweetbird Mojito Mint Syrup with 2 tbsp (approx. 12 g) Ceremonial Matcha Green Tea Powder. Whisk thoroughly or blend on high for 3–5 minutes until the matcha is fully suspended and evenly distributed. Portion into the appropriate service vessel, label with product name and prep date, and store refrigerated. Shake well before use. Shelf life 30 days.",
+    about: "Built as a non-alcoholic alternative to the mojito category. Mint Matcha Syrup adds herbal texture while lime maintains brightness and Strange Sparkling Coconut Water softens the finish. Refreshing, layered, and operationally flexible."
+  },
+  {
+    id: "nb4", name: "Not At All Spritz", glassware: "Wine Glass", method: "Shake & Strain over ice", category: "non-alcoholic",
+    flavorTags: ["Bitter", "Lemon", "Dragon Fruit", "Sparkling"],
+    ingredients: ["2 oz Ritual Aperitif Alternative", "0.25 oz Lemon Juice", "0.25 oz Sweetbird Dragon Fruit & Papaya Syrup", "4 Dashes Peychaud's Bitters", "2 oz Club Soda"],
+    garnish: "Orange Slice, Edible Flower",
+    directions: "Combine all ingredients (minus Club Soda) into a shaker tin. Shake with ice until well chilled. Strain over fresh ice into a wine glass. Top with Club Soda. Add Peychaud's Bitters. Garnish and serve.",
+    prep: "",
+    about: "Interprets the spritz format through a bitter-forward lens. Lemon provides clarity while Sweetbird Dragon Fruit and Papaya Syrup introduces subtle, color-driven intrigue without overt sweetness. Carbonation finishes clean and restrained."
+  },
+  {
+    id: "nb5", name: "Proteiña Colada", glassware: "Collins (12 oz)", method: "Shake & Strain over ice", category: "non-alcoholic",
+    flavorTags: ["Coconut", "Pineapple", "Lime"],
+    ingredients: ["2 oz Ritual Rum Alternative", "0.75 oz Coco Reàl Cream of Coconut", "0.75 oz Pineapple Juice", "0.5 oz Lime Juice", "2 scoops ProCel Protein Powder"],
+    garnish: "Pineapple Flag, Mint Sprig, Toasted Coconut Flakes",
+    directions: "Combine all ingredients into a shaker tin. Shake with ice until well chilled. Strain into a 12 oz Collins. Add ice as needed. Garnish and serve.",
+    prep: "",
+    about: "Reframes the Piña Colada as a functional indulgence while maintaining bar program relevance. Coconut and pineapple deliver familiarity, supported by lime for balance. ProCel Protein Powder introduces a wellness-driven differentiator without disrupting texture or flavor logic."
+  }
+];
+
 const CLASSIC_COCKTAILS = [
   {
     id: "cc1", name: "Whiskey Sour", category: "classic", spirit: "Whiskey", glassware: "Rocks", method: "Shake & Strain",

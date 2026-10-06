@@ -301,13 +301,13 @@ const FLAVOR_ICON_MAP = [
   [["berry", "currant", "plum", "cassis"], "\u{1F347}"],
   [["cherry", "strawberry", "raspberry", "cranberry"], "\u{1F352}"],
   [["citrus", "lemon", "lime", "zest", "yuzu", "bergamot"], "\u{1F34B}"],
-  [["peach", "apple"], "\u{1F34F}"],
   [["tropical", "pineapple", "papaya", "dragon fruit"], "\u{1F34D}"],
+  [["peach", "apple"], "\u{1F34F}"],
   [["melon", "honeydew", "lychee", "pear"], "\u{1F348}"],
   [["flower", "honeysuckle", "violet", "floral", "lavender"], "\u{1F338}"],
   [["mocha", "cocoa", "chocolate", "coffee", "espresso", "roasted"], "\u2615"],
   [["oak", "cedar", "vanilla", "spice", "pepper", "whiskey", "bourbon", "malt", "bitters"], "\u{1FAB5}"],
-  [["earth", "forest", "herb", "garrigue", "mineral", "stone", "flint", "tar", "savory", "basil", "mint", "matcha"], "\u{1F33F}"],
+  [["earth", "forest", "herb", "garrigue", "mineral", "stone", "flint", "tar", "savory", "basil", "mint", "matcha", "chamomile", "cucumber", "black tea", "botanical"], "\u{1F33F}"],
   [["brioche", "toast", "bread", "chalk"], "\u{1F950}"],
   [["honey"], "\u{1F36F}"],
   [["olive", "brin"], "\u{1FAD2}"],
@@ -316,7 +316,9 @@ const FLAVOR_ICON_MAP = [
   [["ginger"], "\u{1FADA}"],
   [["sparkling", "bubbl"], "\u{1F942}"],
   [["sweet", "sugar"], "\u{1F36C}"],
-  [["dry", "crisp", "silky", "bright"], "\u2744\uFE0F"]
+  [["dry", "crisp", "silky", "bright"], "\u2744\uFE0F"],
+  [["coconut"], "\u{1F965}"],
+  [["bitter"], "\u{1F33F}"]
 ];
 function getFlavorIcon(tag) {
   const lower = tag.toLowerCase();
@@ -367,6 +369,7 @@ function render() {
   else if (current.view === "cocktail-list") renderCocktailList();
   else if (current.view === "seasonal-cocktail-list") renderSeasonalCocktailList();
   else if (current.view === "classic-cocktail-list") renderClassicCocktailList();
+  else if (current.view === "na-cocktail-list") renderNaCocktailList();
   else if (current.view === "cocktail-detail") renderCocktailDetail(current.params.cocktailId);
   else if (current.view === "wine-type") renderWineTypeChooser();
   else if (current.view === "wine-bottle-list") renderByTheBottleList();
@@ -1388,6 +1391,10 @@ function renderCocktailTypeChooser() {
       <div class="home-icon-circle">&#127865;</div>
       <div class="home-option-text"><p>Classic Cocktails</p><span>Timeless recipes, by base spirit</span></div>
     </div>
+    <div class="home-option" data-go="na">
+      <div class="home-icon-circle">&#129475;</div>
+      <div class="home-option-text"><p>Non-alcoholic Beverages</p><span>Zero-proof cocktails</span></div>
+    </div>
     <div class="home-option" data-go="liquor">
       <div class="home-icon-circle">&#127866;</div>
       <div class="home-option-text"><p>Liquor</p><span>The back bar, by category</span></div>
@@ -1396,6 +1403,7 @@ function renderCocktailTypeChooser() {
   options.querySelector('[data-go="house"]').onclick = () => go("cocktail-list");
   options.querySelector('[data-go="seasonal"]').onclick = () => go("seasonal-cocktail-list");
   options.querySelector('[data-go="classic"]').onclick = () => go("classic-cocktail-list");
+  options.querySelector('[data-go="na"]').onclick = () => go("na-cocktail-list");
   options.querySelector('[data-go="liquor"]').onclick = () => go("liquor-list");
   app.appendChild(options);
 }
@@ -1759,7 +1767,36 @@ function renderSeasonalCocktailList() {
   app.appendChild(wrap);
 }
 
-function findCocktail(id) { return COCKTAILS.find(c => c.id === id) || SEASONAL_COCKTAILS.find(c => c.id === id) || CLASSIC_COCKTAILS.find(c => c.id === id); }
+function renderNaCocktailList() {
+  header("Non-alcoholic Beverages");
+  const wrap = document.createElement("div");
+  const input = document.createElement("input");
+  input.className = "search-input";
+  input.placeholder = "Search non-alcoholic beverages";
+  wrap.appendChild(input);
+  const listWrap = document.createElement("div");
+  wrap.appendChild(listWrap);
+
+  function draw(filter) {
+    listWrap.innerHTML = "";
+    const filtered = NA_COCKTAILS.filter(c => c.name.toLowerCase().includes(filter.toLowerCase()));
+    filtered.forEach(c => {
+      const row = document.createElement("div");
+      row.className = "list-row";
+      row.innerHTML = `<span class="list-row-main"><span class="dish-icon">&#129475;</span>${c.name}</span>`;
+      row.onclick = () => go("cocktail-detail", { cocktailId: c.id });
+      listWrap.appendChild(row);
+    });
+    if (!filtered.length) {
+      listWrap.innerHTML = `<p class="empty-note">No beverages match that search.</p>`;
+    }
+  }
+  draw("");
+  input.oninput = () => draw(input.value);
+  app.appendChild(wrap);
+}
+
+function findCocktail(id) { return COCKTAILS.find(c => c.id === id) || SEASONAL_COCKTAILS.find(c => c.id === id) || CLASSIC_COCKTAILS.find(c => c.id === id) || NA_COCKTAILS.find(c => c.id === id); }
 
 function renderCocktailDetail(cocktailId) {
   const cocktail = findCocktail(cocktailId);
@@ -1818,6 +1855,7 @@ function renderCocktailDetail(cocktailId) {
       <p class="dish-flip-title">&#127864; Build</p>
       <p class="chefprep-text">${cocktail.directions}</p>
       ${cocktail.prep ? `<p class="chefprep-text" style="margin-top:8px;"><b style="color:#D9B98A;">House prep:</b> ${cocktail.prep}</p>` : ""}
+      ${cocktail.about ? `<p class="chefprep-text" style="margin-top:8px;"><b style="color:#D9B98A;">About:</b> ${cocktail.about}</p>` : ""}
       ${cocktail.funFact ? `<p class="chefprep-text" style="margin-top:8px;"><b style="color:#D9B98A;">Fun fact:</b> ${cocktail.funFact}</p>` : ""}
       ${cocktail.bestFor ? `<p class="chefprep-text" style="margin-top:8px;"><b style="color:#D9B98A;">Great for:</b> ${cocktail.bestFor}</p>` : ""}
     `;

@@ -2664,23 +2664,6 @@ const BOTTLE_WINES = [
     shortStory: "Ray Duncan and Justin Meyer, a former Christian Brother winemaker, built Silver Oak from a handshake deal in 1972 around one uncompromising idea: make only Cabernet Sauvignon, and age it exclusively in American oak. Meyer sold his share to the Duncan family in 2001; Ray's sons David and Tim now run the winery their father and Meyer built."
   },
   {
-    id: "bw96", name: "Bootleg, Meritage", style: "red", price: 80, category: "Cabernet Sauvignon & Meritage", subcategory: "Meritage & Blends",
-    grape: "Cabernet Sauvignon, Merlot, Cabernet Franc", producer: "Bootleg Wines", region: "Napa Valley, California",
-    winemaker: "Bootleg winemaking team",
-    flavorTags: ["Blackberry", "Plum", "Vanilla", "Baking Spice"],
-    structure: { sweetness: 1, acidity: 3, tannin: 4, alcohol: 4, body: 4 },
-    guestDescription: "This is an easy, value-driven Napa Meritage &mdash; blackberry, plum, vanilla &mdash; with a name that winks at Prohibition-era Napa Valley history.",
-    sellingPoints: ["An approachable, well-priced Napa Valley Bordeaux-style blend", "A name that nods to Napa's Prohibition-era history, when winemaking continued in secret", "A dependable option for a guest who wants Napa character without a high price tag"],
-    winemakingNote: "A classic Bordeaux-style blend of Cabernet Sauvignon, Merlot, and Cabernet Franc, made in an approachable, immediately drinkable style rather than built for long-term cellaring.",
-    moment: "A guest who wants real Napa Valley character at a genuinely accessible price.",
-    memory: "An easy-drinking, value-focused Napa Meritage with a name that nods to Prohibition history.",
-    pairingDishIds: ["d-short-rib", "d-marinated-chicken", "d-burger"],
-    arsenal: "Fun bit of trivia: 'Bootleg' references the Prohibition era, when winemaking in Napa Valley continued quietly under the radar.",
-    funFact: "The name 'Bootleg' references the Prohibition era in American history, when secretive, unlicensed winemaking kept parts of Napa Valley's wine culture alive.",
-    funFact2: "Meritage is a term American wineries use for Bordeaux-style blends that don't qualify to be labeled by a single grape variety under U.S. wine law.",
-    shortStory: "Bootleg was built around a simple idea: real Napa Valley Bordeaux-blend character shouldn't have to come with a high price tag, borrowing its name from the resourceful, under-the-radar spirit of Prohibition-era Napa winemakers."
-  },
-  {
     id: "bw97", name: "Leviathan, Meritage", style: "red", price: 108, category: "Cabernet Sauvignon & Meritage", subcategory: "Meritage & Blends",
     grape: "Cabernet Sauvignon, Merlot, Petit Verdot, Malbec", producer: "Leviathan (Andy Erickson & Christian Moueix)", region: "California",
     winemaker: "Andy Erickson",

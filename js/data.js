@@ -8366,6 +8366,203 @@ const LEARNING_MODULES = [
         correctIndex: 1
       }
     ]
+  },
+  {
+    id: "paint-the-dish",
+    title: "Paint the Dish: Descriptions That Sell",
+    category: "Service",
+    unlockAfter: null,
+    chapters: [
+      {
+        title: "Guide, Don't Read",
+        sections: [
+          {
+            type: "text",
+            title: "Guests Can Read",
+            body: "A guest can read the menu themselves. They didn't ask you a question because they need a reader. They asked because they want a guide.<br><br>That's the whole difference between an order taker and a hospitality professional. The order taker reads the menu back. The professional paints the dish before it ever reaches the table.",
+            note: "Every question about a dish is a request for guidance. The guest already holds the menu, so repeating it adds nothing."
+          },
+          {
+            type: "text",
+            title: "One Skill",
+            body: "This module teaches one skill: when a guest asks about a dish, describe it with sensory language, using texture, preparation, and one vivid detail, instead of reading the menu or giving a flat yes or no.<br><br>By the end, you can answer the three most common guest questions with a description that paints a picture, checks for allergies, and builds trust:<br><br>“What do you recommend?”<br>“Is this dish good?”<br>“Any specials tonight?”",
+            note: null
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "A guest asks you about a dish. What are they really asking for?",
+            options: [
+              "Someone to read the menu to them.",
+              "A guide who can help them choose.",
+              "The price of the dish.",
+              "A quick answer so you can move on."
+            ],
+            correctIndex: 1,
+            explanation: "Guests can read the menu themselves. They ask because they want a guide."
+          }
+        ]
+      },
+      {
+        title: "Three Questions",
+        sections: [
+          {
+            type: "text",
+            title: "“What Do You Recommend?”",
+            body: "The order taker says, “The salmon is our most popular dish.” That's a fact, and it's also a dead end.<br><br>The professional answers the question behind the question. Ask what the guest is in the mood for. Ask whether there are any allergies at the table. Then describe one dish like you've already tasted it for them: how it's cooked, what it feels like, and what makes it worth ordering tonight.",
+            note: "Popularity tells a guest what other people ordered. A description tells them what they would be eating."
+          },
+          {
+            type: "text",
+            title: "“Is the Pork Chop Good?”",
+            body: "The order taker says, “Yes, it's delicious.” Every server says that about every dish, so it means nothing.<br><br>The professional says what delicious actually is: “The pork chop has a crispy sear on the outside, but it stays nice and tender inside. It comes with a seasonal accompaniment, like butternut squash this time of year.”",
+            note: "Now the guest can taste it in their head, and a guest who can taste it is a guest who orders it."
+          },
+          {
+            type: "text",
+            title: "“Any Specials Tonight?”",
+            body: "The order taker lists the ingredients, which are the same words printed on the insert the guest is already holding.<br><br>The professional sells the story of the special: why the chef made it, what is seasonal about it, and what it pairs with. Same dish, completely different answer.",
+            note: "One is information. The other is guidance."
+          }
+        ],
+        quiz: [
+          {
+            type: "mcq",
+            question: "A guest asks, “Is the pork chop good?” Which answer is the hospitality professional's?",
+            options: [
+              "“Yes, it's delicious.”",
+              "“It's very popular.”",
+              "“It has a crispy sear on the outside and stays tender inside, and it comes with butternut squash this season.”"
+            ],
+            correctIndex: 2,
+            explanation: "The professional says what delicious actually is. Texture and a seasonal detail let the guest taste it before ordering."
+          },
+          {
+            type: "sort",
+            prompt: "Flat answer, or a description that guides?",
+            groupALabel: "Flat Answer",
+            groupBLabel: "Guides the Guest",
+            chips: [
+              { id: "delicious", label: "“Yes, it's delicious.”", group: "a" },
+              { id: "popular", label: "“It's our most popular dish.”", group: "a" },
+              { id: "insert", label: "Reading the ingredients off the insert", group: "a" },
+              { id: "sear", label: "“A crispy sear outside, nice and tender inside.”", group: "b" },
+              { id: "story", label: "Why the chef made the special, and what's seasonal about it", group: "b" },
+              { id: "mood", label: "Asking what the guest is in the mood for, then describing one dish", group: "b" }
+            ]
+          },
+          {
+            type: "mcq",
+            question: "A guest asks about the specials. What does the professional sell?",
+            options: [
+              "The list of ingredients.",
+              "The story: why the chef made it, what's seasonal about it, and what it pairs with.",
+              "The lowest-priced special.",
+              "Whatever the kitchen wants to move."
+            ],
+            correctIndex: 1,
+            explanation: "Reading ingredients repeats the insert. The story of the special is guidance."
+          }
+        ]
+      },
+      {
+        title: "The Formula",
+        sections: [
+          {
+            type: "text",
+            title: "Texture. One Vivid Detail. Allergies.",
+            body: "Three parts, every time.<br><br><b>1. Texture and preparation.</b> Crispy, tender, charred, silky: how it was cooked and what it feels like.<br><b>2. One vivid detail.</b> A seasonal ingredient, a sauce, or a finish: the thing that makes this dish this dish.<br><b>3. Check for allergies</b> before you finish.",
+            note: "Checking for allergies protects the guest, and it tells them you're paying attention."
+          },
+          {
+            type: "text",
+            title: "Why It Works",
+            body: "Guests don't need someone to read ingredients off the menu for them. What builds trust at the table, and raises check averages naturally, is guidance, confidence, and words that make their mouth water.<br><br>A guest who trusts your description trusts your next recommendation too. That's how a personalized experience gets built, and it's what brings people back.",
+            note: "The goal isn't to push a bigger order. It's for the guest to trust your guidance enough to act on it."
+          },
+          {
+            type: "text",
+            title: "Your Mission",
+            body: "Before your next shift, choose one dish and say your description out loud once: texture and preparation, one vivid detail, then the allergy check.<br><br>On the floor, answer at least one “What do you recommend?” or “Is this good?” with your description instead of a flat answer. Afterward, tell your manager which dish you described and what detail you chose.",
+            note: "Say it like you've tasted it, because you should have."
+          }
+        ],
+        quiz: [
+          {
+            type: "sequence",
+            prompt: "Put the three parts of the description in order.",
+            items: [
+              { id: "texture", label: "Texture and preparation" },
+              { id: "detail", label: "One vivid detail" },
+              { id: "allergy", label: "Check for allergies" }
+            ],
+            correctOrder: ["texture", "detail", "allergy"]
+          },
+          {
+            type: "mcq",
+            question: "Why does sensory description raise check averages?",
+            options: [
+              "It pressures guests into ordering more.",
+              "It builds trust through guidance and confidence, so guests act on recommendations.",
+              "It makes the menu sound longer."
+            ],
+            correctIndex: 1,
+            explanation: "Trust is what raises checks. A guest who trusts your description trusts your next recommendation too."
+          }
+        ]
+      }
+    ],
+    test: [
+      {
+        question: "A guest asks, “Is the pork chop good?” Which answer is the hospitality professional's?",
+        options: [
+          "“Yes, it's delicious.”",
+          "“It's very popular.”",
+          "“It has a crispy sear on the outside and stays tender inside, and it comes with butternut squash this season.”"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "What are the three parts of the description formula?",
+        options: [
+          "Price, popularity, and portion size",
+          "Texture and preparation, one vivid detail, and an allergy check",
+          "Ingredients, origin, and calories",
+          "Greeting, recommendation, and upsell"
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "Why does sensory description raise check averages?",
+        options: [
+          "It pressures guests into ordering more.",
+          "It builds trust through guidance and confidence, so guests act on recommendations.",
+          "It makes the menu sound longer."
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "A guest asks, “What do you recommend?” What does the professional do first?",
+        options: [
+          "Name the most popular dish.",
+          "Ask what the guest is in the mood for and whether there are allergies at the table, then describe one dish.",
+          "Read the entrée list from the top.",
+          "Recommend the most expensive dish."
+        ],
+        correctIndex: 1
+      },
+      {
+        question: "A guest asks about tonight's special. What makes the professional's answer different from the order taker's?",
+        options: [
+          "It lists the ingredients more quickly.",
+          "It tells the story of the special: why the chef made it, what's seasonal, and what it pairs with.",
+          "It leaves out allergy information.",
+          "It repeats the words on the insert."
+        ],
+        correctIndex: 1
+      }
+    ]
   }
 ];
 
@@ -8404,6 +8601,13 @@ const LEARNING_COURSES = [
       "guest-journey-9-dessert-service",
       "guest-journey-10-departure"
     ]
+  },
+  {
+    id: "paint-the-dish",
+    topic: "service",
+    title: "Paint the Dish",
+    blurb: "Stop reading the menu back. Describe a dish with texture, one vivid detail, and an allergy check.",
+    moduleIds: ["paint-the-dish"]
   },
   {
     id: "olive-wagyu",

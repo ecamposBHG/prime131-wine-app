@@ -370,6 +370,7 @@ function render() {
   else if (current.view === "seasonal-cocktail-list") renderSeasonalCocktailList();
   else if (current.view === "classic-cocktail-list") renderClassicCocktailList();
   else if (current.view === "na-cocktail-list") renderNaCocktailList();
+  else if (current.view === "whistlepig-dinner") renderWhistlepigDinner();
   else if (current.view === "cocktail-detail") renderCocktailDetail(current.params.cocktailId);
   else if (current.view === "wine-type") renderWineTypeChooser();
   else if (current.view === "wine-bottle-list") renderByTheBottleList();
@@ -1379,6 +1380,10 @@ function renderCocktailTypeChooser() {
   const options = document.createElement("div");
   options.className = "home-options";
   options.innerHTML = `
+    <div class="home-option" data-go="whistlepig">
+      <div class="home-icon-circle">&#128055;</div>
+      <div class="home-option-text"><p>Whistlepig Dinner</p><span>Oct 22 · Five-course pairing briefing</span></div>
+    </div>
     <div class="home-option" data-go="house">
       <div class="home-icon-circle">&#127864;</div>
       <div class="home-option-text"><p>House Cocktails</p><span>Prime 131's own recipe book</span></div>
@@ -1400,6 +1405,7 @@ function renderCocktailTypeChooser() {
       <div class="home-option-text"><p>Liquor</p><span>The back bar, by category</span></div>
     </div>
   `;
+  options.querySelector('[data-go="whistlepig"]').onclick = () => go("whistlepig-dinner");
   options.querySelector('[data-go="house"]').onclick = () => go("cocktail-list");
   options.querySelector('[data-go="seasonal"]').onclick = () => go("seasonal-cocktail-list");
   options.querySelector('[data-go="classic"]').onclick = () => go("classic-cocktail-list");
@@ -1793,6 +1799,46 @@ function renderNaCocktailList() {
   }
   draw("");
   input.oninput = () => draw(input.value);
+  app.appendChild(wrap);
+}
+
+/* Whistlepig Dinner: one scrollable briefing page, no quiz, no progress tracking.
+   Content lives in WHISTLEPIG_DINNER (data.js). */
+function renderWhistlepigDinner() {
+  header("Whistlepig Dinner");
+  const d = WHISTLEPIG_DINNER;
+  const wrap = document.createElement("div");
+  wrap.className = "wp-wrap";
+
+  const blendHtml = (c) => c.blend
+    ? `<ul class="wp-blend">${c.blend.map(b => `<li>${b}</li>`).join("")}</ul>` : "";
+
+  wrap.innerHTML = `
+    <p class="intro-eyebrow">${d.when}</p>
+    <h1 class="intro-title">${d.title}</h1>
+    <p class="slide-text">${d.big}</p>
+    <div class="fact-block"><b class="wp-label">Pairing logic</b><p>${d.logic}</p></div>
+    ${d.courses.map(c => `
+      <section class="wp-course">
+        <p class="slide-kicker">${c.course} · ${c.move}</p>
+        <h2 class="slide-title">${c.dish}</h2>
+        <p class="wp-dish-notes">${c.dishNotes}</p>
+        <p class="wp-pour">${c.pour}</p>
+        ${c.pourSub ? `<p class="wp-pour-sub">${c.pourSub}</p>` : ""}
+        <p class="hero-meta">${c.facts}</p>
+        ${blendHtml(c)}
+        <p class="wp-label">Tastes like</p>
+        <p class="slide-text">${c.taste}</p>
+        <p class="wp-label">Why it works</p>
+        <p class="slide-text">${c.why}</p>
+        <div class="fact-block"><b class="wp-label">Say to the guest</b><p>“${c.say}”</p></div>
+      </section>
+    `).join("")}
+    <section class="wp-course">
+      <p class="slide-kicker">Quick glossary</p>
+      ${d.glossary.map(g => `<p class="slide-text"><b>${g[0]}:</b> ${g[1]}</p>`).join("")}
+    </section>
+  `;
   app.appendChild(wrap);
 }
 

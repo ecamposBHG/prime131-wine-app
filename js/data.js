@@ -8755,3 +8755,91 @@ const MONDAY_MENU = {
     }
   ]
 };
+
+// WhistlePig Dinner (Thursday, October 22, 2026) -- server briefing, no quiz.
+// Source: event menu + WhistlePig bottle labels/producer notes. The "why it works"
+// lines are Prime 131's pairing reasoning, not producer claims.
+const WHISTLEPIG_DINNER = {
+  title: "Whistlepig Dinner",
+  when: "Thursday, October 22 · 6 PM · Five courses",
+  big: "WhistlePig is a Vermont farm distillery best known for rye. Tonight moves from sweeter bourbons to spicier ryes, and ends with a rye finished in wine casks.",
+  logic: "Each pour either <b>echoes</b> a flavor in the dish or <b>cuts</b> through its richness.",
+  courses: [
+    {
+      course: "First Course",
+      dish: "Hamachi Crudo",
+      dishNotes: "orange, citrus ponzu, shishito, cilantro",
+      pour: "Beef Tallow Old Fashioned",
+      pourSub: "with WhistlePig PiggyBack 6yr Bourbon",
+      facts: "6 years · corn-heavy mash · Char #3 oak · 100 proof",
+      taste: "Vanilla, caramel, cinnamon, maple, orange",
+      move: "Echo",
+      why: "The orange in the bourbon picks up the orange and ponzu. Its sweetness balances the citrus and shishito.",
+      say: "A sweeter, rounder bourbon from a rye house. The orange in it echoes the ponzu."
+    },
+    {
+      course: "Second Course",
+      dish: "Tommy’s Bacon",
+      dishNotes: "WhistlePig maple bacon, danish blue",
+      pour: "WhistlePig Snout-to-Tail 10yr Bourbon",
+      pourSub: "",
+      facts: "Kentucky bourbon, 10 years · finished in Vermont · 88 proof",
+      taste: "Honey, brown sugar, toasted nuts, vanilla, smoky maple",
+      move: "Echo + contrast",
+      why: "The smoked-maple barrel head matches the maple bacon. The sweetness plays against the salty blue cheese.",
+      say: "Each barrel has two differently toasted ends, one smoked maple, and gets flipped during aging. That's the maple you taste with the bacon."
+    },
+    {
+      course: "Third Course",
+      dish: "Bluefin Toro",
+      dishNotes: "bone marrow, truffle soy sauce, brown butter aioli, lemon",
+      pour: "WhistlePig 10yr Small Batch Rye",
+      pourSub: "",
+      facts: "10 years · high-rye · new American oak · 100 proof",
+      taste: "Allspice, orange peel, anise, caramel, mint",
+      move: "Cut",
+      why: "Rye spice and proof cut through the fatty toro and bone marrow. The orange peel meets the lemon.",
+      say: "This is the rye that started WhistlePig. Bold and spicy, so it slices through the richness."
+    },
+    {
+      course: "Fourth Course",
+      dish: "Miso Cured NY Strip",
+      dishNotes: "foie gras, kimchi grits, roasted baby bok choy",
+      pour: "WhistlePig FarmStock Rye",
+      pourSub: "",
+      facts: "A blend of three ryes · 70% distilled in Vermont · 86 proof",
+      blend: [
+        "10% · Vermont · 4 yrs · Char #3",
+        "60% · Vermont · 6 yrs · Char #4",
+        "30% · Canada · 6 yrs · Char #3"
+      ],
+      taste: "Rye spice and oak, from the heavier Char #4 barrels",
+      move: "Cut",
+      why: "Rye spice and oak give it the structure to stand up to foie gras and kimchi grits. At 86 proof it won't overpower the dish.",
+      say: "Mostly distilled on their Vermont farm. Most of the blend is six-year-old Vermont rye."
+    },
+    {
+      course: "Fifth Course",
+      dish: "Vermont Cheese Plate",
+      dishNotes: "chocolate, apple jam, candied pecans",
+      pour: "WhistlePig 12yr Old World Rye",
+      pourSub: "",
+      facts: "12 years · finished in wine casks · 86 proof",
+      blend: [
+        "63% · Madeira casks",
+        "30% · Sauternes casks",
+        "7% · Port casks"
+      ],
+      taste: "Apricot, plum, raisin, date, honey, dark chocolate",
+      move: "Echo",
+      why: "The dried fruit and dark chocolate echo the apple jam, chocolate and pecans. It drinks like a dessert wine.",
+      say: "Rye finished in Madeira, Sauternes and Port barrels. Think dried fruit and dark chocolate with the cheese."
+    }
+  ],
+  glossary: [
+    ["Finish", "The whiskey rested in a second type of barrel after it had already aged."],
+    ["Sauternes", "A sweet French white wine."],
+    ["Madeira", "A fortified wine from Portugal’s island of Madeira."],
+    ["Port", "A fortified wine from Portugal."]
+  ]
+};

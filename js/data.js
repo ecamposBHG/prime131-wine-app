@@ -473,6 +473,43 @@ const OTL_WINES = [
   }
 ];
 
+// Zero Proof (alcohol-removed) wines. Source: Missing Thorn producer/retailer
+// descriptions, most recent vintage. Deliberately lean: only fields with a real
+// source are filled. Structure scores, price, dish pairings and allergens are
+// intentionally absent until tasted/confirmed -- do NOT backfill with guesses.
+// `style` reuses the existing wine styles so grouping/dots work; these wines are
+// NOT part of WINES, so games and the pairing engines never see them.
+const ZERO_PROOF_WINES = [
+  {
+    id: "zp1", name: "Missing Thorn Sparkling White", style: "sparkling",
+    grape: "Riesling", producer: "Missing Thorn", region: "California, USA",
+    winemaker: "Aaron Pott, with Napa vintner Stephanie Honig",
+    abv: "Under 0.5% ABV",
+    calories: "15 calories per 5 oz",
+    flavorTags: [],
+    winemakingNote: "Fermented in stainless steel after whole-cluster pressing, with no malolactic fermentation. The finished sparkling wine is then dealcoholized by low-temperature vacuum distillation to under 0.5% ABV.",
+    notesGap: "Tasting notes and pairings haven't been added yet."
+  },
+  {
+    id: "zp2", name: "Missing Thorn Rosé", style: "white",
+    grape: "Zinfandel", producer: "Missing Thorn", region: "California, USA",
+    winemaker: "Aaron Pott, with Napa vintner Stephanie Honig",
+    abv: "Under 0.5% ABV",
+    flavorTags: ["Red Berries", "Pomegranate", "Blood Orange", "Minerality", "Herbal Spice"],
+    pairingNotes: "Grilled fish, cheese boards, spicy food",
+    winemakingNote: "Fermented in stainless steel, then dealcoholized by low-temperature vacuum distillation. Served chilled."
+  },
+  {
+    id: "zp3", name: "Missing Thorn Red Blend", style: "red",
+    grape: "Bordeaux-style red blend (exact varietal composition not confirmed)", producer: "Missing Thorn", region: "California, USA",
+    winemaker: "Aaron Pott, with Napa vintner Stephanie Honig",
+    abv: "Under 0.5% ABV",
+    flavorTags: ["Blackberry", "Black Cherry", "Cassis", "Cedar", "Vanilla", "Mocha"],
+    pairingNotes: "Duck confit, beef stew, pork",
+    winemakingNote: "Full-bodied and structured, with ripe tannins. Dealcoholized by low-temperature vacuum distillation. Serve slightly chilled, around 65°F."
+  }
+];
+
 const DISHES = [
   { id: "d-oysters", name: "East Coast Oysters", section: "Raw Bar", description: "Chilled: fresh wasabi, shallots, ponzu. Roasted: coconut, chili, cilantro, lime.", pairedWineIds: ["w1", "w5"], quizClue: "Served two ways: raw on the half shell with shallot ponzu and fresh wasabi, or shocked and finished with a charred fresno-coconut vinaigrette and toasted panko.", dropLine: "eastern oysters with shallot ponzu and fresh wasabi / roasted oysters with charred fresno and coconut vinaigrette", ingredients: "house made shallot ponzu - gluten free soy sauce, mirin, rice vinegar, sake, konbu, bonito flakes, minced shallots, orange peel and orange juice. | charred fresno and coconut vinaigrette- red bell pepper, shiro dashi (bonito flakes, konbu, soy sauce, mirin, sake, salt, sugar), fresno pepper, fish sauce, rice vinegar, coconu milk, lime juice, lime zest, sugar", chefPrep: "6 each freshly shucked eastern oyster served with housemade shallot ponzu sauce, fresh grated wasabi root and lemon wedge | for charred fresno vinaigrette all ingredients blended well until smooth and strained. For oysters shocked fresh and dresed with charred fresno vin, toasted panko and roasted in the oven until done. Plated with plating salt underneath and garnished with lemon wedge", allergensInRecipe: ["alcohol", "fish", "soy", "vinegar", "citrus", "chili", "shellfish", "onion"], allergensRemovable: ["onion", "mustard"] },
   { id: "d-tuna-tartare", name: "Tuna Tartare", section: "Raw Bar", description: "Avocado purée, wakamomo, chives, taro chips, sesame garlic soy dressing", pairedWineIds: ["w3"], quizClue: "Diced yellowfin mixed with olive oil and chives, built in a ring mold over a piped avocado-yuzu puree.", dropLine: "yellowfin tuna tartar with avocado puree and taro chips", ingredients: "tartar build- diced yellowfin tuna, chives, avocado puree, yuzu garlic soy dressing,  olive oil.  avocado puree- yuzu juice, evoo, olive oil, black pepper, avocado. Sesame garlic soy dressing- garlic, mirin, sesame oil, soy sauce, yuzu juice, rice vinegar. Garnish- taro chips, wakamomo(young peach in syrup), radish", chefPrep: "finely diced yellowfin tuna mixed with olive oil, chives, salt and pepper. Then ring mold placed on the bowl and avocado puree piped nicely. Follow by tuna mix. Garnished with julienne red radish, wakamomo, sesame garlic soy dressing. Served with taro chips on the side. if guest has glutten Allergy sub for Ponzu Sauce", allergensInRecipe: ["fish", "soy", "sesame", "garlic", "alcohol", "vinegar", "citrus", "onion", "gluten"], allergensRemovable: ["onion", "garlic", "gluten", "sesame"] },

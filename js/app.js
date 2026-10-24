@@ -342,6 +342,8 @@ function render() {
   else if (current.view === "study-card") renderStudyCard(current.params.wineId);
   else if (current.view === "otl-list") renderOtlList();
   else if (current.view === "otl-card") renderOtlCard(current.params.wineId);
+  else if (current.view === "zp-list") renderZeroProofList();
+  else if (current.view === "zp-card") renderZeroProofCard(current.params.wineId);
   else if (current.view === "pairwf-list") renderPairWineFoodList();
   else if (current.view === "pairwf-detail") renderWineDetailWithPairing(current.params.wineId);
   else if (current.view === "pairfw-list") renderPairFoodWineList();
@@ -948,6 +950,10 @@ function renderWineTypeChooser() {
       <div class="home-icon-circle">&#127866;</div>
       <div class="home-option-text"><p>By The Bottle</p><span>The full bottle list</span></div>
     </div>
+    <div class="home-option" data-go="zp">
+      <div class="home-icon-circle">&#127807;</div>
+      <div class="home-option-text"><p>Zero Proof Wines</p><span>Alcohol-removed pours</span></div>
+    </div>
     <div class="home-option" data-go="pairwf">
       <div class="home-icon-circle">&#127815;</div>
       <div class="home-option-text"><p>Pair Wine with Food</p><span>Start from the bottle</span></div>
@@ -960,6 +966,7 @@ function renderWineTypeChooser() {
   options.querySelector('[data-go="otl"]').onclick = () => go("otl-list");
   options.querySelector('[data-go="glass"]').onclick = () => go("study-list");
   options.querySelector('[data-go="bottle"]').onclick = () => go("wine-bottle-list");
+  options.querySelector('[data-go="zp"]').onclick = () => go("zp-list");
   options.querySelector('[data-go="pairwf"]').onclick = () => go("pairwf-list");
   options.querySelector('[data-go="pairfw"]').onclick = () => go("pairfw-list");
   app.appendChild(options);
@@ -1159,6 +1166,77 @@ function renderOtlCard(wineId) {
       go("otl-card", { wineId: OTL_WINES[nextIdx].id }, false);
     }
   }, { once: true });
+}
+
+/* Zero Proof Wines. Separate from WINES so the games and pairing engines never
+   see them. The card shows only sourced facts and says so when a field is missing
+   (no invented structure scores, dishes or allergens). */
+function renderZeroProofList() {
+  header("Zero Proof Wines");
+  app.appendChild(renderSearchableWineList(
+    (wineId) => go("zp-card", { wineId }),
+    "Search Zero Proof wines",
+    ZERO_PROOF_WINES
+  ));
+}
+
+function renderZeroProofCard(wineId) {
+  const wine = ZERO_PROOF_WINES.find(w => w.id === wineId) || ZERO_PROOF_WINES[0];
+  const idx = ZERO_PROOF_WINES.findIndex(w => w.id === wine.id);
+
+  header("Zero Proof Wines");
+  app.appendChild(renderHeroHeader(wine));
+
+  const abv = document.createElement("p");
+  abv.className = "hero-meta strong";
+  abv.textContent = [wine.abv, wine.calories].filter(Boolean).join(" · ");
+  app.appendChild(abv);
+
+  const panel = document.createElement("div");
+  panel.className = "zp-panel";
+  let html = "";
+  if (wine.flavorTags && wine.flavorTags.length) {
+    html += `<p class="face-h3"><span class="ic">&#127815;</span> Flavor profile</p>
+      <div class="flavor-grid">${wine.flavorTags.map(t => `<div class="flavor-item"><div class="icon">${getFlavorIcon(t)}</div><p>${t}</p></div>`).join("")}</div>`;
+  }
+  if (wine.pairingNotes) {
+    html += `<p class="face-h3"><span class="ic">&#127860;</span> Suggested pairings</p>
+      <p class="face-desc">${wine.pairingNotes}</p>`;
+  }
+  if (wine.winemakingNote) {
+    html += `<p class="face-h3"><span class="ic">&#127866;</span> How it's made</p>
+      <p class="face-desc">${wine.winemakingNote}</p>`;
+  }
+  if (wine.notesGap) {
+    html += `<p class="empty-note" style="text-align:left;font-style:italic;">${wine.notesGap}</p>`;
+  }
+  panel.innerHTML = html;
+  app.appendChild(panel);
+
+  const footerNav = document.createElement("div");
+  footerNav.className = "card-footer-nav";
+
+  const backBtn = document.createElement("button");
+  backBtn.className = "footer-btn";
+  backBtn.textContent = "← Back";
+  backBtn.disabled = idx === 0;
+  backBtn.onclick = () => go("zp-card", { wineId: ZERO_PROOF_WINES[idx - 1].id }, false);
+
+  const homeBtn = document.createElement("button");
+  homeBtn.className = "footer-btn footer-btn-home";
+  homeBtn.textContent = "Home";
+  homeBtn.onclick = () => go("home", {});
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "footer-btn";
+  nextBtn.textContent = "Next →";
+  nextBtn.disabled = idx === ZERO_PROOF_WINES.length - 1;
+  nextBtn.onclick = () => go("zp-card", { wineId: ZERO_PROOF_WINES[idx + 1].id }, false);
+
+  footerNav.appendChild(backBtn);
+  footerNav.appendChild(homeBtn);
+  footerNav.appendChild(nextBtn);
+  app.appendChild(footerNav);
 }
 
 function renderPairWineFoodList() {

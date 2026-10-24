@@ -298,6 +298,11 @@ button, input {
 .flip-inner.face-1 { border-top: 4px solid var(--shoyu-300); }
 .flip-inner.face-2 { border-top: 4px solid var(--neon); }
 
+/* Zero Proof card: static panel (no flip), same border language as flip-inner */
+.zp-panel { margin-top: 16px; padding: 20px; border: 2px solid var(--washi-300); border-top: 4px solid var(--bronze-500); background: var(--sumi-700); }
+.zp-panel .face-h3 { margin-top: 18px; }
+.zp-panel .face-h3:first-child { margin-top: 0; }
+
 .flip-label {
   font-family: var(--font-mono); font-size: 10px; color: var(--bronze-200);
   text-transform: uppercase; letter-spacing: 1px; margin: 0 0 4px;

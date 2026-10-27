@@ -390,6 +390,8 @@ function render() {
   else if (current.view === "learning-test") renderLearningTest(current.params.moduleId, current.params.index);
   else if (current.view === "learning-test-result") renderLearningTestResult(current.params.moduleId, current.params.correctCount, current.params.total, current.params.passed, current.params.wrongIndices);
   else if (current.view === "learning-complete") renderLearningComplete(current.params.moduleId);
+  else if (current.view === "training-calendar") renderTrainingCalendar();
+  else if (current.view === "training-week") renderTrainingWeek(current.params.monthId, current.params.week);
   makeDivsKeyboardAccessible();
   window.scrollTo(0, 0);
 }
@@ -561,7 +563,16 @@ function setChapterQuizPassed(moduleId, chapterIndex) {
   p[moduleId] = cur;
   try { localStorage.setItem(LEARNING_PROGRESS_KEY, JSON.stringify(p)); } catch (e) {}
 }
+/* Today's date on this device, as YYYY-MM-DD, for date-gated lessons. Plain
+   string comparison is safe because the format sorts chronologically. */
+function todayISO() {
+  const d = new Date();
+  const pad = (n) => (n < 10 ? "0" : "") + n;
+  return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+}
 function isModuleUnlocked(mod) {
+  // Training Calendar lessons open on their week's date and stay open.
+  if (mod.unlocksOn && todayISO() < mod.unlocksOn) return false;
   if (!mod.unlockAfter) return true;
   const p = getLearningProgress();
   return !!(p[mod.unlockAfter] && p[mod.unlockAfter].completed);
@@ -3780,6 +3791,10 @@ function learningGroupRowHTML(dataAttr, id, title, meta, pct) {
 
 /* Where "back to where I was browsing" goes once a module is finished. */
 function backToCourseTarget(moduleId) {
+  const mod = findLearningModule(moduleId);
+  if (mod && mod.calendar) {
+    return { label: `Back to Week ${mod.calendar.week}`, go: () => go("training-week", { monthId: mod.calendar.monthId, week: mod.calendar.week }) };
+  }
   const course = courseOfModule(moduleId);
   return course
     ? { label: "Back to Course", go: () => go("learning-course", { courseId: course.id }) }
@@ -3951,6 +3966,8 @@ function renderLearningHub() {
   const wrap = document.createElement("div");
   let html = "";
 
+  if (typeof TRAINING_CALENDAR !== "undefined" && TRAINING_CALENDAR.length) html += trainingCalendarHubRowHTML();
+
   const inProgress = LEARNING_MODULES.filter(m => moduleStatus(m) === "in-progress");
   if (inProgress.length) {
     html += `<p class="section-label">In Progress</p>` + inProgress.map(m => learningRowHTML(m, true)).join("");
@@ -3967,7 +3984,8 @@ function renderLearningHub() {
 
   wrap.innerHTML = html;
   wrap.querySelectorAll(".list-row").forEach(row => {
-    if (row.dataset.topic) row.onclick = () => go("learning-topic", { topicId: row.dataset.topic });
+    if (row.dataset.calendar) row.onclick = () => go("training-calendar");
+    else if (row.dataset.topic) row.onclick = () => go("learning-topic", { topicId: row.dataset.topic });
     else if (row.dataset.module && !row.classList.contains("locked")) row.onclick = () => go("learning-intro", { moduleId: row.dataset.module });
   });
   app.appendChild(wrap);
@@ -4018,6 +4036,8 @@ function renderLearningIntro(moduleId) {
   header("Learning");
   const mod = findLearningModule(moduleId);
   if (!mod) { go("learning-hub"); return; }
+  // A calendar lesson whose week hasn't opened yet goes back to the calendar.
+  if (!isModuleUnlocked(mod)) { go("training-calendar", {}, false); return; }
   addJourneyButton(mod);
 
   const status = moduleStatus(mod);
@@ -4027,11 +4047,12 @@ function renderLearningIntro(moduleId) {
   const pct = status === "completed" ? 100 : status === "in-progress" ? Math.round(((p.furthest + 1) / totalContent) * 100) : 0;
   const minutes = Math.max(1, Math.round((totalContent + (hasTest ? mod.test.length : 0)) * 1.5));
   const startLabel = status === "completed" ? "Review Module" : status === "in-progress" ? "Resume Module" : "Start Module";
+  const eyebrow = mod.calendar ? `Week ${mod.calendar.week} \u00b7 ${mod.category}` : `${mod.category} \u00b7 Module`;
 
   const wrap = document.createElement("div");
   wrap.className = "intro-wrap";
   wrap.innerHTML = `
-    <p class="intro-eyebrow">${mod.category} \u00b7 Module</p>
+    <p class="intro-eyebrow">${eyebrow}</p>
     <h1 class="intro-title">${mod.title}</h1>
     <div class="intro-meta-row">
       <div class="intro-meta"><b>${totalContent}</b><span>Sections</span></div>
@@ -4084,7 +4105,7 @@ function renderLearningChapter(moduleId, chapterIndex, sectionIndex) {
       <p class="slide-kicker">${kicker}</p>
       <h2 class="slide-title">${section.title}</h2>
       <p class="slide-text">${section.body}</p>
-      ${section.note ? `<div class="fact-block"><b>Why it matters</b><p>${section.note}</p></div>` : ""}
+      ${section.note ? `<div class="fact-block"><b>${section.noteLabel || "Why it matters"}</b><p>${section.note}</p></div>` : ""}
     `;
   } else if (section.type === "image") {
     body.innerHTML = `
@@ -4719,11 +4740,23 @@ function renderLearningComplete(moduleId) {
 
   const unlocked = LEARNING_MODULES.find(m => m.unlockAfter === moduleId && isModuleUnlocked(m));
 
+  // Training Calendar lessons: offer the next unfinished lesson in the same week.
+  let nextInWeek = null;
+  if (mod.calendar && typeof TRAINING_CALENDAR !== "undefined") {
+    const month = trainingFindMonth(mod.calendar.monthId);
+    const week = month && month.weeks.find(w => w.n === mod.calendar.week);
+    if (week) {
+      const lessons = trainingWeekLessons(week);
+      const at = lessons.findIndex(l => l.id === moduleId);
+      nextInWeek = lessons.slice(at + 1).find(l => moduleStatus(l) !== "completed") || null;
+    }
+  }
+
   const wrap = document.createElement("div");
   wrap.className = "complete-wrap";
   wrap.innerHTML = `
     <div class="complete-badge">&#10003;</div>
-    <h2 class="complete-title">Module Complete</h2>
+    <h2 class="complete-title">${mod.calendar ? "Lesson Complete" : "Module Complete"}</h2>
     <p class="complete-sub">You finished ${mod.title}.</p>
     ${unlocked ? `<div class="milestone-strip"><p class="milestone-line">${unlocked.title} unlocked</p></div>` : ""}
   `;
@@ -4737,14 +4770,149 @@ function renderLearningComplete(moduleId) {
   hubBtn.textContent = backTarget.label;
   hubBtn.onclick = backTarget.go;
   nav.appendChild(hubBtn);
-  if (unlocked) {
+  const nextTarget = unlocked || nextInWeek;
+  if (nextTarget) {
     const nextBtn = document.createElement("button");
     nextBtn.className = "footer-btn footer-btn-home";
-    nextBtn.textContent = "Next Module \u203a";
-    nextBtn.onclick = () => go("learning-intro", { moduleId: unlocked.id });
+    nextBtn.textContent = unlocked ? "Next Module \u203a" : "Next Lesson \u203a";
+    nextBtn.onclick = () => go("learning-intro", { moduleId: nextTarget.id });
     nav.appendChild(nextBtn);
   }
   app.appendChild(nav);
+}
+
+/* ---------- Training Calendar ----------
+   Learning > Training Calendar > Week N > a column's lesson. The calendar
+   itself (months, weeks, columns, unlock dates) is TRAINING_CALENDAR, defined
+   by js/training-calendar.js and one js/training-YYYY-MM.js per month. Each
+   lesson is a normal learning module, so the lesson, test, lockout and
+   progress code above all apply unchanged. A week opens on its date and
+   stays open; nothing about it depends on earlier weeks. */
+
+function trainingFindMonth(id) { return TRAINING_CALENDAR.find(m => m.id === id); }
+function trainingWeekOpen(week) { return todayISO() >= week.unlocksOn; }
+function trainingWeekLessons(week) {
+  return Object.keys(week.items).map(c => week.items[c].moduleId).filter(Boolean).map(findLearningModule).filter(Boolean);
+}
+function trainingDate(iso) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+function trainingShort(date) { return date.toLocaleDateString("en-US", { month: "short", day: "numeric" }); }
+/* "Nov 1\u20137": a week runs until the day before the next one opens, and the
+   last week of a month runs to the end of that month. */
+function trainingWeekRange(month, week) {
+  const start = trainingDate(week.unlocksOn);
+  const next = month.weeks.find(w => w.n === week.n + 1);
+  const end = next ? trainingDate(next.unlocksOn) : new Date(start.getFullYear(), start.getMonth() + 1, 1);
+  end.setDate(end.getDate() - 1);
+  const endText = end.getMonth() === start.getMonth() ? String(end.getDate()) : trainingShort(end);
+  return `${trainingShort(start)}\u2013${endText}`;
+}
+
+/* The row that sits at the top of the Learning hub. */
+function trainingCalendarHubRowHTML() {
+  const months = TRAINING_CALENDAR.slice().sort((a, b) => (a.id < b.id ? 1 : -1));
+  let openWeek = null, openMonth = null;
+  months.forEach(m => m.weeks.forEach(w => {
+    if (trainingWeekOpen(w) && (!openWeek || w.unlocksOn > openWeek.unlocksOn)) { openWeek = w; openMonth = m; }
+  }));
+  const mods = [];
+  TRAINING_CALENDAR.forEach(m => m.weeks.forEach(w => { if (trainingWeekOpen(w)) mods.push(...trainingWeekLessons(w)); }));
+  const meta = openWeek ? `${openMonth.title} \u00b7 Week ${openWeek.n} is open` : `${months[0].title} \u00b7 Opens ${trainingShort(trainingDate(months[0].weeks[0].unlocksOn))}`;
+  return `<p class="section-label">Pre-Shift</p>` + learningGroupRowHTML("data-calendar", "open", "Training Calendar", meta, averagePercent(mods));
+}
+
+function renderTrainingCalendar() {
+  header("Training Calendar");
+  const wrap = document.createElement("div");
+  let html = `<p class="slide-text">Learn each week's topics before pre-shift. Every lesson ends with a test, and you need 100% to pass. A week opens on its start date and stays open.</p>`;
+
+  TRAINING_CALENDAR.slice().sort((a, b) => (a.id < b.id ? 1 : -1)).forEach(month => {
+    html += `<p class="section-label">${month.title}</p>`;
+    month.weeks.forEach(week => {
+      if (!trainingWeekOpen(week)) {
+        html += `
+          <div class="list-row locked" tabindex="-1" aria-disabled="true">
+            <div class="list-row-main">
+              <span class="mod-dot locked"></span>
+              <div class="list-row-text">
+                <p>Week ${week.n}</p>
+                <span>Opens ${trainingShort(trainingDate(week.unlocksOn))}</span>
+              </div>
+            </div>
+            <span class="lock-ic">&#128274;</span>
+          </div>`;
+        return;
+      }
+      const lessons = trainingWeekLessons(week);
+      const done = completedCount(lessons);
+      const meta = lessons.length
+        ? `${trainingWeekRange(month, week)} \u00b7 ${done} of ${pluralize(lessons.length, "lesson", "lessons")} complete`
+        : `${trainingWeekRange(month, week)} \u00b7 Lessons coming soon`;
+      html += learningGroupRowHTML("data-week", `${month.id}|${week.n}`, `Week ${week.n}`, meta, averagePercent(lessons));
+    });
+  });
+
+  wrap.innerHTML = html;
+  wrap.querySelectorAll("[data-week]").forEach(row => {
+    row.onclick = () => {
+      const [monthId, n] = row.dataset.week.split("|");
+      go("training-week", { monthId, week: Number(n) });
+    };
+  });
+  app.appendChild(wrap);
+}
+
+function renderTrainingWeek(monthId, weekN) {
+  const month = trainingFindMonth(monthId);
+  const week = month && month.weeks.find(w => w.n === weekN);
+  // A week that hasn't opened yet (or doesn't exist) goes back to the calendar.
+  if (!week || !trainingWeekOpen(week)) { go("training-calendar", {}, false); return; }
+  header(`Week ${week.n}`);
+
+  const wrap = document.createElement("div");
+  let html = `<p class="slide-text">${month.title} \u00b7 ${trainingWeekRange(month, week)}</p><p class="section-label">Lessons</p>`;
+  month.columns.forEach(col => {
+    const item = week.items[col.id];
+    if (!item) return;
+    const mod = item.moduleId ? findLearningModule(item.moduleId) : null;
+    const kicker = `${col.title} \u00b7 ${col.lens}`;
+    if (!mod) {
+      html += `
+        <div class="list-row locked" tabindex="-1" aria-disabled="true">
+          <div class="list-row-main">
+            <span class="mod-dot locked"></span>
+            <div class="list-row-text">
+              <p>${item.label}</p>
+              <span>${kicker} \u00b7 Coming soon</span>
+            </div>
+          </div>
+        </div>`;
+      return;
+    }
+    const status = moduleStatus(mod);
+    const pct = modulePercent(mod);
+    const right = status === "completed"
+      ? `<span class="chev">&#10003;</span>`
+      : `<div class="mini-track"><div class="mini-fill" style="width:${pct}%"></div></div>`;
+    html += `
+      <div class="list-row" data-lesson="${mod.id}">
+        <div class="list-row-main">
+          <span class="mod-dot ${status === "completed" ? "done" : ""}"></span>
+          <div class="list-row-text">
+            <p>${item.label}</p>
+            <span>${kicker}</span>
+          </div>
+        </div>
+        ${right}
+      </div>`;
+  });
+  wrap.innerHTML = html;
+  wrap.querySelectorAll("[data-lesson]").forEach(row => {
+    row.onclick = () => go("learning-intro", { moduleId: row.dataset.lesson });
+  });
+  app.appendChild(wrap);
 }
 
 /* ---------- This or That: judgment calls from real pairings ---------- */

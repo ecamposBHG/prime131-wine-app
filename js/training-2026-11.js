@@ -347,7 +347,7 @@
       { id: "other",      title: "Other",     lens: "Storytelling" }
     ],
     weeks: [
-      { n: 1, unlocksOn: "2026-11-01", items: {
+      { n: 1, unlocksOn: "2026-10-26", items: {
         wine:       { label: "Faust / Mount Fishtail Sauvignon Blanc", moduleId: "tc-2026-11-w1-wine" },
         spirits:    { label: "Whiskeys",                               moduleId: "tc-2026-11-w1-whiskeys" },
         cocktails:  { label: "Opulent Espresso Martini",               moduleId: "tc-2026-11-w1-cocktail" },

@@ -3969,25 +3969,49 @@ function renderLearningHub() {
   const wrap = document.createElement("div");
   let html = "";
 
-  if (typeof TRAINING_CALENDAR !== "undefined" && TRAINING_CALENDAR.length) html += trainingCalendarHubRowHTML();
-  if (typeof SERVICE_ENHANCEMENT !== "undefined" && SERVICE_ENHANCEMENT.length) html += serviceEnhancementHubRowHTML();
+  /* Pre-Shift: the two date-locked weekly items, stacked, in this order. */
+  let preShift = "";
+  if (typeof TRAINING_CALENDAR !== "undefined" && TRAINING_CALENDAR.length) preShift += trainingCalendarHubRowHTML();
+  if (typeof SERVICE_ENHANCEMENT !== "undefined" && SERVICE_ENHANCEMENT.length) preShift += serviceEnhancementHubRowHTML();
+  if (preShift) html += `<p class="section-label">Pre-Shift</p>` + preShift;
 
+  /* Topics: a fixed 2x2 grid. Every topic in LEARNING_TOPICS shows, even one
+     with no courses yet (Wine), so the grid keeps its shape; an empty topic
+     says so honestly instead of showing placeholder content. Resume-where-
+     you-left-off lives on each card's progress bar. */
+  html += `<p class="section-label">Topics</p><div class="learn-grid">` + LEARNING_TOPICS.map(t => {
+    const courses = LEARNING_COURSES.filter(c => c.topic === t.id);
+    const mods = courses.flatMap(courseModules);
+    const done = completedCount(mods);
+    const pct = averagePercent(mods);
+    let meta, state;
+    if (!mods.length) {
+      meta = "Coming soon";
+      state = "";
+    } else if (done === mods.length) {
+      meta = `${done} of ${mods.length} complete`;
+      state = `<span class="learn-topic-check" aria-hidden="true">&#10003;</span>`;
+    } else {
+      meta = `${done} of ${mods.length} complete`;
+      state = `<span class="mini-track" aria-hidden="true"><span class="mini-fill" style="width:${pct}%"></span></span>`;
+    }
+    return `
+      <button type="button" class="learn-topic${mods.length ? "" : " is-empty"}${mods.length && done === mods.length ? " is-done" : ""}" data-topic="${t.id}"${mods.length ? "" : " disabled"}>
+        <span class="learn-topic-title">${t.title}</span>
+        <span class="learn-topic-meta">${meta}</span>
+        ${state}
+      </button>`;
+  }).join("") + `</div>`;
+
+  /* In Progress sits under the topic cards, so the structure stays on top
+     and the "pick up where you left off" row is the last thing you see. */
   const inProgress = LEARNING_MODULES.filter(m => moduleStatus(m) === "in-progress");
   if (inProgress.length) {
     html += `<p class="section-label">In Progress</p>` + inProgress.map(m => learningRowHTML(m, true)).join("");
   }
 
-  const topics = LEARNING_TOPICS.filter(t => LEARNING_COURSES.some(c => c.topic === t.id));
-  html += `<p class="section-label">Topics</p>` + topics.map(t => {
-    const courses = LEARNING_COURSES.filter(c => c.topic === t.id);
-    const mods = courses.flatMap(courseModules);
-    const done = completedCount(mods);
-    const meta = `${pluralize(courses.length, "course", "courses")} · ${done} of ${pluralize(mods.length, "module", "modules")} complete`;
-    return learningGroupRowHTML("data-topic", t.id, t.title, meta, averagePercent(mods));
-  }).join("");
-
   wrap.innerHTML = html;
-  wrap.querySelectorAll(".list-row").forEach(row => {
+  wrap.querySelectorAll(".list-row, .learn-topic").forEach(row => {
     if (row.dataset.calendar) row.onclick = () => go("training-calendar");
     else if (row.dataset.se) row.onclick = () => go("service-enhancement");
     else if (row.dataset.topic) row.onclick = () => go("learning-topic", { topicId: row.dataset.topic });
@@ -4004,6 +4028,11 @@ function renderLearningTopic(topicId) {
 
   const courses = LEARNING_COURSES.filter(c => c.topic === topic.id);
   const wrap = document.createElement("div");
+  if (!courses.length) {
+    wrap.innerHTML = `<p class="slide-text">No courses here yet.</p>`;
+    app.appendChild(wrap);
+    return;
+  }
   wrap.innerHTML = `<p class="section-label">Courses</p>` + courses.map(c => {
     const mods = courseModules(c);
     const done = completedCount(mods);
@@ -4825,7 +4854,7 @@ function trainingCalendarHubRowHTML() {
   const mods = [];
   TRAINING_CALENDAR.forEach(m => m.weeks.forEach(w => { if (trainingWeekOpen(w)) mods.push(...trainingWeekLessons(w)); }));
   const meta = openWeek ? `${openMonth.title} \u00b7 Week ${openWeek.n} is open` : `${months[0].title} \u00b7 Opens ${trainingShort(trainingDate(months[0].weeks[0].unlocksOn))}`;
-  return `<p class="section-label">Pre-Shift</p>` + learningGroupRowHTML("data-calendar", "open", "Training Calendar", meta, averagePercent(mods));
+  return learningGroupRowHTML("data-calendar", "open", "Training Calendar", meta, averagePercent(mods));
 }
 
 function renderTrainingCalendar() {
@@ -4946,8 +4975,7 @@ function serviceEnhancementHubRowHTML() {
   const meta = openWeek
     ? `${openMonth.title} · Week ${openWeek.n} is open`
     : `${months[0].title} · Opens ${trainingShort(trainingDate(months[0].weeks[0].unlocksOn))}`;
-  return `<p class="section-label">Weekly Lesson</p>
-    <div class="list-row" data-se="hub">
+  return `<div class="list-row" data-se="hub">
       <div class="list-row-main">
         <span class="mod-dot"></span>
         <div class="list-row-text">

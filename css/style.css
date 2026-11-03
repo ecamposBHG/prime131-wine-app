@@ -875,14 +875,14 @@ button, input {
 /* ============================================================
    Press feedback — mechanical, not glossy: steep ease-out, short.
    ============================================================ */
-.home-option, .home-card, .list-row, .pill, .nav-chip, .footer-btn, .speed-toggle,
+.home-option, .home-card, .list-row, .learn-topic, .pill, .nav-chip, .footer-btn, .speed-toggle,
 .wotd-strip, .wotd-main, .wotd-shuffle, .theme-toggle, .back-btn, .section-toggle,
 .match-tile, .allergen-filter-chip, .testme-reset, .confidence-btn, .mc-btn, .somm-btn,
 .flipcard, .dish-flipcard, .testme-card, .imposter-tile,
 .learning-card, .quiz-opt, .btn-start, .video-frame, .wcard, .knockout-hint-btn {
   transition: transform var(--press-duration) ease-out, background var(--press-duration) ease-out, border-color var(--press-duration) ease-out;
 }
-.home-option:active, .home-card:active, .list-row:active, .pill:active, .nav-chip:active,
+.home-option:active, .home-card:active, .list-row:active, .learn-topic:not(:disabled):active, .pill:active, .nav-chip:active,
 .footer-btn:not(:disabled):active, .speed-toggle:active, .wotd-strip:active,
 .wotd-main:active, .wotd-shuffle:active, .theme-toggle:active, .back-btn:active, .section-toggle:active,
 .match-tile:not(.matched):not(.picked):active, .allergen-filter-chip:active,
@@ -897,7 +897,7 @@ button, input {
 /* ============================================================
    Focus visibility — hard neon/rust ring, never soft.
    ============================================================ */
-.home-option:focus-visible, .home-card:focus-visible, .list-row:focus-visible, .pill:focus-visible,
+.home-option:focus-visible, .home-card:focus-visible, .list-row:focus-visible, .learn-topic:focus-visible, .pill:focus-visible,
 .nav-chip:focus-visible, .footer-btn:focus-visible, .speed-toggle:focus-visible,
 .wotd-strip:focus-visible, .wotd-main:focus-visible, .wotd-shuffle:focus-visible, .theme-toggle:focus-visible,
 .back-btn:focus-visible, .section-toggle:focus-visible, .match-tile:focus-visible,
@@ -915,7 +915,7 @@ button, input {
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   .flip-inner, .dish-flip-inner, .confetti, .match-tile,
-  .home-option, .home-card, .list-row, .pill, .nav-chip, .footer-btn, .speed-toggle,
+  .home-option, .home-card, .list-row, .learn-topic, .pill, .nav-chip, .footer-btn, .speed-toggle,
   .wotd-strip, .wotd-shuffle, .theme-toggle, .back-btn, .section-toggle,
   .allergen-filter-chip, .testme-reset, .confidence-btn, .mc-btn, .somm-btn,
   .flipcard, .dish-flipcard, .testme-card, .imposter-tile,
@@ -1316,3 +1316,38 @@ button.monday-item:focus-visible { outline: none; box-shadow: inset 0 0 0 2px va
     transform: none !important;
   }
 }
+
+/* Learning hub: Pre-Shift rows stack tight; topics are a 2x2 grid of cards.
+   Same language as the home grid: hard corners, 2px structure, mono meta.
+   Progress is the 8px bar at the card's foot; a done card swaps it for a check. */
+.learn-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+  border: 2px solid var(--washi-300);
+}
+.learn-topic {
+  background: var(--washi-200); border: none;
+  border-right: 2px solid var(--washi-300); border-bottom: 2px solid var(--washi-300);
+  padding: 14px 14px 14px; min-height: 112px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 4px;
+  text-align: left; position: relative; color: var(--shoyu-700);
+}
+.learn-topic:nth-child(2n) { border-right: none; }
+.learn-topic:nth-last-child(-n+2) { border-bottom: none; }
+.learn-topic-title {
+  font-family: var(--font-display); font-size: 17px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.4px; line-height: 1.1;
+}
+.learn-topic-meta {
+  font-family: var(--font-mono); font-size: 10px; color: var(--shoyu-300);
+  text-transform: uppercase; letter-spacing: 0.3px;
+}
+.learn-topic .mini-track { width: 100%; margin-top: 8px; display: block; }
+.learn-topic .mini-fill { display: block; }
+.learn-topic-check {
+  position: absolute; top: 12px; right: 14px; color: var(--bronze-200); font-size: 16px; line-height: 1;
+}
+.learn-topic.is-done .learn-topic-title { color: var(--shoyu-700); }
+.learn-topic.is-empty { cursor: default; }
+.learn-topic.is-empty .learn-topic-title { color: var(--shoyu-300); }
+.learn-topic:not(:disabled):hover { background: var(--washi-300-soft); }
+@media (hover: none) { .learn-topic:not(:disabled):hover { background: var(--washi-200); } }

@@ -1192,3 +1192,127 @@ button.monday-item:focus-visible { outline: none; box-shadow: inset 0 0 0 2px va
 .wp-blend { list-style: none; margin: 8px 0 0; padding: 0; border: 1px solid var(--washi-300); }
 .wp-blend li { font-family: var(--font-mono); font-size: 11px; color: var(--shoyu-500); padding: 7px 10px; border-bottom: 1px solid var(--washi-300-soft); }
 .wp-blend li:last-child { border-bottom: none; }
+
+/* ============================================================
+   Service Enhancement — weekly audio lesson + slide deck.
+   Same tokens as the rest of Learning: hard corners, 2px structure,
+   rust accent, mono labels. Press/focus rules mirror the app-wide ones.
+   ============================================================ */
+.se-title { margin: 0 0 4px; }
+
+/* Audio player */
+.se-player {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--washi-200); border: 2px solid var(--washi-300); padding: 12px;
+  --p: 0%;
+}
+.se-play {
+  flex-shrink: 0; width: 52px; height: 52px; border: none; background: var(--bronze-500);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.se-play::before {
+  content: ""; width: 0; height: 0;
+  border-top: 9px solid transparent; border-bottom: 9px solid transparent;
+  border-left: 15px solid var(--ink-on-rust); margin-left: 4px;
+}
+.se-player.is-playing .se-play::before {
+  border: none; width: 4px; height: 16px; margin: 0 8px 0 0;
+  background: var(--ink-on-rust); box-shadow: 8px 0 0 var(--ink-on-rust);
+}
+.se-track { flex: 1; min-width: 0; }
+.se-seek {
+  -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 32px;
+  margin: 0; background: transparent; cursor: pointer;
+}
+.se-seek::-webkit-slider-runnable-track {
+  height: 4px; background: linear-gradient(to right, var(--bronze-500) var(--p), var(--washi-300) var(--p));
+}
+.se-seek::-moz-range-track { height: 4px; background: var(--washi-300); }
+.se-seek::-moz-range-progress { height: 4px; background: var(--bronze-500); }
+.se-seek::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 12px; height: 20px; margin-top: -8px;
+  background: var(--bronze-200); border: none;
+}
+.se-seek::-moz-range-thumb { width: 12px; height: 20px; background: var(--bronze-200); border: none; }
+.se-seek:focus-visible { outline: none; }
+.se-seek:focus-visible::-webkit-slider-thumb { box-shadow: var(--focus-ring); }
+.se-seek:focus-visible::-moz-range-thumb { box-shadow: var(--focus-ring); }
+.se-times {
+  display: flex; justify-content: space-between;
+  font-family: var(--font-mono); font-size: 11px; color: var(--shoyu-500);
+}
+.se-skip {
+  flex-shrink: 0; width: 48px; height: 48px; background: none; cursor: pointer;
+  border: 2px solid var(--washi-300); color: var(--shoyu-500);
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+}
+.se-status { font-size: 13px; color: var(--shoyu-500); margin: 8px 0 0; }
+.se-status.is-error { color: var(--shoyu-700); border-left: 3px solid var(--error-500); padding-left: 10px; }
+.se-status[hidden] { display: none; }
+
+/* Slide deck */
+.se-dots { margin-bottom: 8px; }
+.se-deck { border: 2px solid var(--washi-300); background: var(--washi-200); }
+.se-stage {
+  display: block; width: 100%; padding: 0; border: none; cursor: pointer;
+  aspect-ratio: 16 / 9; background: var(--sumi-700); touch-action: pan-y;
+  -webkit-user-select: none; user-select: none;
+}
+.se-slide { display: block; width: 100%; height: 100%; object-fit: contain; -webkit-user-drag: none; }
+.se-deck-bar { display: flex; align-items: stretch; border-top: 2px solid var(--washi-300); }
+.se-nav {
+  flex: 1; min-height: 48px; background: none; border: none; cursor: pointer;
+  font-family: var(--font-display); font-size: 12px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px; color: var(--shoyu-700);
+}
+.se-nav:disabled { opacity: 0.35; cursor: default; }
+.se-count {
+  flex: 0 0 84px; display: flex; align-items: center; justify-content: center;
+  border-left: 1px solid var(--washi-300-soft); border-right: 1px solid var(--washi-300-soft);
+  font-family: var(--font-mono); font-size: 11px; color: var(--shoyu-500);
+}
+.se-hint { font-size: 12.5px; color: var(--shoyu-500); margin: 10px 0 0; }
+
+/* Full-screen slides */
+.se-zoom {
+  position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column;
+  background: var(--sumi-900); animation: confirm-fade 140ms ease-out;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.se-zoom-bar {
+  flex: 0 0 auto; height: 52px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 4px 0 16px; border-bottom: 1px solid var(--washi-300-soft);
+}
+.se-zoom-count { margin: 0; font-family: var(--font-mono); font-size: 11px; color: var(--shoyu-500); }
+.se-zoom-actions { display: flex; }
+.se-zoom-btn {
+  width: 48px; height: 48px; background: none; border: none; cursor: pointer;
+  color: var(--shoyu-700); font-size: 18px;
+}
+.se-zoom-btn:disabled { opacity: 0.35; cursor: default; }
+.se-zoom-stage { position: relative; flex: 1 1 auto; min-height: 0; touch-action: pan-y; }
+.se-zoom-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; -webkit-user-drag: none; }
+.se-zoom-hint {
+  display: none; flex: 0 0 auto; margin: 0; padding: 12px 16px; text-align: center;
+  font-family: var(--font-mono); font-size: 10px; color: var(--shoyu-500);
+  text-transform: uppercase; letter-spacing: 0.4px;
+}
+@media (orientation: portrait) and (pointer: coarse) { .se-zoom-hint { display: block; } }
+
+/* Press + focus feedback, same language as the rest of the app */
+.se-play, .se-skip, .se-nav, .se-zoom-btn {
+  transition: transform var(--press-duration) ease-out, background var(--press-duration) ease-out, border-color var(--press-duration) ease-out;
+}
+.se-play:active, .se-skip:active, .se-nav:not(:disabled):active, .se-zoom-btn:not(:disabled):active { transform: scale(0.97); }
+.se-play:focus-visible, .se-skip:focus-visible, .se-nav:focus-visible, .se-stage:focus-visible, .se-zoom-btn:focus-visible {
+  outline: none; box-shadow: var(--focus-ring);
+}
+.se-stage:focus-visible { box-shadow: inset 0 0 0 3px var(--neon); }
+
+@media (prefers-reduced-motion: reduce) {
+  .se-zoom { animation: none; }
+  .se-play, .se-skip, .se-nav, .se-zoom-btn {
+    transition: background var(--press-duration) ease-out, border-color var(--press-duration) ease-out !important;
+    transform: none !important;
+  }
+}

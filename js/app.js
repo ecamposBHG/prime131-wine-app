@@ -335,6 +335,7 @@ let activeTimer = null;
 
 function render() {
   if (activeTimer) { clearInterval(activeTimer); activeTimer = null; }
+  app.querySelectorAll("audio").forEach(a => a.pause());   // never leave a lesson's audio playing behind another screen
   app.innerHTML = "";
   app.classList.toggle("home-view", current.view === "home");
   if (current.view === "home") renderHome();
@@ -392,6 +393,8 @@ function render() {
   else if (current.view === "learning-complete") renderLearningComplete(current.params.moduleId);
   else if (current.view === "training-calendar") renderTrainingCalendar();
   else if (current.view === "training-week") renderTrainingWeek(current.params.monthId, current.params.week);
+  else if (current.view === "service-enhancement") renderServiceEnhancement();
+  else if (current.view === "service-enhancement-lesson") renderServiceEnhancementLesson(current.params.monthId, current.params.week);
   makeDivsKeyboardAccessible();
   window.scrollTo(0, 0);
 }
@@ -3967,6 +3970,7 @@ function renderLearningHub() {
   let html = "";
 
   if (typeof TRAINING_CALENDAR !== "undefined" && TRAINING_CALENDAR.length) html += trainingCalendarHubRowHTML();
+  if (typeof SERVICE_ENHANCEMENT !== "undefined" && SERVICE_ENHANCEMENT.length) html += serviceEnhancementHubRowHTML();
 
   const inProgress = LEARNING_MODULES.filter(m => moduleStatus(m) === "in-progress");
   if (inProgress.length) {
@@ -3985,6 +3989,7 @@ function renderLearningHub() {
   wrap.innerHTML = html;
   wrap.querySelectorAll(".list-row").forEach(row => {
     if (row.dataset.calendar) row.onclick = () => go("training-calendar");
+    else if (row.dataset.se) row.onclick = () => go("service-enhancement");
     else if (row.dataset.topic) row.onclick = () => go("learning-topic", { topicId: row.dataset.topic });
     else if (row.dataset.module && !row.classList.contains("locked")) row.onclick = () => go("learning-intro", { moduleId: row.dataset.module });
   });
@@ -4913,6 +4918,347 @@ function renderTrainingWeek(monthId, weekN) {
     row.onclick = () => go("learning-intro", { moduleId: row.dataset.lesson });
   });
   app.appendChild(wrap);
+}
+
+/* ---------- Service Enhancement ----------
+   Learning > Service Enhancement > a week's lesson. One skill per week, taught
+   as a short audio lesson plus a slide deck. The weeks live in
+   SERVICE_ENHANCEMENT (js/service-enhancement.js) and open by date exactly
+   like the Training Calendar: a week opens on its start date and stays open.
+   One topic per week, so a week goes straight to its lesson (no week screen).
+   No tests and no progress tracking. */
+
+function seFindMonth(id) { return SERVICE_ENHANCEMENT.find(m => m.id === id); }
+function seWeekOpen(week) { return todayISO() >= week.unlocksOn; }
+function seClock(sec) {
+  sec = Math.max(0, Math.floor(sec) || 0);
+  return Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0");
+}
+function seSlideSrc(slides, i) { return `${slides.dir}slide-${String(i + 1).padStart(2, "0")}.jpg`; }
+
+/* The row on the Learning hub, directly under the Training Calendar. */
+function serviceEnhancementHubRowHTML() {
+  const months = SERVICE_ENHANCEMENT.slice().sort((a, b) => (a.id < b.id ? 1 : -1));
+  let openWeek = null, openMonth = null;
+  months.forEach(m => m.weeks.forEach(w => {
+    if (seWeekOpen(w) && (!openWeek || w.unlocksOn > openWeek.unlocksOn)) { openWeek = w; openMonth = m; }
+  }));
+  const meta = openWeek
+    ? `${openMonth.title} · Week ${openWeek.n} is open`
+    : `${months[0].title} · Opens ${trainingShort(trainingDate(months[0].weeks[0].unlocksOn))}`;
+  return `<p class="section-label">Weekly Lesson</p>
+    <div class="list-row" data-se="hub">
+      <div class="list-row-main">
+        <span class="mod-dot"></span>
+        <div class="list-row-text">
+          <p>Service Enhancement</p>
+          <span>${meta}</span>
+        </div>
+      </div>
+      <span class="chev" aria-hidden="true">&#8250;</span>
+    </div>`;
+}
+
+function seLockedRowHTML(title, meta, showLock) {
+  return `
+    <div class="list-row locked" tabindex="-1" aria-disabled="true">
+      <div class="list-row-main">
+        <span class="mod-dot locked"></span>
+        <div class="list-row-text">
+          <p>${title}</p>
+          <span>${meta}</span>
+        </div>
+      </div>
+      ${showLock ? `<span class="lock-ic">&#128274;</span>` : ""}
+    </div>`;
+}
+
+function renderServiceEnhancement() {
+  header("Service Enhancement");
+  const wrap = document.createElement("div");
+  let html = `<p class="slide-text">One skill each week, taught with a short audio lesson and slides. A week opens on its start date and stays open.</p>`;
+
+  SERVICE_ENHANCEMENT.slice().sort((a, b) => (a.id < b.id ? 1 : -1)).forEach(month => {
+    html += `<p class="section-label">${month.title}</p>`;
+    month.weeks.forEach(week => {
+      const range = trainingWeekRange(month, week);
+      if (!seWeekOpen(week)) {
+        html += seLockedRowHTML(`Week ${week.n}`, `Opens ${trainingShort(trainingDate(week.unlocksOn))}`, true);
+      } else if (!week.lesson) {
+        html += seLockedRowHTML(`Week ${week.n}`, `${range} · Coming soon`, false);
+      } else {
+        html += `
+          <div class="list-row" data-se-week="${month.id}|${week.n}">
+            <div class="list-row-main">
+              <span class="mod-dot"></span>
+              <div class="list-row-text">
+                <p>${week.lesson.title}</p>
+                <span>Week ${week.n} · ${range} · Audio + slides</span>
+              </div>
+            </div>
+            <span class="chev" aria-hidden="true">&#8250;</span>
+          </div>`;
+      }
+    });
+  });
+
+  wrap.innerHTML = html;
+  wrap.querySelectorAll("[data-se-week]").forEach(row => {
+    row.onclick = () => {
+      const [monthId, n] = row.dataset.seWeek.split("|");
+      go("service-enhancement-lesson", { monthId, week: Number(n) });
+    };
+  });
+  app.appendChild(wrap);
+}
+
+function renderServiceEnhancementLesson(monthId, weekN) {
+  const month = seFindMonth(monthId);
+  const week = month && month.weeks.find(w => w.n === weekN);
+  // A week that hasn't opened yet, or has no lesson yet, goes back to the list.
+  if (!week || !week.lesson || !seWeekOpen(week)) { go("service-enhancement", {}, false); return; }
+  const lesson = week.lesson;
+  const count = lesson.slides.alt.length;
+  header(`Week ${week.n}`);
+
+  const wrap = document.createElement("div");
+  wrap.innerHTML = `
+    <p class="slide-kicker">${month.title} · ${trainingWeekRange(month, week)}</p>
+    <h2 class="intro-title se-title">${lesson.title}</h2>
+
+    <p class="section-label">Audio · ${seClock(lesson.audio.seconds)}</p>
+    <div class="se-player">
+      <audio preload="metadata" src="${lesson.audio.src}"></audio>
+      <button type="button" class="se-play" aria-label="Play audio"></button>
+      <div class="se-track">
+        <input type="range" class="se-seek" min="0" max="${lesson.audio.seconds}" step="1" value="0" aria-label="Audio position">
+        <div class="se-times"><span class="se-cur">0:00</span><span class="se-dur">${seClock(lesson.audio.seconds)}</span></div>
+      </div>
+      <button type="button" class="se-skip" aria-label="Back 15 seconds">−15s</button>
+    </div>
+    <p class="se-status" role="status" hidden></p>
+
+    <p class="section-label">Slides · ${count}</p>
+    <div class="dots-row se-dots">${lesson.slides.alt.map(() => `<div class="dot-seg"></div>`).join("")}</div>
+    <div class="se-deck">
+      <button type="button" class="se-stage" aria-label="Open slide full screen">
+        <img class="se-slide" src="${seSlideSrc(lesson.slides, 0)}" alt="${lesson.slides.alt[0]}" decoding="async">
+      </button>
+      <div class="se-deck-bar">
+        <button type="button" class="se-nav se-prev">← Previous</button>
+        <span class="se-count" aria-live="polite"></span>
+        <button type="button" class="se-nav se-next">Next →</button>
+      </div>
+    </div>
+    <p class="se-hint">Tap a slide to open it full screen.</p>`;
+  app.appendChild(wrap);
+
+  seWirePlayer(wrap, lesson);
+  seWireDeck(wrap, lesson);
+}
+
+function seWirePlayer(root, lesson) {
+  const box = root.querySelector(".se-player");
+  const audio = box.querySelector("audio");
+  const playBtn = box.querySelector(".se-play");
+  const skipBtn = box.querySelector(".se-skip");
+  const seek = box.querySelector(".se-seek");
+  const cur = box.querySelector(".se-cur");
+  const dur = box.querySelector(".se-dur");
+  const status = root.querySelector(".se-status");
+  let dragging = false;
+
+  const total = () => (isFinite(audio.duration) && audio.duration > 0 ? audio.duration : lesson.audio.seconds);
+  const showStatus = (text, isError) => {
+    status.textContent = text;
+    status.classList.toggle("is-error", !!isError);
+    status.hidden = false;
+  };
+  const hideStatus = () => { status.hidden = true; status.textContent = ""; status.classList.remove("is-error"); };
+  // Label and fill follow the slider's value, so scrubbing previews live and
+  // playback just moves the slider.
+  const paint = () => {
+    const t = total();
+    seek.max = String(Math.ceil(t));
+    if (!dragging) seek.value = String(Math.floor(audio.currentTime || 0));
+    const v = Number(seek.value);
+    box.style.setProperty("--p", (Number(seek.max) ? (v / Number(seek.max)) * 100 : 0) + "%");
+    seek.setAttribute("aria-valuetext", `${seClock(v)} of ${seClock(t)}`);
+    cur.textContent = seClock(v);
+    dur.textContent = seClock(t);
+  };
+  const setPlaying = (playing) => {
+    box.classList.toggle("is-playing", playing);
+    playBtn.setAttribute("aria-label", playing ? "Pause audio" : "Play audio");
+  };
+  const showError = () => showStatus("The audio didn’t load. Check your connection and try again.", true);
+
+  playBtn.onclick = () => {
+    if (audio.paused) {
+      hideStatus();
+      const p = audio.play();
+      if (p && p.catch) p.catch(showError);
+    } else {
+      audio.pause();
+    }
+  };
+  skipBtn.onclick = () => { audio.currentTime = Math.max(0, (audio.currentTime || 0) - 15); paint(); };
+
+  seek.addEventListener("pointerdown", () => { dragging = true; });
+  seek.addEventListener("pointercancel", () => { dragging = false; paint(); });
+  seek.addEventListener("input", () => { dragging = true; paint(); });
+  seek.addEventListener("change", () => { audio.currentTime = Number(seek.value); dragging = false; paint(); });
+
+  audio.addEventListener("play", () => setPlaying(true));
+  audio.addEventListener("pause", () => setPlaying(false));
+  audio.addEventListener("ended", () => { audio.currentTime = 0; setPlaying(false); paint(); });
+  audio.addEventListener("timeupdate", paint);
+  audio.addEventListener("durationchange", paint);
+  audio.addEventListener("waiting", () => showStatus("Loading audio…", false));
+  audio.addEventListener("playing", hideStatus);
+  audio.addEventListener("error", showError);
+
+  paint();
+
+  // Lock-screen / headphone controls show the lesson, not a bare URL.
+  if ("mediaSession" in navigator && typeof MediaMetadata !== "undefined") {
+    try {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: lesson.title,
+        artist: (typeof BRAND !== "undefined" && BRAND.name) || "",
+        album: "Service Enhancement"
+      });
+    } catch (e) {}
+  }
+}
+
+function seWireDeck(root, lesson) {
+  const slides = lesson.slides;
+  const count = slides.alt.length;
+  const stage = root.querySelector(".se-stage");
+  const img = root.querySelector(".se-slide");
+  const prev = root.querySelector(".se-prev");
+  const next = root.querySelector(".se-next");
+  const counter = root.querySelector(".se-count");
+  const dots = root.querySelectorAll(".se-dots .dot-seg");
+  let i = 0;
+  let swiped = false;
+
+  const show = (n) => {
+    i = Math.max(0, Math.min(count - 1, n));
+    img.src = seSlideSrc(slides, i);
+    img.alt = slides.alt[i];
+    counter.textContent = `${i + 1} / ${count}`;
+    prev.disabled = i === 0;
+    next.disabled = i === count - 1;
+    // A button that just went disabled can't keep keyboard focus.
+    if (prev.disabled && document.activeElement === prev) next.focus();
+    if (next.disabled && document.activeElement === next) prev.focus();
+    dots.forEach((d, k) => d.classList.toggle("filled", k <= i));
+    // Warm the neighbors so the next tap shows a slide, not a blank frame.
+    [i - 1, i + 1].forEach(k => { if (k >= 0 && k < count) new Image().src = seSlideSrc(slides, k); });
+  };
+  show(0);
+
+  prev.onclick = () => show(i - 1);
+  next.onclick = () => show(i + 1);
+  stage.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") { e.preventDefault(); show(i - 1); }
+    else if (e.key === "ArrowRight") { e.preventDefault(); show(i + 1); }
+  });
+  seAttachSwipe(stage, (dir) => { swiped = true; show(i + dir); }, () => { swiped = false; });
+  stage.onclick = () => {
+    if (swiped) { swiped = false; return; }     // a swipe is not a tap
+    seOpenZoom(slides, i, (last) => { show(last); stage.focus({ preventScroll: true }); });
+  };
+}
+
+/* Horizontal swipe on an element: calls onSwipe(+1) for left, onSwipe(-1) for right. */
+function seAttachSwipe(el, onSwipe, onStart) {
+  let sx = null, sy = 0;
+  el.addEventListener("pointerdown", (e) => { sx = e.clientX; sy = e.clientY; if (onStart) onStart(); });
+  el.addEventListener("pointercancel", () => { sx = null; });
+  el.addEventListener("pointerup", (e) => {
+    if (sx === null) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    sx = null;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) onSwipe(dx < 0 ? 1 : -1);
+  });
+}
+
+/* Full-screen slide viewer. Slides are small on a phone held upright, so this
+   gives them the whole screen (best sideways). */
+function seOpenZoom(slides, start, onClose) {
+  const count = slides.alt.length;
+  let i = start;
+  const overlay = document.createElement("div");
+  overlay.className = "se-zoom";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-label", "Slides, full screen");
+  overlay.innerHTML = `
+    <div class="se-zoom-bar">
+      <p class="se-zoom-count" aria-live="polite"></p>
+      <div class="se-zoom-actions">
+        <button type="button" class="se-zoom-btn se-zoom-prev" aria-label="Previous slide">&#8592;</button>
+        <button type="button" class="se-zoom-btn se-zoom-next" aria-label="Next slide">&#8594;</button>
+        <button type="button" class="se-zoom-btn se-zoom-close" aria-label="Close full screen">&#10005;</button>
+      </div>
+    </div>
+    <div class="se-zoom-stage"><img class="se-zoom-img" alt=""></div>
+    <p class="se-zoom-hint">Turn your phone sideways for a bigger view.</p>`;
+
+  const img = overlay.querySelector(".se-zoom-img");
+  const prev = overlay.querySelector(".se-zoom-prev");
+  const next = overlay.querySelector(".se-zoom-next");
+  const closeBtn = overlay.querySelector(".se-zoom-close");
+  const counter = overlay.querySelector(".se-zoom-count");
+
+  const show = (n) => {
+    i = Math.max(0, Math.min(count - 1, n));
+    img.src = seSlideSrc(slides, i);
+    img.alt = slides.alt[i];
+    counter.textContent = `${i + 1} / ${count}`;
+    prev.disabled = i === 0;
+    next.disabled = i === count - 1;
+    if (prev.disabled && document.activeElement === prev) next.focus();
+    if (next.disabled && document.activeElement === next) prev.focus();
+    [i - 1, i + 1].forEach(k => { if (k >= 0 && k < count) new Image().src = seSlideSrc(slides, k); });
+  };
+
+  let closed = false;
+  const close = () => {
+    if (closed) return;
+    closed = true;
+    document.removeEventListener("keydown", onKey, true);
+    window.removeEventListener("popstate", close);
+    document.body.style.overflow = "";
+    overlay.remove();
+    if (onClose) onClose(i);
+  };
+  const onKey = (e) => {
+    if (e.key === "Escape") { e.preventDefault(); close(); return; }
+    if (e.key === "ArrowLeft") { e.preventDefault(); show(i - 1); return; }
+    if (e.key === "ArrowRight") { e.preventDefault(); show(i + 1); return; }
+    if (e.key !== "Tab") return;
+    const focusables = Array.from(overlay.querySelectorAll("button:not(:disabled)"));
+    if (!focusables.length) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  };
+
+  prev.onclick = () => show(i - 1);
+  next.onclick = () => show(i + 1);
+  closeBtn.onclick = close;
+  seAttachSwipe(overlay.querySelector(".se-zoom-stage"), (dir) => show(i + dir));
+  document.addEventListener("keydown", onKey, true);
+  window.addEventListener("popstate", close);
+  document.body.style.overflow = "hidden";
+  document.body.appendChild(overlay);
+  show(start);
+  closeBtn.focus();
 }
 
 /* ---------- This or That: judgment calls from real pairings ---------- */

@@ -1,4 +1,4 @@
-const CACHE_NAME = "prime131-wines-v152b";
+const CACHE_NAME = "prime131-wines-v153";
 const ASSETS = [
   "./",
   "./index.html",
@@ -6,6 +6,7 @@ const ASSETS = [
   "./js/data.js",
   "./js/training-calendar.js",
   "./js/training-2026-11.js",
+  "./js/service-enhancement.js",
   "./js/config.js",
   "./js/auth.js",
   "./js/app.js",
@@ -45,6 +46,9 @@ self.addEventListener("activate", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
+  // Audio and other Range requests go straight to the network: the browser
+  // seeks with partial (206) responses, which the cache can't store.
+  if (event.request.headers.has("range")) return;
   event.respondWith(
     fetch(event.request)
       .then((response) => {

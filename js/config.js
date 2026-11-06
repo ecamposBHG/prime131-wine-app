@@ -26,7 +26,7 @@ const AUTH_CONFIG = {
 // stamp on the home screen so we can confirm, at a glance, whether a
 // given device is actually serving the latest build -- useful while
 // GitHub Pages' CDN edge cache may lag behind the reported build status.
-const APP_VERSION = "v156";
+const APP_VERSION = "v157";
 
 // Which home cards this restaurant's deployment shows, and in what order.
 // (Currently informational — app.js still renders all five directly.
@@ -36,7 +36,8 @@ const FEATURES = {
   wineBTG: true,
   cocktails: true,
   classicCocktails: true,
-  gameRoom: true
+  learning: true,
+  tools: true
 };
 
 // Base-spirit categories for the Classic Cocktails library.

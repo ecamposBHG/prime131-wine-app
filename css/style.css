@@ -515,74 +515,25 @@ button, input {
   100% { transform: translateY(0); opacity: 1; }
 }
 
-/* Test Me */
+/* Counter line used by the Learning chapter quizzes */
 .testme-counter {
   font-family: var(--font-mono); font-size: 11px; color: var(--shoyu-300);
   text-align: center; margin: 0 0 12px; text-transform: uppercase; letter-spacing: 0.3px;
-}
-.testme-card { height: var(--flipcard-height); cursor: pointer; }
-.testme-card .dish-flip-inner.drag-right { border-color: var(--bronze-500); }
-.testme-card .dish-flip-inner.drag-left { border-color: var(--shoyu-300); }
-.testme-answer-name {
-  font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--shoyu-700);
-  margin: 8px 0 10px; line-height: 1.25;
-}
-.testme-reset {
-  font-family: var(--font-mono); font-size: 11px; color: var(--shoyu-300); text-align: center;
-  text-transform: uppercase; letter-spacing: 0.3px; cursor: pointer; margin-top: 18px; text-decoration: none; border-top: 1px solid var(--washi-300-soft); padding-top: 14px;
 }
 
 /* Mastery bar (replaces the old "known/learning" counter's implicit
    progress -- now a literal weighted-confidence fill, mirroring
    Brainscape's Deck Mastery score). */
-.mastery-track { height: 6px; background: var(--washi-300); overflow: hidden; margin-bottom: 14px; }
-.mastery-fill { height: 100%; background: var(--wasabi-500); transition: width 0.25s ease-out; }
-.testme-nudge {
-  font-family: var(--font-mono); font-size: 11px; color: var(--bronze-200); text-align: center;
-  margin: -8px 0 14px; text-transform: uppercase; letter-spacing: 0.3px;
-}
 
 /* Confidence rating (Brainscape-style 1-5 scale, shown only after reveal) */
-.confidence-wrap { display: none; margin-top: 12px; }
-.confidence-labels {
-  display: flex; justify-content: space-between; font-family: var(--font-mono);
-  font-size: 10px; color: var(--shoyu-300); text-transform: uppercase; letter-spacing: 0.3px;
-  margin-bottom: 6px; padding: 0 2px;
-}
-.confidence-row { display: flex; gap: 0; border: 2px solid var(--washi-300); }
-.confidence-btn {
-  flex: 1; padding: 16px 0; border: none; border-right: 1px solid var(--washi-300-soft);
-  font-family: var(--font-display); font-size: 16px; font-weight: 700; cursor: pointer;
-  background: var(--washi-200); color: var(--shoyu-500);
-}
-.confidence-row .confidence-btn:last-child { border-right: none; }
 /* A deliberate 5-step ramp (not the palette's literal red/green, which
    would clash with the app's warm bronze identity) -- deep red through
    amber to wasabi green, so "3" reads as a real midpoint instead of
    disappearing against the dark background. */
-.confidence-btn[data-rating="1"] { background: #9C3B2E; color: var(--shoyu-700); }
-.confidence-btn[data-rating="2"] { background: #B15A2A; color: var(--shoyu-700); }
-.confidence-btn[data-rating="3"] { background: #B98026; color: var(--ink-on-rust); }
-.confidence-btn[data-rating="4"] { background: #8FA042; color: var(--ink-on-rust); }
-.confidence-btn[data-rating="5"] { background: var(--wasabi-500); color: var(--ink-on-rust); }
 
 /* Answer reconnects to clue */
-.answer-connector { text-align: center; font-family: var(--font-mono); font-size: 11px; color: var(--bronze-200); text-transform: uppercase; letter-spacing: 0.5px; margin: 14px 0 10px; }
-.answer-block { border-top: 2px solid var(--washi-300); padding-top: 10px; margin-top: 4px; }
 
 /* Speed Round: verified multiple choice */
-.testme-card.no-flip { height: auto; cursor: default; margin-bottom: 12px; }
-.testme-card.no-flip .dish-flip-inner { min-height: 0; }
-.mc-row { display: flex; flex-direction: column; gap: 0; border: 2px solid var(--washi-300); }
-.mc-btn {
-  padding: 16px; border: none; border-bottom: 1px solid var(--washi-300-soft);
-  background: var(--washi-200); color: var(--shoyu-700); font-family: var(--font-body);
-  font-size: 14px; font-weight: 600; text-align: left; cursor: pointer;
-}
-.mc-row .mc-btn:last-child { border-bottom: none; }
-.mc-btn:disabled { cursor: default; }
-.mc-btn.mc-correct, .mc-btn.mc-reveal-correct { background: var(--wasabi-500); color: var(--ink-on-rust); }
-.mc-btn.mc-incorrect { background: var(--error-500); color: var(--shoyu-700); }
 
 /* Milestone celebration */
 .celebrate-overlay {
@@ -602,54 +553,7 @@ button, input {
 }
 .milestone-line { font-family: var(--font-mono); font-size: 11px; color: var(--shoyu-700); margin: 0; text-transform: uppercase; letter-spacing: 0.3px; }
 
-/* This or That */
-.home-option.tot-correct { border: 2px solid var(--wasabi-500); }
-.home-option.tot-wrong { border: 2px solid var(--error-500); }
-.tot-explain { margin-top: 16px; }
-.tot-contrast-label {
-  font-family: var(--font-mono); font-size: 10px; color: var(--shoyu-300);
-  text-transform: uppercase; letter-spacing: 0.5px; margin: 14px 0 4px;
-}
-.tot-contrast { color: var(--shoyu-500); font-style: italic; margin-top: 0; }
-.tot-verdict { font-size: 15px; font-weight: 600; color: var(--shoyu-700); margin: 0 0 6px; }
-.tot-explain .footer-btn { width: 100%; margin-top: 12px; }
-
-/* Knockout */
-.knockout-streak {
-  font-family: var(--font-mono); font-size: 10px; color: var(--shoyu-300);
-  text-transform: uppercase; letter-spacing: 0.4px; text-align: center; margin: 8px 0 14px;
-}
-.knockout-streak b { color: var(--bronze-200); font-family: var(--font-display); font-size: 13px; text-transform: none; letter-spacing: 0; }
-.matchup { display: flex; gap: 10px; margin: 0 0 4px; }
-.wcard {
-  flex: 1; background: var(--washi-200); border: 2px solid var(--washi-300);
-  cursor: pointer; text-align: center; padding: 14px 10px 16px; position: relative;
-}
-.wcard.correct { border-color: var(--wasabi-500); }
-.wcard.wrong { border-color: var(--error-500); }
-.wcard-badge {
-  position: absolute; top: -2px; right: -2px; width: 20px; height: 20px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700; color: var(--washi-100);
-}
-.wcard.correct .wcard-badge { background: var(--wasabi-500); }
-.wcard.wrong .wcard-badge { background: var(--error-500); }
-.wcard-crown {
-  font-family: var(--font-mono); font-size: 9px; color: var(--bronze-200);
-  text-transform: uppercase; letter-spacing: 0.5px; min-height: 12px; margin-bottom: 8px;
-}
-.wcard-icon { font-size: 26px; margin-bottom: 8px; }
-.wcard-name { font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--shoyu-700); margin: 0 0 4px; line-height: 1.2; }
-.wcard-meta { font-family: var(--font-mono); font-size: 9px; color: var(--shoyu-300); line-height: 1.5; }
-.knockout-explain { margin-top: 16px; }
-.knockout-hint-row { display: flex; justify-content: center; margin: 12px 0 0; }
-.knockout-hint-btn {
-  background: none; border: 1px solid var(--washi-300); color: var(--shoyu-300);
-  font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
-  letter-spacing: 0.4px; padding: 7px 14px; cursor: pointer;
-}
-
-/* Allergy Sort */
+/* Tap-sort bins (Learning chapter quizzes) */
 .asort-bins { display: flex; gap: 10px; margin: 10px 0 4px; }
 .asort-bin { flex: 1; display: flex; flex-direction: column; }
 .asort-bin-header { font-family: var(--font-display); font-size: 13px; font-weight: 600; text-align: center; margin: 0 0 6px; }
@@ -657,7 +561,6 @@ button, input {
   flex: 1; min-height: 150px; border: 2px solid var(--washi-300); background: var(--washi-200);
   position: relative; padding: 8px 6px; transition: border-color 120ms ease, background 120ms ease;
 }
-.asort-well.drag-over { border-color: var(--bronze-500); background: var(--sumi-700); }
 .asort-count {
   position: absolute; top: -10px; right: -6px; width: 20px; height: 20px;
   background: var(--washi-300); color: var(--shoyu-700); font-family: var(--font-mono);
@@ -681,43 +584,16 @@ button, input {
 }
 .asort-placed.correct .asort-badge { background: var(--wasabi-500); }
 .asort-placed.wrong .asort-badge { background: var(--error-500); }
-.asort-deck-zone { display: flex; flex-direction: column; align-items: center; margin-top: 14px; min-height: 150px; }
 .asort-active {
   width: 100%; max-width: 260px; background: var(--sumi-700); border: 2px solid var(--washi-300);
   padding: 16px 14px; text-align: center; cursor: grab; touch-action: none; position: relative; z-index: 5;
 }
-.asort-active-section { font-family: var(--font-mono); font-size: 9px; color: var(--bronze-200); text-transform: uppercase; letter-spacing: 0.4px; margin: 0 0 6px; }
 .asort-active-name { font-family: var(--font-display); font-size: 15px; font-weight: 600; margin: 0 0 4px; }
-.asort-active-desc { font-family: var(--font-body); font-size: 10.5px; color: var(--shoyu-300); margin: 0; line-height: 1.4; }
 .asort-fallback-row { display: flex; gap: 8px; margin-top: 10px; width: 100%; max-width: 260px; }
 .asort-fallback-btn {
   flex: 1; background: none; border: 1px solid var(--washi-300); color: var(--shoyu-300);
   font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px;
   padding: 8px 4px; cursor: pointer;
-}
-.asort-verdict-sub { font-family: var(--font-body); font-size: 11.5px; color: var(--shoyu-300); text-align: center; margin: 0 0 4px; }
-.asort-learn-panel {
-  background: var(--sumi-700); border: 1px solid var(--washi-300-soft); padding: 12px; margin-top: 10px;
-  font-family: var(--font-body); font-size: 11.5px; color: var(--shoyu-500); line-height: 1.5; display: none;
-}
-.asort-learn-panel.show { display: block; }
-.asort-learn-panel b { color: var(--bronze-200); }
-
-/* Match It */
-.match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-.match-tile {
-  min-height: 74px; padding: 10px; border: 2px solid var(--washi-300);
-  background: var(--washi-200);
-  color: var(--shoyu-700); font-size: 12px; font-weight: 500; line-height: 1.35;
-  cursor: pointer; transition: transform 0.12s ease-out, background 0.15s ease-out;
-}
-.match-tile.picked { border-color: var(--neon); color: var(--neon); transform: scale(0.97); }
-.match-tile.matched {
-  background: var(--bronze-500); border-color: var(--bronze-500); color: var(--ink-on-rust); font-weight: 700;
-  animation: match-pop 0.25s ease-out;
-}
-@keyframes match-pop {
-  0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); }
 }
 
 /* Allergen filter chips */
@@ -727,77 +603,10 @@ button, input {
   text-decoration: line-through; font-weight: 700;
 }
 
-/* Speed toggle */
-.speed-toggle {
-  display: flex; align-items: center; gap: 10px;
-  background: var(--washi-200); border: 2px solid var(--washi-300);
-  padding: 12px 14px; margin-bottom: 14px; cursor: pointer;
-}
-.speed-toggle.active { border-color: var(--bronze-500); border-left: 4px solid var(--neon); }
-.speed-icon { font-size: 16px; }
-.speed-text { flex: 1; font-size: 13px; color: var(--shoyu-700); }
-.speed-state {
-  font-family: var(--font-mono); font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px;
-  color: var(--shoyu-300); border: 1px solid var(--washi-300);
-  padding: 4px 9px;
-}
-.speed-toggle.active .speed-state { color: var(--bronze-200); border-color: var(--bronze-500); }
-
-/* Countdown timer — continuous linear, not segmented (progress, not trait data) */
-.timer-wrap { margin-bottom: 14px; }
-.timer-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
-.timer-score, .timer-count { font-family: var(--font-mono); font-size: 12px; color: var(--shoyu-700); font-weight: 600; text-transform: uppercase; }
-.timer-track { height: 6px; background: var(--washi-300); overflow: hidden; }
-.timer-fill { height: 100%; background: var(--bronze-500); transition: width 0.2s linear; }
-
-/* Speed / Sommelier Says end screen */
-.speed-end { text-align: center; padding: 32px 0 20px; }
-.speed-end-icon { font-size: 30px; margin: 0 0 4px; }
-.speed-end-score { font-family: var(--font-display); font-size: 64px; font-weight: 700; color: var(--shoyu-700); margin: 0; line-height: 1; }
-.speed-end-total { font-size: 24px; color: var(--shoyu-300); }
-.speed-end-label { font-family: var(--font-mono); font-size: 11px; color: var(--shoyu-300); text-transform: uppercase; letter-spacing: 0.4px; margin: 8px 0 14px; }
-.speed-end-best { font-family: var(--font-mono); font-size: 12px; color: var(--bronze-200); margin: 0; text-transform: uppercase; letter-spacing: 0.3px; }
-
-/* Sommelier Says */
-.somm-card {
-  background: var(--sumi-700); border: 2px solid var(--washi-300); padding: 26px 20px;
-  min-height: 170px; display: flex; align-items: center; justify-content: center;
-  transition: border-color 0.15s ease-out;
-}
-.somm-statement { font-size: 17px; color: var(--shoyu-700); line-height: 1.55; text-align: center; margin: 0; font-weight: 500; }
-.somm-card.somm-flash-right { border-color: var(--wasabi-500); border-width: 3px; }
-.somm-card.somm-flash-wrong { border-color: var(--error-500); border-width: 3px; }
-.somm-btn-row { display: flex; gap: 0; margin-top: 14px; border: 2px solid var(--washi-300); }
-.somm-btn {
-  flex: 1; padding: 18px; border: none; font-size: 15px; font-weight: 700;
-  font-family: var(--font-mono); text-transform: uppercase; cursor: pointer; letter-spacing: 1px;
-}
-.somm-false { background: var(--washi-200); border-right: 1px solid var(--washi-300-soft); color: var(--error-500); }
-.somm-true { background: var(--bronze-500); color: var(--ink-on-rust); }
-
-.somm-streak {
-  text-align: center; font-family: var(--font-mono); font-size: 13px; font-weight: 700;
-  color: var(--bronze-200); margin: 0 0 10px; text-transform: uppercase; letter-spacing: 0.4px;
-}
-.somm-review-block {
-  background: var(--washi-200); border: 1px solid var(--washi-300-soft); padding: 10px 12px; margin-bottom: 8px;
-}
-.somm-review-shown {
-  font-size: 12px; color: var(--shoyu-300); margin: 0 0 4px; text-decoration: line-through; text-decoration-color: var(--error-500);
-}
-.somm-review-correct { font-size: 13px; color: var(--wasabi-500); font-weight: 600; margin: 0; }
-
-/* Imposter */
-.imposter-tile { min-height: 88px; }
-.imposter-sub { font-size: 9.5px; font-weight: 400; color: var(--shoyu-300); font-family: var(--font-mono); text-transform: uppercase; }
-.imposter-tile.matched .imposter-sub { color: var(--ink-on-rust-soft); }
-.imposter-tile.revealed { cursor: default; }
-.imposter-tile.tot-wrong-tile { border-color: var(--error-500); border-width: 3px; }
-
 /* ============================================================
    Learning modules — same schema/engine for every restaurant clone.
    ============================================================ */
-.learning-card {
+.wide-card {
   width: 100%; margin-top: 2px; border: 2px solid var(--washi-300); border-left: 4px solid var(--bronze-500);
   padding: 14px; min-height: 64px; display: flex; flex-direction: column; justify-content: center;
   gap: 4px; cursor: pointer; position: relative; background: var(--washi-200);
@@ -842,7 +651,7 @@ button, input {
 .video-caption { position: absolute; bottom: 10px; left: 12px; font-family: var(--font-mono); font-size: 10px; color: var(--shoyu-300); }
 .video-time { font-family: var(--font-mono); font-size: 11px; color: var(--shoyu-300); text-align: right; margin: 0 0 14px; }
 
-/* Quiz slide — same interaction language as the other quiz games */
+/* Quiz slide */
 .quiz-opt { display: block; width: 100%; text-align: left; background: var(--washi-200); border: 2px solid var(--washi-300); color: var(--shoyu-700); font-size: 14px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer; font-family: var(--font-body); }
 .missed-list { text-align: left; margin: 6px 0 0; padding-left: 18px; font-size: 13px; color: var(--shoyu-500); line-height: 1.5; }
 .missed-list li { margin-bottom: 4px; }
@@ -853,7 +662,7 @@ button, input {
 .quiz-feedback { font-family: var(--font-mono); font-size: 11px; color: var(--wasabi-500); text-transform: uppercase; letter-spacing: 0.4px; margin-top: 6px; }
 .dot-seg.answered { background: var(--bronze-200); }
 
-/* Chapter mini-games: tap-to-order sequence */
+/* Chapter mini-quizzes: tap-to-order sequence */
 .seq-slots { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
 .seq-slot { border: 2px dashed var(--washi-300); background: var(--sumi-900); min-height: 40px; padding: 8px 12px; display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--shoyu-500); cursor: pointer; }
 .seq-slot.filled { border-style: solid; background: var(--washi-200); color: var(--shoyu-700); }
@@ -863,7 +672,7 @@ button, input {
 .seq-pool { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
 .seq-chip { background: var(--washi-200); border: 2px solid var(--washi-300); color: var(--shoyu-700); font-size: 13px; padding: 9px 12px; cursor: pointer; font-family: var(--font-body); }
 
-/* Chapter mini-games: tap-sort deck (mirrors .asort-* used by Allergy Sort) */
+/* Chapter mini-quizzes: tap-sort deck (shares the .asort-* bins above) */
 .asort-active-name { font-family: var(--font-display); font-size: 16px; font-weight: 700; color: var(--shoyu-700); margin: 0 0 10px; text-align: center; }
 
 /* Completion screen — reuses .milestone-strip for the celebration line */
@@ -875,37 +684,17 @@ button, input {
 /* ============================================================
    Press feedback — mechanical, not glossy: steep ease-out, short.
    ============================================================ */
-.home-option, .home-card, .list-row, .learn-topic, .pill, .nav-chip, .footer-btn, .speed-toggle,
-.wotd-strip, .wotd-main, .wotd-shuffle, .theme-toggle, .back-btn, .section-toggle,
-.match-tile, .allergen-filter-chip, .testme-reset, .confidence-btn, .mc-btn, .somm-btn,
-.flipcard, .dish-flipcard, .testme-card, .imposter-tile,
-.learning-card, .quiz-opt, .btn-start, .video-frame, .wcard, .knockout-hint-btn {
+.home-option, .home-card, .list-row, .learn-topic, .pill, .nav-chip, .footer-btn, .wotd-strip, .wotd-main, .wotd-shuffle, .theme-toggle, .back-btn, .section-toggle, .allergen-filter-chip, .flipcard, .dish-flipcard, .wide-card, .quiz-opt, .btn-start, .video-frame {
   transition: transform var(--press-duration) ease-out, background var(--press-duration) ease-out, border-color var(--press-duration) ease-out;
 }
-.home-option:active, .home-card:active, .list-row:active, .learn-topic:not(:disabled):active, .pill:active, .nav-chip:active,
-.footer-btn:not(:disabled):active, .speed-toggle:active, .wotd-strip:active,
-.wotd-main:active, .wotd-shuffle:active, .theme-toggle:active, .back-btn:active, .section-toggle:active,
-.match-tile:not(.matched):not(.picked):active, .allergen-filter-chip:active,
-.testme-reset:active, .confidence-btn:active, .mc-btn:active, .somm-btn:active,
-.flipcard:active, .dish-flipcard:active, .testme-card:active,
-.imposter-tile:not(.revealed):active,
-.learning-card:active, .quiz-opt:active, .btn-start:active, .video-frame:active,
-.wcard:not(.correct):not(.wrong):active, .knockout-hint-btn:not(:disabled):active {
+.home-option:active, .home-card:active, .list-row:active, .learn-topic:not(:disabled):active, .pill:active, .nav-chip:active, .footer-btn:not(:disabled):active, .wotd-strip:active, .wotd-main:active, .wotd-shuffle:active, .theme-toggle:active, .back-btn:active, .section-toggle:active, .allergen-filter-chip:active, .flipcard:active, .dish-flipcard:active, .wide-card:active, .quiz-opt:active, .btn-start:active, .video-frame:active {
   transform: scale(0.97);
 }
 
 /* ============================================================
    Focus visibility — hard neon/rust ring, never soft.
    ============================================================ */
-.home-option:focus-visible, .home-card:focus-visible, .list-row:focus-visible, .learn-topic:focus-visible, .pill:focus-visible,
-.nav-chip:focus-visible, .footer-btn:focus-visible, .speed-toggle:focus-visible,
-.wotd-strip:focus-visible, .wotd-main:focus-visible, .wotd-shuffle:focus-visible, .theme-toggle:focus-visible,
-.back-btn:focus-visible, .section-toggle:focus-visible, .match-tile:focus-visible,
-.allergen-filter-chip:focus-visible, .confidence-btn:focus-visible, .mc-btn:focus-visible, .somm-btn:focus-visible,
-.flipcard:focus-visible, .dish-flipcard:focus-visible, .testme-card:focus-visible,
-.imposter-tile:focus-visible, .search-input:focus-visible,
-.learning-card:focus-visible, .quiz-opt:focus-visible, .btn-start:focus-visible, .video-frame:focus-visible,
-.wcard:focus-visible, .knockout-hint-btn:focus-visible {
+.home-option:focus-visible, .home-card:focus-visible, .list-row:focus-visible, .learn-topic:focus-visible, .pill:focus-visible, .nav-chip:focus-visible, .footer-btn:focus-visible, .wotd-strip:focus-visible, .wotd-main:focus-visible, .wotd-shuffle:focus-visible, .theme-toggle:focus-visible, .back-btn:focus-visible, .section-toggle:focus-visible, .allergen-filter-chip:focus-visible, .flipcard:focus-visible, .dish-flipcard:focus-visible, .search-input:focus-visible, .wide-card:focus-visible, .quiz-opt:focus-visible, .btn-start:focus-visible, .video-frame:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
 }
@@ -914,12 +703,7 @@ button, input {
    Reduced motion — keep state/color feedback, drop movement.
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
-  .flip-inner, .dish-flip-inner, .confetti, .match-tile,
-  .home-option, .home-card, .list-row, .learn-topic, .pill, .nav-chip, .footer-btn, .speed-toggle,
-  .wotd-strip, .wotd-shuffle, .theme-toggle, .back-btn, .section-toggle,
-  .allergen-filter-chip, .testme-reset, .confidence-btn, .mc-btn, .somm-btn,
-  .flipcard, .dish-flipcard, .testme-card, .imposter-tile,
-  .learning-card, .quiz-opt, .btn-start, .video-frame, .wcard, .knockout-hint-btn, .asort-placed {
+  .flip-inner, .dish-flip-inner, .confetti, .home-option, .home-card, .list-row, .learn-topic, .pill, .nav-chip, .footer-btn, .wotd-strip, .wotd-shuffle, .theme-toggle, .back-btn, .section-toggle, .allergen-filter-chip, .flipcard, .dish-flipcard, .wide-card, .quiz-opt, .btn-start, .video-frame, .asort-placed {
     animation: none !important;
     transition: background var(--press-duration) ease-out, border-color var(--press-duration) ease-out !important;
     transform: none !important;

@@ -395,6 +395,7 @@ function render() {
   else if (current.view === "training-week") renderTrainingWeek(current.params.monthId, current.params.week);
   else if (current.view === "service-enhancement") renderServiceEnhancement();
   else if (current.view === "service-enhancement-lesson") renderServiceEnhancementLesson(current.params.monthId, current.params.week);
+  else if (current.view === "banquet-service") renderBanquetService();
   makeDivsKeyboardAccessible();
   window.scrollTo(0, 0);
 }
@@ -3975,6 +3976,9 @@ function renderLearningHub() {
   if (typeof SERVICE_ENHANCEMENT !== "undefined" && SERVICE_ENHANCEMENT.length) preShift += serviceEnhancementHubRowHTML();
   if (preShift) html += `<p class="section-label">Pre-Shift</p>` + preShift;
 
+  /* Tools: live checklists used during service rather than courses to pass. */
+  if (typeof BANQUET_SERVICE !== "undefined") html += `<p class="section-label">Tools</p>` + bqHubRowHTML();
+
   /* Topics: a fixed 2x2 grid. Every topic in LEARNING_TOPICS shows, even one
      with no courses yet (Wine), so the grid keeps its shape; an empty topic
      says so honestly instead of showing placeholder content. Resume-where-
@@ -4014,6 +4018,7 @@ function renderLearningHub() {
   wrap.querySelectorAll(".list-row, .learn-topic").forEach(row => {
     if (row.dataset.calendar) row.onclick = () => go("training-calendar");
     else if (row.dataset.se) row.onclick = () => go("service-enhancement");
+    else if (row.dataset.bq) row.onclick = () => go("banquet-service");
     else if (row.dataset.topic) row.onclick = () => go("learning-topic", { topicId: row.dataset.topic });
     else if (row.dataset.module && !row.classList.contains("locked")) row.onclick = () => go("learning-intro", { moduleId: row.dataset.module });
   });
@@ -6375,6 +6380,166 @@ function renderSommEnd(seconds, params) {
   btnRow.appendChild(backBtn);
   btnRow.appendChild(againBtn);
   app.appendChild(btnRow);
+}
+
+/* ---------- Banquet Service: live event checklist ----------
+   Data lives in js/banquet-service.js. Progress is per device (BQ_KEY) and
+   covers one event at a time; "Start a new event" clears it. Steps in the
+   course-loop phase repeat per course, so their keys carry the course number.
+   Checking the last box of a step collapses it and opens the next incomplete one. */
+const BQ_KEY = "p131-banquet-event";
+const BQ_ROLE = { M: "Manager", L: "Lead", S: "Servers" };
+
+function bqEsc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+function bqLoad() {
+  const base = { done: {}, open: {}, courses: 1, course: 1 };
+  try {
+    const s = JSON.parse(localStorage.getItem(BQ_KEY));
+    if (s && typeof s === "object") return Object.assign(base, s);
+  } catch (e) {}
+  return base;
+}
+function bqSave(st) { try { localStorage.setItem(BQ_KEY, JSON.stringify(st)); } catch (e) {} }
+function bqRepeats(step) { return BANQUET_SERVICE.phases.find(p => p.id === step.phase).repeats; }
+function bqKey(step, course) { return bqRepeats(step) ? `${step.n}@${course}` : String(step.n); }
+function bqStat(st, step, course) {
+  const k = bqKey(step, course || st.course);
+  const total = step.items.length + 1;
+  let done = 0;
+  for (let i = 0; i < total; i++) if (st.done[`${k}:${i}`]) done++;
+  return { k, total, done, ok: done === total };
+}
+function bqTotals(st) {
+  let items = 0, itemsDone = 0, steps = 0, stepsDone = 0;
+  BANQUET_SERVICE.steps.forEach(step => {
+    const n = bqRepeats(step) ? st.courses : 1;
+    for (let c = 1; c <= n; c++) {
+      const x = bqStat(st, step, c);
+      items += x.total; itemsDone += x.done; steps++;
+      if (x.ok) stepsDone++;
+    }
+  });
+  return { items, itemsDone, steps, stepsDone };
+}
+function bqStepByN(n) { return BANQUET_SERVICE.steps.find(s => s.n === n); }
+function bqAdvance(st, step) {
+  st.open[bqKey(step, st.course)] = false;
+  const list = BANQUET_SERVICE.steps;
+  for (let i = list.indexOf(step) + 1; i < list.length; i++) {
+    if (!bqStat(st, list[i]).ok) { st.open[bqKey(list[i], st.course)] = true; break; }
+  }
+}
+
+function bqHubRowHTML() {
+  const t = bqTotals(bqLoad());
+  const meta = t.itemsDone
+    ? `${t.stepsDone} of ${t.steps} steps complete`
+    : `${BANQUET_SERVICE.steps.length} steps · Live checklist`;
+  return `<div class="list-row" data-bq="hub">
+      <div class="list-row-main">
+        <span class="mod-dot"></span>
+        <div class="list-row-text">
+          <p>${BANQUET_SERVICE.title}</p>
+          <span>${meta}</span>
+        </div>
+      </div>
+      <span class="chev" aria-hidden="true">&#8250;</span>
+    </div>`;
+}
+
+function bqStepHTML(st, step) {
+  const x = bqStat(st, step);
+  const open = !!st.open[x.k];
+  const roles = step.roles.split("").map(r => `<span class="bq-tag">${BQ_ROLE[r]}</span>`).join("");
+  let h = `<div class="bq-step${x.ok ? " is-ok" : ""}">
+    <button type="button" class="bq-head" data-act="open" data-k="${x.k}" aria-expanded="${open}">
+      <span class="bq-num">${step.n}</span>
+      <span class="bq-head-main"><span class="bq-head-title">${bqEsc(step.title)}</span>
+        <span class="bq-tags">${step.key ? `<span class="bq-tag bq-tag-key">Key step</span>` : ""}${roles}</span></span>
+      <span class="bq-status">${x.ok ? "Complete" : `${x.done} of ${x.total}`}<span class="bq-mark" aria-hidden="true">${x.ok ? "&#10003;" : ""}</span></span>
+    </button>`;
+  if (open) {
+    step.items.forEach((text, i) => {
+      const d = !!st.done[`${x.k}:${i}`];
+      h += `<button type="button" role="checkbox" aria-checked="${d}" class="bq-item${d ? " is-on" : ""}" data-act="chk" data-k="${x.k}:${i}" data-n="${step.n}"><span class="bq-box" aria-hidden="true">${d ? "&#10003;" : ""}</span><span class="bq-text">${bqEsc(text)}</span></button>`;
+    });
+    const si = step.items.length;
+    const sd = !!st.done[`${x.k}:${si}`];
+    h += `<button type="button" role="checkbox" aria-checked="${sd}" class="bq-item bq-std${sd ? " is-on" : ""}" data-act="chk" data-k="${x.k}:${si}" data-n="${step.n}"><span class="bq-box" aria-hidden="true">${sd ? "&#10003;" : ""}</span><span class="bq-text"><span class="bq-std-label">Standard met</span>${bqEsc(step.standard)}</span></button>
+      <div class="bq-foot"><button type="button" class="bq-ghost" data-act="${x.ok ? "none" : "all"}" data-n="${step.n}">${x.ok ? "Clear this step" : "Mark all complete"}</button></div>`;
+  }
+  return h + `</div>`;
+}
+
+function bqBodyHTML(st) {
+  const t = bqTotals(st);
+  const pct = t.items ? t.itemsDone / t.items : 0;
+  let h = `<div class="bq-progress">
+      <div class="bq-progress-row"><span class="bq-progress-title">${t.stepsDone} of ${t.steps} steps complete</span><span class="bq-progress-pct">${Math.round(pct * 100)}%</span></div>
+      <div class="bq-bar" role="progressbar" aria-label="Event progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct * 100)}"><i style="transform:scaleX(${pct})"></i></div>
+    </div>`;
+  BANQUET_SERVICE.phases.forEach(p => {
+    h += `<p class="section-label">${p.title}${p.repeats ? ` <span class="bq-repeat">Repeats every course</span>` : ""}</p>`;
+    if (p.repeats) {
+      h += `<div class="bq-courses">`;
+      for (let c = 1; c <= st.courses; c++) {
+        const done = BANQUET_SERVICE.steps.filter(s => s.phase === p.id && bqStat(st, s, c).ok).length;
+        const total = BANQUET_SERVICE.steps.filter(s => s.phase === p.id).length;
+        h += `<button type="button" class="bq-chip" data-act="course" data-c="${c}" aria-pressed="${st.course === c}">Course ${c} · ${done}/${total}</button>`;
+      }
+      if (st.courses < 8) h += `<button type="button" class="bq-chip" data-act="addc">+ Add course</button>`;
+      h += `</div>`;
+    }
+    BANQUET_SERVICE.steps.filter(s => s.phase === p.id).forEach(s => { h += bqStepHTML(st, s); });
+  });
+  h += `<button type="button" class="bq-reset" data-act="reset">Start a new event</button>`;
+  return h;
+}
+
+function renderBanquetService() {
+  header(BANQUET_SERVICE.title);
+  const wrap = document.createElement("div");
+  wrap.className = "bq";
+  const st = bqLoad();
+  const paint = () => {
+    const y = window.scrollY;
+    wrap.innerHTML = bqBodyHTML(st);
+    window.scrollTo(0, y);
+  };
+  wrap.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-act]");
+    if (!b) return;
+    const act = b.dataset.act;
+    if (act === "open") {
+      st.open[b.dataset.k] = !st.open[b.dataset.k];
+    } else if (act === "course") {
+      st.course = Number(b.dataset.c);
+    } else if (act === "addc") {
+      st.courses++; st.course = st.courses;
+    } else if (act === "chk") {
+      const step = bqStepByN(Number(b.dataset.n));
+      const was = bqStat(st, step).ok;
+      st.done[b.dataset.k] = !st.done[b.dataset.k];
+      if (!was && bqStat(st, step).ok) bqAdvance(st, step);
+    } else if (act === "all" || act === "none") {
+      const step = bqStepByN(Number(b.dataset.n));
+      const k = bqKey(step, st.course);
+      for (let i = 0; i < step.items.length + 1; i++) st.done[`${k}:${i}`] = act === "all";
+      if (act === "all") bqAdvance(st, step);
+    } else if (act === "reset") {
+      showConfirm("Clear this event's checklist?", "Clear", () => {
+        st.done = {}; st.open = {}; st.courses = 1; st.course = 1;
+        bqSave(st); paint();
+      });
+      return;
+    }
+    bqSave(st);
+    paint();
+  });
+  app.appendChild(wrap);
+  paint();
 }
 
 migrateProgressToConfidence();

@@ -1351,3 +1351,49 @@ button.monday-item:focus-visible { outline: none; box-shadow: inset 0 0 0 2px va
 .learn-topic.is-empty .learn-topic-title { color: var(--shoyu-300); }
 .learn-topic:not(:disabled):hover { background: var(--washi-300-soft); }
 @media (hover: none) { .learn-topic:not(:disabled):hover { background: var(--washi-200); } }
+
+/* ============================================================
+   Banquet Service — live event checklist (Learning > Tools)
+   ============================================================ */
+.bq-progress { margin: 0 0 4px; }
+.bq-progress-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.bq-progress-title { font-family: var(--font-display); font-size: 17px; font-weight: 500; color: var(--shoyu-700); }
+.bq-progress-pct { font-family: var(--font-mono); font-size: 11px; color: var(--shoyu-300); }
+.bq-bar { height: 6px; background: var(--washi-300); overflow: hidden; }
+.bq-bar i { display: block; height: 100%; width: 100%; background: var(--bronze-500); transform-origin: left; transition: transform 200ms ease-out; }
+.bq-repeat { font-family: var(--font-mono); font-size: 10px; color: var(--shoyu-300); text-transform: none; letter-spacing: 0; margin-left: 6px; }
+.bq-courses { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.bq-chip { min-height: 40px; padding: 0 12px; background: var(--washi-200); border: 1px solid var(--washi-300); color: var(--shoyu-500); font-family: var(--font-body); font-size: 13px; cursor: pointer; }
+.bq-chip[aria-pressed="true"] { border-color: var(--bronze-200); color: var(--bronze-200); background: var(--washi-300-soft); }
+.bq-step { background: var(--washi-200); border: 1px solid var(--washi-300); margin-bottom: 8px; }
+.bq-step.is-ok { border-color: var(--wasabi-500); }
+.bq-head { width: 100%; min-height: 56px; display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: none; border: 0; text-align: left; color: var(--shoyu-700); font-family: var(--font-body); cursor: pointer; }
+.bq-num { font-family: var(--font-display); font-size: 17px; font-weight: 500; color: var(--bronze-200); width: 24px; flex-shrink: 0; }
+.bq-head-main { flex: 1; min-width: 0; }
+.bq-head-title { display: block; font-size: 14px; font-weight: 600; color: var(--shoyu-700); }
+.bq-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.bq-tag { font-family: var(--font-mono); font-size: 10px; color: var(--bronze-200); border: 1px solid var(--bronze-600); padding: 1px 6px; }
+.bq-tag-key { background: var(--bronze-500); border-color: var(--bronze-500); color: var(--shoyu-700); font-weight: 700; }
+.bq-status { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; color: var(--shoyu-500); flex-shrink: 0; }
+.bq-step.is-ok .bq-status { color: var(--wasabi-500); }
+.bq-mark { width: 22px; height: 22px; border: 1.5px solid var(--shoyu-200); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.bq-step.is-ok .bq-mark { border-color: var(--wasabi-500); background: var(--wasabi-500); color: var(--shoyu-700); }
+.bq-item { width: 100%; min-height: 48px; display: flex; align-items: flex-start; gap: 12px; padding: 10px 12px; background: var(--washi-200); border: 0; border-top: 1px solid var(--washi-300-soft); text-align: left; color: var(--shoyu-700); font-family: var(--font-body); font-size: 14px; line-height: 1.45; cursor: pointer; }
+.bq-std { background: var(--sumi-500); }
+.bq-box { width: 24px; height: 24px; flex-shrink: 0; margin-top: 1px; border: 1.5px solid var(--shoyu-300); display: flex; align-items: center; justify-content: center; font-size: 15px; color: var(--shoyu-700); }
+.bq-item.is-on .bq-box { background: var(--bronze-500); border-color: var(--bronze-500); }
+.bq-item.is-on .bq-text { color: var(--shoyu-300); text-decoration: line-through; }
+.bq-text { flex: 1; min-width: 0; }
+.bq-std-label { display: block; font-family: var(--font-mono); font-size: 10px; color: var(--bronze-200); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 2px; }
+.bq-item.is-on .bq-std-label { text-decoration: none; }
+.bq-foot { display: flex; justify-content: flex-end; border-top: 1px solid var(--washi-300-soft); }
+.bq-ghost { min-height: 44px; padding: 0 12px; background: none; border: 0; color: var(--shoyu-300); font-family: var(--font-body); font-size: 13px; cursor: pointer; }
+.bq-reset { width: 100%; min-height: 48px; margin-top: 16px; background: var(--washi-200); border: 1px solid var(--washi-300); color: var(--shoyu-700); font-family: var(--font-body); font-size: 14px; cursor: pointer; }
+.bq-head:focus-visible, .bq-item:focus-visible, .bq-chip:focus-visible, .bq-ghost:focus-visible, .bq-reset:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+@media (prefers-reduced-motion: no-preference) {
+  .bq-head, .bq-item, .bq-chip, .bq-reset { transition: transform var(--press-duration) ease-out, background var(--press-duration) ease-out, border-color var(--press-duration) ease-out; }
+  .bq-head:active, .bq-item:active, .bq-chip:active, .bq-reset:active { transform: scale(0.98); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bq-bar i { transition: none; }
+}

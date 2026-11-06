@@ -4155,7 +4155,7 @@ function bqStepHTML(st, step) {
     });
     const si = step.items.length;
     const sd = !!st.done[`${x.k}:${si}`];
-    h += `<button type="button" role="checkbox" aria-checked="${sd}" class="bq-item bq-std${sd ? " is-on" : ""}" data-act="chk" data-k="${x.k}:${si}" data-n="${step.n}"><span class="bq-box" aria-hidden="true">${sd ? "&#10003;" : ""}</span><span class="bq-text"><span class="bq-std-label">Standard met</span>${bqEsc(step.standard)}</span></button>
+    h += `<button type="button" role="checkbox" aria-checked="${sd}" class="bq-item bq-std${sd ? " is-on" : ""}" data-act="chk" data-k="${x.k}:${si}" data-n="${step.n}"><span class="bq-box" aria-hidden="true">${sd ? "&#10003;" : ""}</span><span class="bq-text"><span class="bq-std-label">Goal met</span>${bqEsc(step.standard)}</span></button>
       <div class="bq-foot"><button type="button" class="bq-ghost" data-act="${x.ok ? "none" : "all"}" data-n="${step.n}">${x.ok ? "Clear this step" : "Mark all complete"}</button></div>`;
   }
   return h + `</div>`;

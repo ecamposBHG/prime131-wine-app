@@ -2,10 +2,8 @@
 // Source: "11.26 TrainingCal". Lens this month: By-the-bottle stories (wine),
 // basics (spirits), descriptive language (cocktails), storytelling (food).
 //
-// Week 1 lessons are written. Weeks 2-4 are on the calendar (they unlock by
-// date) but have no lessons yet, so they show an honest "coming soon" until
-// the lessons are added. To add one: write the lesson below and set the
-// item's moduleId to its id.
+// Week 1 lessons are in this file; Weeks 2-4 are in training-2026-11-w2/w3/w4.js
+// (loaded first, then linked to the calendar below by moduleId).
 
 (function () {
   const sec = (title, body, note, noteLabel) => ({ type: "text", title, body, note: note || null, noteLabel: noteLabel || null });
@@ -356,29 +354,29 @@
         other:      { label: "Tuna &ndash; Bluefin &amp; Yellowfin",   moduleId: "tc-2026-11-w1-tuna" }
       } },
       { n: 2, unlocksOn: "2026-11-08", items: {
-        wine:       { label: "Fortunate Son / Far Niente Chardonnay",  moduleId: null },
-        spirits:    { label: "Vodkas",                                 moduleId: null },
-        cocktails:  { label: "Cosmobelle",                             moduleId: null },
-        appetizers: { label: "Tuna Tartare",                           moduleId: null },
-        entrees:    { label: "American Wagyu",                         moduleId: null },
-        other:      { label: "Omakase Platters",                       moduleId: null }
+        wine:       { label: "Fortunate Son / Far Niente Chardonnay",  moduleId: "tc-2026-11-w2-wine" },
+        spirits:    { label: "Vodkas",                                 moduleId: "tc-2026-11-w2-vodkas" },
+        cocktails:  { label: "Cosmobelle",                             moduleId: "tc-2026-11-w2-cocktail" },
+        appetizers: { label: "Tuna Tartare",                           moduleId: "tc-2026-11-w2-tartare" },
+        entrees:    { label: "American Wagyu",                         moduleId: "tc-2026-11-w2-amwagyu" },
+        other:      { label: "Omakase Platters",                       moduleId: "tc-2026-11-w2-omakase" }
       } },
       { n: 3, unlocksOn: "2026-11-15", items: {
-        wine:       { label: "Penner-Ash Pinot Noir / Dr. Loosen Riesling", moduleId: null },
-        spirits:    { label: "Tequilas",                               moduleId: null },
-        cocktails:  { label: "Lycheetini",                             moduleId: null },
-        appetizers: { label: "Dinosaur Bone Marrow",                   moduleId: null },
-        entrees:    { label: "Australian Wagyu",                       moduleId: null },
-        other:      { label: "Basque Cheesecake",                      moduleId: null }
+        wine:       { label: "Penner-Ash Pinot Noir / Dr. Loosen Riesling", moduleId: "tc-2026-11-w3-wine" },
+        spirits:    { label: "Tequilas",                               moduleId: "tc-2026-11-w3-tequilas" },
+        cocktails:  { label: "Lycheetini",                             moduleId: "tc-2026-11-w3-cocktail" },
+        appetizers: { label: "Dinosaur Bone Marrow",                   moduleId: "tc-2026-11-w3-marrow" },
+        entrees:    { label: "Australian Wagyu",                       moduleId: "tc-2026-11-w3-auwagyu" },
+        other:      { label: "Basque Cheesecake",                      moduleId: "tc-2026-11-w3-cheesecake" }
       } },
       { n: 4, unlocksOn: "2026-11-22", items: {
-        wine:       { label: "Viña Ardanza Tempranillo / Domäne Wachau Grüner Veltliner", moduleId: null },
-        spirits:    { label: "Gins",                                   moduleId: null },
-        cocktails:  { label: "Golden “B”",                             moduleId: null },
-        appetizers: { label: "Chicken Fried Lobster",                  moduleId: null },
-        entrees:    { label: "USDA Prime",                             moduleId: null },
-        other:      { label: "Dragon Roll",                            moduleId: null }
+        wine:       { label: "Viña Ardanza Tempranillo / Domäne Wachau Grüner Veltliner", moduleId: "tc-2026-11-w4-wine" },
+        spirits:    { label: "Gins",                                   moduleId: "tc-2026-11-w4-gins" },
+        cocktails:  { label: "Golden “B”",                             moduleId: "tc-2026-11-w4-cocktail" },
+        appetizers: { label: "Chicken Fried Lobster",                  moduleId: "tc-2026-11-w4-lobster" },
+        entrees:    { label: "USDA Prime",                             moduleId: "tc-2026-11-w4-prime" },
+        other:      { label: "Dragon Roll",                            moduleId: "tc-2026-11-w4-dragon" }
       } }
     ]
-  }, [wine, whiskeys, cocktail, caviar, a5, tuna]);
+  }, [wine, whiskeys, cocktail, caviar, a5, tuna].concat(TC_2026_11_W2, TC_2026_11_W3, TC_2026_11_W4));
 })();

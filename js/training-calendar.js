@@ -48,3 +48,20 @@ function defineTrainingMonth(month, lessons) {
 
   TRAINING_CALENDAR.push(month);
 }
+
+// Small builders shared by every month's lesson files.
+const tcSec = (title, body, note, noteLabel) => ({ type: "text", title, body, note: note || null, noteLabel: noteLabel || null });
+// tcQ shuffles the options in a fixed, repeatable order (seeded from the
+// question text) so the right answer isn't always in the same slot, and it
+// never changes between page loads.
+const tcQ = (question, options, correctIndex) => {
+  let seed = 0;
+  for (let i = 0; i < question.length; i++) seed = (seed * 31 + question.charCodeAt(i)) >>> 0;
+  const rand = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+  const order = options.map((_, i) => i);
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  return { question, options: order.map(i => options[i]), correctIndex: order.indexOf(correctIndex) };
+};

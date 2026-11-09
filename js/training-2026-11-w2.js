@@ -48,8 +48,8 @@ const TC_2026_11_W2 = (function () {
         sections: [
           sec("The Rule",
             "In the US, vodka must be bottled at 40% ABV (80 proof) or higher and can't be sold as aged. It used to be legally defined as having no distinctive character, aroma or taste. In 2020 the TTB removed that requirement.<br><br>So vodkas differ in three ways: the <b>base ingredient</b>, how it's <b>distilled</b>, and how it's <b>filtered</b>."),
-          sec("The Base Ingredient",
-            "<b>Wheat:</b> Grey Goose (French wheat): delicate floral, toffee, almond. Absolut (Swedish winter wheat): grain, dried fruit, soft sweetness. Ketel One: wet flint, white pepper, citrus zest.<br><br><b>Corn:</b> Tito's: creamy corn sweetness, round middle, a faint brine.<br><br><b>Rye:</b> Belvedere: vanilla, black pepper, toasted almond. It's a certified Polska Wódka, made only from Polish-grown grain and Polish water.<br><br><b>Rice:</b> Haku: delicate rice sweetness, soft floral, silky. Japanese white rice."),
+          sec("What Each Vodka Is Made From",
+            "All eight vodkas we carry, by base ingredient:<br><br><b>Wheat</b><br><b>Grey Goose:</b> soft winter wheat from Picardy, France. Delicate floral, toffee, almond.<br><b>Absolut:</b> winter wheat grown around Åhus, Sweden. Grain, dried fruit, soft sweetness.<br><b>Absolut Citron:</b> the same Åhus winter wheat as Absolut, flavored with natural lemon and lime. No added sugar.<br><b>Ketel One:</b> 100% European winter wheat. Wet flint, white pepper, citrus zest.<br><br><b>Wheat and barley</b><br><b>Reyka:</b> a wheat and barley grain spirit, made in Iceland.<br><br><b>Corn</b><br><b>Tito's:</b> 100% yellow corn. Creamy corn sweetness, round middle, a faint brine.<br><br><b>Rye</b><br><b>Belvedere:</b> 100% Dankowskie Gold rye, a single heritage Polish variety. Vanilla, black pepper, toasted almond. A certified Polska Wódka: only Polish grain and Polish water.<br><br><b>Rice</b><br><b>Haku:</b> 100% Japanese white rice, fermented with rice koji. Delicate rice sweetness, soft floral, silky."),
           sec("Distilling and Filtering",
             "<b>Grey Goose</b> distills once and keeps only about 12% of each run, the “heart.”<br><b>Tito's</b> is distilled six times in copper pot stills, at Texas's first legal distillery.<br><b>Belvedere</b> is distilled four times.<br><b>Ketel One</b> redistills column-distilled wheat spirit through a pot still. “Ketel” is Dutch for pot still.<br><b>Haku</b> is filtered through bamboo charcoal for a silky texture.<br><b>Reyka</b> (Iceland) is distilled in a Carter-Head still with geothermal power, then filtered through lava rock.",
             "More distillations doesn't automatically mean better. Grey Goose distills once.", "Remember"),
@@ -72,7 +72,13 @@ const TC_2026_11_W2 = (function () {
       q("What does “Ketel” mean in Ketel One?",
         ["Wheat", "Winter", "Pot still", "Crystal"], 2),
       q("Which vodka is filtered through lava rock?",
-        ["Reyka", "Haku", "Absolut", "Tito's"], 0)
+        ["Reyka", "Haku", "Absolut", "Tito's"], 0),
+      q("What is Reyka made from?",
+        ["Potatoes", "Rice", "A wheat and barley grain spirit", "Corn"], 2),
+      q("Which two vodkas on our list are made from corn and rye?",
+        ["Tito's (corn) and Belvedere (rye)", "Haku (corn) and Grey Goose (rye)", "Absolut (corn) and Ketel One (rye)", "Reyka (corn) and Tito's (rye)"], 0),
+      q("Which of these is NOT made from wheat?",
+        ["Grey Goose", "Ketel One", "Absolut Citron", "Tito's"], 3)
     ]
   };
 

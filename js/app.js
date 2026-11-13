@@ -1787,7 +1787,7 @@ function renderSeasonalCocktailList() {
     filtered.forEach(c => {
       const row = document.createElement("div");
       row.className = "list-row";
-      row.innerHTML = `<span class="list-row-main"><span class="dish-icon">&#127810;</span>${c.name}</span>`;
+      row.innerHTML = `<span class="list-row-main"><span class="dish-icon">${c.icon || "&#127810;"}</span>${c.name}</span>`;
       row.onclick = () => go("cocktail-detail", { cocktailId: c.id });
       listWrap.appendChild(row);
     });

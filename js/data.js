@@ -767,6 +767,37 @@ const SEASONAL_COCKTAILS = [
     prep: "",
     funFact: "This fall riff swaps the Opulent Espresso Martini's tequila base for vodka and tops it with a pumpkin spice cold foam instead of espresso beans.",
     bestFor: "An espresso martini regular who wants the fall-seasonal version without losing the coffee-forward core."
+  },
+  // Berg Hospitality Group 2026 Holiday LTO (Nov 12 - Dec 26). Source: BHG 2026 Holiday LTO Cocktail Recipes.
+  {
+    id: "sc4", name: "Santa Clausmopolitan", glassware: "Martini/Coupe + Ornament Vessel", method: "Shake & Strain", category: "seasonal",
+    flavorTags: ["Tart Berry", "Citrus", "Crisp", "Vodka"],
+    ingredients: ["1.5 oz Grey Goose Vodka", "1 oz Cointreau Orange Liqueur", "1 oz Pomegranate Juice", "0.5 oz Lime Juice", "1 dash Edible Glitter"],
+    garnish: "Candy Cane",
+    directions: "Combine all ingredients into a shaker tin. Shake with ice and strain into the ornament vessel with edible glitter. Garnish and serve. At the table, shake the ornament to distribute the glitter, pour into a martini glass and remove the ornament.",
+    prep: "",
+    funFact: "Grey Goose is distilled from French winter wheat in the Cognac region of France.",
+    bestFor: "A Cosmopolitan drinker who wants a festive, tableside moment: the glitter-filled ornament is shaken and poured in front of the guest."
+  },
+  {
+    id: "sc5", name: "Salted Pecan Old Fashioned", glassware: "Single Rocks", method: "Stir & Strain", category: "seasonal",
+    flavorTags: ["Pecan", "Brown Sugar", "Bourbon", "Salted"],
+    ingredients: ["1 oz Blackland Texas Pecan Brown Sugar Bourbon", "1 oz Rémy Martin 1738", "2-3 Dashes Black Walnut Bitters", "1 Pinch of Salt"],
+    garnish: "Candied Pecan",
+    directions: "Combine all ingredients into a mixing glass with ice. Stir and strain into a single rocks glass over large format ice. Garnish and serve.",
+    prep: "",
+    funFact: "Rémy Martin 1738 is named for the year King Louis XV granted the house the right to plant new vineyards.",
+    bestFor: "An Old Fashioned drinker who likes a sweeter, dessert-leaning take: pecan and brown sugar bourbon split with cognac."
+  },
+  {
+    id: "sc6", name: "Gingerbread Margarita", glassware: "Rocks", method: "Shake & Strain", category: "seasonal",
+    flavorTags: ["Ginger", "Cinnamon Spice", "Citrus", "Agave"],
+    ingredients: ["1.5 oz Patrón Reposado", "0.25 oz Bacan Guaro 24 Aguardiente", "0.75 oz Cointreau Orange Liqueur", "1 oz Gingerbread Syrup", "1 oz Lime Juice"],
+    garnish: "Gingersnap/Cinnamon Sugar Rim, Gingerbread House or Man, Mint, Lime",
+    directions: "Combine all ingredients into a shaker tin. Shake with ice and strain into a rocks glass. Garnish and serve.",
+    prep: "",
+    funFact: "Cointreau blends sweet and bitter orange peels, which is why it sits so naturally in a margarita.",
+    bestFor: "A margarita drinker who wants a holiday twist: gingerbread spice on the rim and in the glass, with the lime still up front."
   }
 ];
 

@@ -74,7 +74,28 @@ const SERVICE_ENHANCEMENT = [
           }
         }
       },
-      { n: 3, unlocksOn: "2026-11-15", lesson: null },
+      {
+        n: 3,
+        unlocksOn: "2026-11-15",
+        lesson: {
+          title: "Perceived Value",
+          audio: {
+            src: "audio/2026-11-w3-perceived-value.m4a",
+            seconds: 344
+          },
+          slides: {
+            dir: "images/service-enhancement/2026-11-w3/",
+            alt: [
+              "Title slide: Perceived Value. Putting it all together. Week 3 FOH Training. Prime 131, curated by Eli Campos.",
+              "Value is a feeling, not a number. Value equals food plus experience plus feeling, divided by price. Food, experience and feeling are the server's domain, what we control. Price is the fixed anchor, what we don't. Two guests can pay the exact same amount for the same dish; one says worth every penny, the other says overpriced. The difference is what they knew, noticed and felt along the way. Guest reviews reveal the gap: they often miss the value we already provide. We cannot change the price, but we have total control over illuminating the effort, sourcing and care behind it.",
+              "How guests calculate value in real time. An iceberg: the visible experience is what arrives at the table, and the invisible effort sits below the waterline. Guests only judge what they can see; if nobody tells them, it doesn't count. The example: there are only about 17,000 heads of this type of cattle at any given time, the rarest type of steak in the world. Four forces shape the calculation. Expectations: a $38 entrée demands higher engagement than a $16 one; meet the bar and the price is fair, fall short and it's a rip-off. Emotion over math: feeling cared for and celebrated outweighs objective math. Anchoring: mid-tier prices feel reasonable next to premium items, and good presentation elevates the anchor. The halo effect: friendly service, timing, ambiance and a smooth check color the memory of the food.",
+              "The Architecture of Perceived Value, four pillars. Pillar 1, Narrative (Story): inform. Share one short, true fact about sourcing or prep; meaning is worth paying for. Example: the steak comes from a family farm in Snake River Valley. Pillar 2, Sensory (Description): evoke. Describe texture and one vivid detail, never just read the menu. Example: cooked over woodfire with a little garlic butter. Pillar 3, Curation (Suggestions): guide. Offer specific good, better, best pairings and avoid generic questions like want an app. Example: the crab cakes are the first thing people tell us about. Pillar 4, Adaptation (Service): read the room. Toast the celebration, be invisible for the business meeting, protect the budget for the cost-conscious. If they don't want the story, skip it.",
+              "Engineering the perfect interaction. A sample answer with three parts highlighted: It's one of our best sellers. It's a cross between A5 Wagyu and American Angus, which gives it more marbling and a buttery texture. It's cooked over wood fire, so you get a crisp, charred crust and a juicy center. A lot of people pair it with the Caymus Napa cab we have by the glass. Would you like to try it that way? Marker 1, Story and Trust: establishes the hidden effort and justifies the premium. Marker 2, Sensory Detail: evokes the physical taste and texture before the plate arrives. Marker 3, Curation: elevates the single item into a complete, considered experience. High impact, zero friction, under 30 seconds, feels like hosting, not selling.",
+              "Practice and Execution. One, Build Your Repertoire: select your top 3 signature items and write out exactly one 1-sentence story and one sensory detail for each. Two, Pre-Shift Roleplay: pair up and practice answering what do you recommend, focusing strictly on natural delivery, never a robotic script. Three, Daily Star Feature: highlight one menu item per shift; every server ensures guests know its story; measure success by rising add-on rates and guest mentions. Guests buy understanding, care, and a good memory. When we share what makes our food special, the price feels like a fair trade."
+            ]
+          }
+        }
+      },
       { n: 4, unlocksOn: "2026-11-22", lesson: null }
     ]
   }

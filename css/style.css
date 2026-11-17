@@ -952,13 +952,41 @@ button.monday-item:focus-visible { outline: none; box-shadow: inset 0 0 0 2px va
 .monday-item-price { flex-shrink: 0; margin-left: auto; font-family: var(--font-mono); font-size: 12px; color: var(--bronze-200); padding-top: 2px; }
 
 @keyframes journey-rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+/* Guest Journey tool (Tools screen): phases open to tappable steps, each with a short description */
+.journey-page { padding-bottom: calc(24px + env(safe-area-inset-bottom, 0)); }
+.journey-page .slide-text { margin-bottom: 8px; }
+.journey-page-sub { margin: 0 0 12px; }
+.journey-page .journey-phase:first-of-type { border-top: 1px solid var(--washi-300-soft); }
+.journey-steps-tap { padding-left: 16px; }
+.journey-step-item { border-top: 1px solid var(--washi-300-soft); }
+.journey-step-item:first-child { border-top: none; }
+.journey-step-row {
+  display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; min-height: 44px;
+  cursor: pointer; list-style: none; -webkit-tap-highlight-color: transparent;
+}
+.journey-step-row::-webkit-details-marker { display: none; }
+.journey-step-row::after {
+  content: ""; width: 6px; height: 6px; margin: 7px 4px 0 auto; flex-shrink: 0;
+  border-right: 2px solid var(--shoyu-300); border-bottom: 2px solid var(--shoyu-300);
+  transform: rotate(45deg); transition: transform 160ms ease-out;
+}
+.journey-stepd[open] > .journey-step-row::after { transform: rotate(-135deg); }
+.journey-step-row:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.journey-step-row .journey-step-task, .journey-step-row .journey-step-meta { display: block; }
+.journey-stepd[open] .journey-step-task { font-weight: 600; }
+.journey-step-desc {
+  margin: 0 0 12px 40px; padding: 8px 10px; border-left: 2px solid var(--bronze-500);
+  font-size: 13px; line-height: 1.45; color: var(--shoyu-500); animation: journey-rise 160ms ease-out;
+}
+
 @media (min-width: 560px) {
   .journey-overlay { align-items: center; }
   .journey-sheet { border-bottom: 2px solid var(--washi-300); }
 }
 @media (prefers-reduced-motion: reduce) {
   .journey-overlay, .journey-sheet { animation: none; }
-  .journey-phase-head::after, .journey-btn, .monday-item { transition: none; }
+  .journey-phase-head::after, .journey-step-row::after, .journey-btn, .monday-item { transition: none; }
+  .journey-step-desc { animation: none; }
 }
 
 /* Learning rows (topic, course, module): the progress bar had no width in a

@@ -380,6 +380,7 @@ function render() {
   else if (current.view === "service-enhancement-lesson") renderServiceEnhancementLesson(current.params.monthId, current.params.week);
   else if (current.view === "tools") renderTools();
   else if (current.view === "banquet-service") renderBanquetService();
+  else if (current.view === "guest-journey") renderGuestJourney();
   makeDivsKeyboardAccessible();
   window.scrollTo(0, 0);
 }
@@ -1296,7 +1297,7 @@ function renderMenuList() {
 
 /* ---------- Monday Steak Night menu ----------
    A "Monday" button in the Food menu header opens the limited Monday menu
-   (MONDAY_MENU in data.js) as the same sheet the Guest Journey uses. Each item
+   (MONDAY_MENU in data.js) as a sheet (styled like the Guest Journey tool). Each item
    points at a regular DISHES entry, so tapping one opens its normal detail
    page. Opening the sheet changes no route or progress. */
 function addMondayButton() {
@@ -2616,120 +2617,9 @@ function learningRowHTML(mod, showCourse) {
   `;
 }
 
-/* ---------- Guest Journey overview ----------
-   A course module that sets `journeyPhase` gets a "Journey" button in the
-   header of its intro, lesson, and completion screens, and the course
-   itself (`journey: true`) gets one on its module list. It opens the whole
-   order of service (GUEST_JOURNEY in data.js) as a sheet over the current
-   screen, with the module's own phase open and marked. It is deliberately
-   never added to chapter quizzes, the final test, or the test result, so
-   it can't be used mid-question. Opening it changes no route or progress. */
-
+/* Shared HTML escaper for the Journey-style sheets (Monday menu, Guest Journey tool). */
 function journeyEsc(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
-
-/* `source` is either a module (journeyPhase: the phase it teaches, opened and
-   marked "You are here") or a course (journey: true, no single phase, so
-   every phase starts collapsed). */
-function addJourneyButton(source) {
-  if (!source || !(source.journeyPhase || source.journey) || typeof GUEST_JOURNEY === "undefined") return;
-  const hdr = app.querySelector(".app-header");
-  if (!hdr) return;
-  const btn = document.createElement("button");
-  btn.type = "button";
-  btn.className = "journey-btn";
-  btn.setAttribute("aria-haspopup", "dialog");
-  btn.setAttribute("aria-label", "Show the full Guest Journey");
-  btn.textContent = "Journey";
-  btn.onclick = () => showJourneyOverview(source.journeyPhase || null, btn);
-  hdr.appendChild(btn);
-}
-
-function showJourneyOverview(currentPhaseId, trigger) {
-  if (document.querySelector(".journey-overlay")) return;
-  const phases = GUEST_JOURNEY.phases;
-  const totalSteps = phases.reduce((n, ph) => n + ph.steps.length, 0);
-
-  const phasesHTML = phases.map(ph => {
-    const here = currentPhaseId !== null && ph.id === currentPhaseId;
-    const stepsHTML = ph.steps.map(st => `
-      <li class="journey-step">
-        <span class="journey-step-n">${journeyEsc(st.n)}</span>
-        <div class="journey-step-main">
-          <p class="journey-step-task">${journeyEsc(st.task)}</p>
-          <p class="journey-step-meta">${journeyEsc(st.owner)}${st.timing ? ` · ${journeyEsc(st.timing)}` : ""}</p>
-        </div>
-      </li>`).join("");
-    return `
-      <details class="journey-phase${here ? " is-here" : ""}"${here ? " open" : ""}>
-        <summary class="journey-phase-head">
-          <span class="journey-phase-num">${ph.id}</span>
-          <span class="journey-phase-text">
-            <span class="journey-phase-title">${journeyEsc(ph.title)}${here ? `<span class="journey-here">You are here</span>` : ""}</span>
-            <span class="journey-phase-meta">${ph.steps.length} steps · ${journeyEsc(ph.limit)}</span>
-          </span>
-        </summary>
-        <ol class="journey-steps">${stepsHTML}</ol>
-      </details>`;
-  }).join("");
-
-  const overlay = document.createElement("div");
-  overlay.className = "journey-overlay";
-  overlay.innerHTML = `
-    <div class="journey-sheet" role="dialog" aria-modal="true" aria-labelledby="journey-title">
-      <div class="journey-head">
-        <div>
-          <p class="journey-eyebrow">Order of service</p>
-          <h2 class="journey-title" id="journey-title">${journeyEsc(GUEST_JOURNEY.title)}</h2>
-          <p class="journey-sub">${phases.length} phases · ${totalSteps} steps</p>
-        </div>
-        <button type="button" class="journey-close" aria-label="Close the Guest Journey">&#10005;</button>
-      </div>
-      <div class="journey-body">${phasesHTML}</div>
-    </div>
-  `;
-
-  // Size the sheet to exactly fill the lesson area below the app header
-  // (the header itself, with its Back/Journey buttons, stays uncovered),
-  // so the sheet's height stays fixed while phases open and close --
-  // it no longer shrink-wraps to whichever content happens to be visible.
-  const appHeader = app.querySelector(".app-header");
-  const headerBottom = appHeader ? Math.max(appHeader.getBoundingClientRect().bottom, 0) : 0;
-  const sheetHeight = Math.max(window.innerHeight * 0.5, window.innerHeight - headerBottom);
-  const sheetEl = overlay.querySelector(".journey-sheet");
-  sheetEl.style.height = `${sheetHeight}px`;
-  sheetEl.style.maxHeight = `${sheetHeight}px`;
-
-  const prevOverflow = document.body.style.overflow;
-  let closed = false;
-  const close = () => {
-    if (closed) return;
-    closed = true;
-    document.removeEventListener("keydown", onKey, true);
-    window.removeEventListener("popstate", close);
-    overlay.remove();
-    document.body.style.overflow = prevOverflow;
-    if (trigger && document.body.contains(trigger)) trigger.focus();
-  };
-  const onKey = (e) => {
-    if (e.key === "Escape") { e.preventDefault(); close(); return; }
-    if (e.key !== "Tab") return;
-    const focusables = overlay.querySelectorAll("button, summary");
-    if (!focusables.length) return;
-    const first = focusables[0];
-    const last = focusables[focusables.length - 1];
-    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-  };
-
-  overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
-  overlay.querySelector(".journey-close").onclick = close;
-  document.addEventListener("keydown", onKey, true);
-  window.addEventListener("popstate", close);
-  document.body.style.overflow = "hidden";
-  document.body.appendChild(overlay);
-  overlay.querySelector(".journey-close").focus();
 }
 
 /* Level 1: topics. Only topics that have at least one course are shown, so
@@ -2817,12 +2707,11 @@ function renderLearningTopic(topicId) {
 }
 
 /* Level 3: the modules inside one course, in the order they're meant to be
-   taken. Courses that set `journey` also get the Guest Journey button. */
+   taken. */
 function renderLearningCourse(courseId) {
   const course = findLearningCourse(courseId);
   if (!course) { go("learning-hub", {}, false); return; }
   header(course.title);
-  addJourneyButton(course);
 
   const wrap = document.createElement("div");
   wrap.innerHTML = `
@@ -2843,7 +2732,6 @@ function renderLearningIntro(moduleId) {
   if (!mod) { go("learning-hub"); return; }
   // A calendar lesson whose week hasn't opened yet goes back to the calendar.
   if (!isModuleUnlocked(mod)) { go("training-calendar", {}, false); return; }
-  addJourneyButton(mod);
 
   const status = moduleStatus(mod);
   const p = getLearningProgress()[mod.id];
@@ -2880,7 +2768,6 @@ function renderLearningChapter(moduleId, chapterIndex, sectionIndex) {
   if (!mod) { go("learning-hub"); return; }
   const chapters = moduleChapters(mod);
   if (!chapters.length) { go("learning-hub"); return; }
-  addJourneyButton(mod);
   chapterIndex = Math.max(0, Math.min(chapterIndex, chapters.length - 1));
   const chapter = chapters[chapterIndex];
   sectionIndex = Math.max(0, Math.min(sectionIndex, chapter.sections.length - 1));
@@ -3539,7 +3426,6 @@ function renderLearningComplete(moduleId) {
   const mod = findLearningModule(moduleId);
   if (!mod) { go("learning-hub"); return; }
 
-  addJourneyButton(mod);
   const firstTime = markLearningComplete(moduleId);
   if (firstTime) celebrate();
 
@@ -4061,7 +3947,7 @@ function seOpenZoom(slides, start, onClose) {
 }
 
 /* ---------- Tools: things used during a shift rather than courses to pass.
-   Banquet Service (live checklist) and the two wine-pairing lookups. ---------- */
+   Banquet Service (live checklist), the Guest Journey step reference, and the two wine-pairing lookups. ---------- */
 function renderTools() {
   header("Tools");
   const rows = [];
@@ -4071,6 +3957,10 @@ function renderTools() {
       ? `${t.stepsDone} of ${t.steps} steps complete`
       : `${BANQUET_SERVICE.steps.length} steps &middot; Live checklist`;
     rows.push({ go: "banquet-service", title: BANQUET_SERVICE.title, sub: meta });
+  }
+  if (typeof GUEST_JOURNEY !== "undefined") {
+    const n = GUEST_JOURNEY.phases.reduce((t, ph) => t + ph.steps.length, 0);
+    rows.push({ go: "guest-journey", title: GUEST_JOURNEY.title, sub: `${GUEST_JOURNEY.phases.length} phases &middot; ${n} steps &middot; Tap a step for details` });
   }
   rows.push({ go: "pairwf-list", title: "Pair Wine with Food", sub: "Start from the bottle" });
   rows.push({ go: "pairfw-list", title: "Pair Food with Wine", sub: "Start from the dish" });
@@ -4085,6 +3975,46 @@ function renderTools() {
     el.onclick = () => go(rows[Number(el.dataset.i)].go);
   });
   app.appendChild(options);
+}
+
+/* ---------- Guest Journey: order-of-service reference ----------
+   Every phase (GUEST_JOURNEY in data.js) is a collapsible group; tapping a step
+   opens a short description of it. Read-only: no progress, nothing saved. */
+function renderGuestJourney() {
+  header(GUEST_JOURNEY.title);
+  const totalSteps = GUEST_JOURNEY.phases.reduce((t, ph) => t + ph.steps.length, 0);
+  const wrap = document.createElement("div");
+  wrap.className = "journey-page";
+  wrap.innerHTML = `
+    <p class="slide-text">The full order of service, from the first greeting to the last impression. Open a phase, then tap a step to see what it means.</p>
+    <p class="journey-sub journey-page-sub">${GUEST_JOURNEY.phases.length} phases &middot; ${totalSteps} steps</p>
+    ${GUEST_JOURNEY.phases.map(ph => `
+      <details class="journey-phase">
+        <summary class="journey-phase-head">
+          <span class="journey-phase-num">${ph.id}</span>
+          <span class="journey-phase-text">
+            <span class="journey-phase-title">${journeyEsc(ph.title)}</span>
+            <span class="journey-phase-meta">${ph.steps.length} steps &middot; ${journeyEsc(ph.limit)}</span>
+          </span>
+        </summary>
+        <ol class="journey-steps journey-steps-tap">
+          ${ph.steps.map(st => `
+            <li class="journey-step-item">
+              <details class="journey-stepd">
+                <summary class="journey-step-row">
+                  <span class="journey-step-n">${journeyEsc(st.n)}</span>
+                  <span class="journey-step-main">
+                    <span class="journey-step-task">${journeyEsc(st.task)}</span>
+                    <span class="journey-step-meta">${journeyEsc(st.owner)}${st.timing ? ` &middot; ${journeyEsc(st.timing)}` : ""}</span>
+                  </span>
+                </summary>
+                ${st.desc ? `<p class="journey-step-desc">${journeyEsc(st.desc)}</p>` : ""}
+              </details>
+            </li>`).join("")}
+        </ol>
+      </details>`).join("")}
+  `;
+  app.appendChild(wrap);
 }
 
 /* ---------- Banquet Service: live event checklist ----------

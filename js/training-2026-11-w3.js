@@ -119,15 +119,15 @@ const TC_2026_11_W3 = (function () {
   /* APPETIZERS · Dinosaur Bone Marrow */
   const marrow = {
     id: "tc-2026-11-w3-marrow",
-    title: "Dinosaur Bone Marrow: The Oldest Fat on the Menu",
+    title: "Dinosaur Bone Marrow: Butter in a Bone",
     category: "Food",
     chapters: [
       {
-        title: "A Very Old Food",
+        title: "Marrow Basics",
         sections: [
-          sec("Why Marrow",
-            "Bone marrow is mostly fat. Researchers argue that our early ancestors began acquiring a taste for fat about 4 million years ago, and that the marrow in the long bones of carcasses was a huge calorie package on a calorie-poor landscape. The bone sealed it in like a container, so only a hyena's jaws or a toolmaking ancestor could open it.<br><br>The human brain uses about 20 percent of the body's energy at rest, roughly twice that of other primates. Lean meat alone doesn't supply that. Fat does.",
-            "“People have been cracking bones for marrow for a very long time.”", "Say it"),
+          sec("What Marrow Is",
+            "Marrow is the soft center of a beef bone, and it's mostly fat. That's why it's so rich: silky, savory and mild, like beef-flavored butter, and it spreads like butter on toast.<br><br>Fat this rich calls for a red with tannin and structure. Tannin cuts through the richness and refreshes the palate between bites, which is why we pair it with Austin Hope or Caymus.",
+            "“It's the soft, rich center of a beef bone, roasted until it's silky. Think beef-flavored butter on toast.”", "Say it"),
           sec("London, 1994",
             "St. John opened in October 1994 in a former bacon smokehouse in Smithfield, London. Fergus Henderson was head chef, with Trevor Gulliver and Jon Spiteri. Its philosophy is nose-to-tail eating: using the whole animal, including cuts rarely seen in restaurants.<br><br>Henderson's roast bone marrow and parsley salad, from his book <i>Nose to Tail Eating</i> (1999), is marrow roasted until loose, scraped onto toast with coarse salt and a sharp parsley, shallot and caper salad. It has stayed on the menu unchanged.")
         ]
@@ -146,6 +146,8 @@ const TC_2026_11_W3 = (function () {
     test: [
       q("What is bone marrow mostly made of?",
         ["Protein", "Fat", "Water", "Collagen"], 1),
+      q("Why do we pair the marrow with a tannic red like Austin Hope or Caymus?",
+        ["Tannin cuts through the richness and refreshes the palate", "Tannin makes the marrow sweeter", "Red wine cools the dish down", "Tannin hides the flavor of the bone"], 0),
       q("Which London restaurant, opened in 1994, serves a roast bone marrow and parsley salad that never changes on the menu?",
         ["Le Bernardin, New York", "St. John, London", "Noma, Copenhagen", "Chez Panisse, California"], 1),
       q("Why do we brine the marrow overnight?",

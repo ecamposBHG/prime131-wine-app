@@ -96,7 +96,28 @@ const SERVICE_ENHANCEMENT = [
           }
         }
       },
-      { n: 4, unlocksOn: "2026-11-22", lesson: null }
+      {
+        n: 4,
+        unlocksOn: "2026-11-22",
+        lesson: {
+          title: "Setting the Pace",
+          audio: {
+            src: "audio/2026-11-w4-dead-time.m4a",
+            seconds: 318
+          },
+          slides: {
+            dir: "images/service-enhancement/2026-11-w4/",
+            alt: [
+              "Title slide: Setting the Pace, Holiday service training for front of house. Pace is the rhythm of the guest's meal: each stage flows into the next with no waiting in between, and the guest never feels rushed. Our job is to remove dead time, not to rush guests. Control the experience. Make every minute count.",
+              "The mindset: think one step ahead. Step 1, right now: what does this table need immediately? Step 2, next 5 minutes: what will they need shortly? Step 3, prevention: what can I do now to prevent a delay later? Guests should never feel they are waiting on you, and never feel you are waiting for them to leave.",
+              "The pacing map across six stages of the meal, each with a trap and a move. Greeting: the trap is telling them to take their time; the move is to start drinks. Deciding: the trap is waiting for an undecided guest; the move is to help them narrow it down. Ordering: the trap is holding the order; the move is to enter it in the POS immediately. Between courses: the trap is dirty plates sitting; the move is to clear and reset as soon as possible. After entrées: the trap is dropping dessert menus and walking away; the move is to help them pick one right then and there. Check: the trap is waiting for a flag; the move is to tell them, as dessert and coffee wind down, that the check will be ready if they need nothing else. The trap is waiting. The move is the next thing the table needs, done before they ask.",
+              "Own the first five minutes: guide the order. Guests aren't ready: start drinks, saying I'll get drinks started for everyone and be right back to take your order. One guest is ready, others aren't: take the ready order now and ask what's catching your eye. Torn between two dishes: guide them, richer is the ribeye, leaner is the filet. Slow to decide: buy time with an appetizer, such as getting the oysters started for the table. Ready to order: don't stop for anything else first; take the order, confirm temps and enter it in the POS immediately. Golden rule: slow ordering is almost always a lack of guidance. Never tell a guest to take your time. You set the pace.",
+              "Efficient is not rushed: read the room, then say it right. Ready to move the table forward when menus are closed, they are looking around for you, drinks are empty or plates finished, or they ask about the next course. Wants more time when they are deep in conversation, still enjoying food or a bottle, celebrating a special occasion, or relaxed and not looking around. Instead of take your time, say I'll get drinks started and be right back. Instead of let me know when you're ready, say I'll check back in a moment to help you finalize. Instead of are you ready yet, say can I help narrow it down. Instead of are you finished, say may I clear these for you. Instead of here's your check, say whenever you're ready, I've got everything taken care of.",
+              "Non-negotiables: five rules for the floor. One, never leave a table without a next step. Two, never hold an order in your head; enter it in the POS immediately. Three, never cross your section empty-handed; carry plates, glasses or a request. Four, never wait to be asked; refill, clear and offer the check before the guest has to flag you. Five, never confuse busy with productive; every trip should move a table forward. Pre-flight check at every table: drinks on the way, orders in, table clear of empties, and guests know what's next. Set the tempo. Control the experience. Make every minute count."
+            ]
+          }
+        }
+      }
     ]
   }
 ];
